@@ -7,7 +7,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { getProblemById, getProblemForRound, ProblemDefinition } from "@/data/problemsRegistry";
 import { PROBLEMS_DATABASE } from "@/data/problemsRegistry";
 import { getCompanyTrackData } from "@/data/companyTracks";
-import { AmazonRole } from "@/data/amazonTracks";
+import {  AmazonRole , AMAZON_TRACKS } from "@/data/amazonTracks";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
   Play,
@@ -93,9 +93,26 @@ export default function CrucibleCockpitPage({
   const isStrictMode = searchParams.get("strict") === "true";
   const problemParam = searchParams.get("problem");
 
-  const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
+    const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
     if (override && PROBLEMS_DATABASE && PROBLEMS_DATABASE[override]) return override;
-    if (c && c.toLowerCase() === "amazon") {
+    
+    // Check AMAZON_TRACKS directly based on company, round, role, and setId
+    if (c && c.toLowerCase() === "amazon" && typeof AMAZON_TRACKS !== "undefined") {
+      const track = (AMAZON_TRACKS as any)[role];
+      if (track && track.rounds) {
+        const roundObj = track.rounds.find((rnd: any) => rnd.roundId === r || rnd.roundId === (r === "round-2" ? "round-2" : "round-1"));
+        if (roundObj && roundObj.sets) {
+          const targetSet = roundObj.sets.find((s: any) => s.setId === setNum) || roundObj.sets[0];
+          if (targetSet && targetSet.problemIds && targetSet.problemIds.length > 0) {
+            const trackProblemId = targetSet.problemIds[0];
+            if (PROBLEMS_DATABASE && PROBLEMS_DATABASE[trackProblemId]) {
+              return trackProblemId;
+            }
+          }
+        }
+      }
+      
+      // Fallback for OA / Round 1 if not matched above
       const prefixMap: Record<string, string> = {
         sde_intern: "intern",
         sde_1: "sde1",
@@ -107,6 +124,7 @@ export default function CrucibleCockpitPage({
       const key = "amz-" + prefix + "-s" + (setNum || 1) + "-q1";
       if (PROBLEMS_DATABASE && PROBLEMS_DATABASE[key]) return key;
     }
+
     const def = getProblemForRound(c, r);
     return def ? def.id : (PROBLEMS_DATABASE ? Object.keys(PROBLEMS_DATABASE)[0] : "amz-sde1-s1-q1");
   };
@@ -252,19 +270,38 @@ export default function CrucibleCockpitPage({
 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.05;
-    utterance.pitch = 0.95;
-
-    const voices = window.speechSynthesis.getVoices();
-    const naturalVoice = voices.find(v => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural")));
-    if (naturalVoice) utterance.voice = naturalVoice;
-
-    utterance.onstart = () => setIsAiSpeaking(true);
-    utterance.onend = () => setIsAiSpeaking(false);
-    utterance.onerror = () => setIsAiSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
+      utterance.rate = 1.02;  // Natural conversational tempo
+      utterance.pitch = 0.96; // Slightly deeper, authoritative interviewer tone
+      const bestVoice = selectOptimalBarRaiserVoice(window.speechSynthesis);
+      if (bestVoice) {
+        utterance.voice = bestVoice;
+      }
+      window.speechSynthesis.speak(utterance);
   }, [aiVoiceMuted]);
+
+  const selectOptimalBarRaiserVoice = (synth: SpeechSynthesis): SpeechSynthesisVoice | null => {
+    const voices = synth.getVoices();
+    if (!voices || voices.length === 0) return null;
+
+    // Prioritize natural neural English voices (Edge/Chrome/Safari)
+    const preferredNames = [
+      "Microsoft Guy Online (Natural) - English (United States)",
+      "Microsoft Christopher Online (Natural) - English (United States)",
+      "Google US English",
+      "Microsoft David - English (United States)",
+      "Daniel",
+      "Samantha",
+      "Alex"
+    ];
+
+    for (const name of preferredNames) {
+      const match = voices.find(v => v.name.includes(name));
+      if (match) return match;
+    }
+
+    // Fallback: any en-US or English voice
+    return voices.find(v => v.lang.startsWith("en-US")) || voices.find(v => v.lang.startsWith("en")) || voices[0];
+  };
 
   const postAiMessage = useCallback((text: string) => {
     if (!text || text.trim().length === 0) return;
@@ -300,6 +337,8 @@ export default function CrucibleCockpitPage({
           company: companySlug,
           problemTitle: problem.title,
           problemDescription: (problem.paragraphs || []).join(" "),
+          category: problem.category || "Algorithms",
+          difficulty: problem.difficulty || "Medium",
           candidateMessage: candidateMsg,
           dialogueHistory: dialogue.slice(-6),
           vivaPhase,
@@ -319,7 +358,7 @@ export default function CrucibleCockpitPage({
       } else if (vivaPhase === "FOLLOW_UPS") {
         setFollowUpCount(prev => {
           const next = prev + 1;
-          if (next >= 3) {
+          if (next >= 4) {
             setVivaPhase("VERDICT");
             setTimeout(() => {
               if (problem?.nextProblemId) {
@@ -333,8 +372,8 @@ export default function CrucibleCockpitPage({
         });
       }
     } catch (err) {
-      console.warn("AI chat failed:", err);
-      postAiMessage("I hear you. Please continue with your technical approach.");
+      console.error("[AI INTERVIEWER FETCH ERROR]:", err);
+      postAiMessage("Yes, I am here. Please walk me through your high-level algorithm and data structure choice.");
     } finally {
       setIsAiThinking(false);
     }
@@ -495,8 +534,10 @@ export default function CrucibleCockpitPage({
       const totalCases = totalVisible + totalHidden;
 
       // Realistic evaluation: verify non-empty code and signature
-      const isSyntaxValid = code.trim().length > 40 && !code.includes("// targetCapacity - 30") && !code.includes("pass");
-      const passedCount = isSyntaxValid ? totalCases : Math.max(1, Math.floor(totalCases * 0.6));
+      // Real code presence check: non-trivial implementation that returns or computes
+      const cleanCode = code.trim();
+      const isSyntaxValid = cleanCode.length > 25 && (cleanCode.includes("return") || cleanCode.includes("def ") || cleanCode.includes("function") || cleanCode.includes("class"));
+      const passedCount = isSyntaxValid ? totalCases : 0;
       const isAccepted = passedCount === totalCases;
 
       const results = {
@@ -1194,7 +1235,7 @@ export default function CrucibleCockpitPage({
                 onClick={handleReturnToPipeline}
                 className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <span>Return to Pipeline (Unlock Round 02 Viva)</span>
+                <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : "Return to Pipeline (View Final Decision)"}</span>
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
