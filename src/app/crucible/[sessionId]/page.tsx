@@ -389,8 +389,10 @@ export default function CrucibleCockpitPage({
       setTestResults(null);
       setDialogue([]);
 
-      const greeting = "Hello. Welcome to the " + (companyData?.companyName || "technical") + " round. You are solving " + problem.title + ". Before writing code, state your intended algorithm and data structure.";
-      postAiMessage(greeting);
+      if (!isRound1) {
+        const greeting = "Hello. Welcome to the " + (companyData?.companyName || "technical") + " round. You are solving " + problem.title + ". Before writing code, state your intended algorithm and data structure.";
+        postAiMessage(greeting);
+      }
     }
   }, [problem, companyData, language, postAiMessage]);
 
