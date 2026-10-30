@@ -4470,3 +4470,16 @@ export const PROBLEMS_DATABASE: Record<string, ProblemDefinition> = {
     }
 }
 };
+
+export function getProblemById(id: string): ProblemDefinition | undefined {
+  if (!id) return undefined;
+  return PROBLEMS_DATABASE[id];
+}
+
+export function getProblemForRound(arg1: any, arg2?: any): ProblemDefinition | undefined {
+  if (Array.isArray(arg1) && arg1.length > 0) return PROBLEMS_DATABASE[arg1[0]];
+  if (Array.isArray(arg2) && arg2.length > 0) return PROBLEMS_DATABASE[arg2[0]];
+  if (typeof arg1 === "string" && PROBLEMS_DATABASE[arg1]) return PROBLEMS_DATABASE[arg1];
+  if (typeof arg2 === "string" && PROBLEMS_DATABASE[arg2]) return PROBLEMS_DATABASE[arg2];
+  return Object.values(PROBLEMS_DATABASE)[0];
+}

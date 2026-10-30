@@ -89,6 +89,15 @@ export default function CrucibleCockpitPage({
     return !r || r.toLowerCase() === "round-1" || r.toLowerCase() === "oa";
   };
   const isRound1 = getIsRound1();
+  const getIsRound4 = (): boolean => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search).get("round");
+      if (p) return p.toLowerCase() === "round-4" || p.toLowerCase() === "bar-raiser";
+    }
+    const r = searchParams.get("round");
+    return r ? (r.toLowerCase() === "round-4" || r.toLowerCase() === "bar-raiser") : false;
+  };
+  const isRound4 = getIsRound4();
 
   const isStrictMode = searchParams.get("strict") === "true";
   const problemParam = searchParams.get("problem");
@@ -100,7 +109,7 @@ export default function CrucibleCockpitPage({
     if (c && c.toLowerCase() === "amazon" && typeof AMAZON_TRACKS !== "undefined") {
       const track = (AMAZON_TRACKS as any)[role];
       if (track && track.rounds) {
-        const roundObj = track.rounds.find((rnd: any) => rnd.roundId === r || rnd.roundId === (r === "round-2" ? "round-2" : "round-1"));
+        const roundObj = track.rounds.find((rnd: any) => rnd.roundId === r) || track.rounds.find((rnd: any) => rnd.roundId === "round-1");
         if (roundObj && roundObj.sets) {
           const targetSet = roundObj.sets.find((s: any) => s.setId === setNum) || roundObj.sets[0];
           if (targetSet && targetSet.problemIds && targetSet.problemIds.length > 0) {
@@ -767,7 +776,152 @@ export default function CrucibleCockpitPage({
         />
 
         {/* Right: editor + console */}
-        <section className="flex-1 min-w-0 flex flex-col overflow-hidden bg-[#1A1A1A]">
+        {isRound4 ? (
+            <section className="flex-1 min-w-0 flex flex-col overflow-hidden bg-[#13161C] border-l border-white/10">
+              {/* Studio Header */}
+              <div className="h-14 bg-[#181C24] border-b border-white/10 px-6 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-3">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500" />
+                  <span className="text-xs font-mono font-bold tracking-wider text-emerald-400 uppercase">
+                    Amazon Executive Bar Raiser Session Active
+                  </span>
+                  <span className="text-xs font-mono text-slate-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-md">
+                    Non-Technical Evaluation
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-amber-400 bg-amber-950/40 border border-amber-500/30 px-3 py-1 rounded-md font-bold">
+                    STAR Rigor Level: High
+                  </span>
+                </div>
+              </div>
+
+              {/* Boardroom Cockpit Feed */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-5">
+                {/* LP Focus Badge and Socratic Interrogation Banner */}
+                <div className="bg-[#1C222D] border border-amber-500/30 rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[11px] font-mono uppercase tracking-wider font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
+                      Primary LP Calibration
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">
+                      Standard Bar: &ldquo;I&rdquo; vs &ldquo;We&rdquo; Ownership + Quantifiable Metric
+                    </span>
+                  </div>
+                  <h2 className="text-base font-bold text-white mb-2">
+                    {problem?.title || "Behavioral Leadership Scenario"}
+                  </h2>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    The Bar Raiser evaluates depth, individual actions, metrics, and systemic learnings under direct pushback. Ensure your answers isolate your specific contribution rather than the broader team.
+                  </p>
+                </div>
+
+                {/* STAR Method Progress Pipeline */}
+                <div className="grid grid-cols-4 gap-3">
+                  {[
+                    { key: "S", title: "Situation", desc: "Context & stakes" },
+                    { key: "T", title: "Task", desc: "Your ownership" },
+                    { key: "A", title: "Action", desc: "Specific steps taken" },
+                    { key: "R", title: "Result", desc: "Quantifiable metrics" }
+                  ].map((stage) => (
+                    <div
+                      key={stage.key}
+                      className="bg-[#181C24] border border-white/5 rounded-xl p-3 text-center transition-all hover:border-amber-500/40"
+                    >
+                      <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-mono font-black text-xs flex items-center justify-center mx-auto mb-1">
+                        {stage.key}
+                      </div>
+                      <div className="text-xs font-bold text-white">{stage.title}</div>
+                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">{stage.desc}</div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Dialogue Transcript Feed */}
+                <div className="bg-[#181C24] border border-white/10 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-mono text-slate-400 pb-2 border-b border-white/10">
+                    <span className="font-bold text-white flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                      Executive Bar Raiser Transcript
+                    </span>
+                    <span>{dialogue.length} messages logged</span>
+                  </div>
+
+                  <div ref={dialogueContainerRef} className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {dialogue.map((item) => (
+                      <div
+                        key={item.id}
+                        className={"p-4 rounded-xl text-xs leading-relaxed border " + (
+                          item.sender === "ai"
+                            ? "bg-[#1E2430] border-indigo-500/40 text-slate-100"
+                            : "bg-emerald-950/40 border-emerald-600/50 text-emerald-200 ml-8"
+                        )}
+                      >
+                        <div className="flex items-center justify-between font-mono font-bold uppercase mb-1.5 text-[11px] text-slate-400">
+                          <span className={item.sender === "ai" ? "text-indigo-400 font-bold" : "text-emerald-400 font-bold"}>
+                            {item.sender === "ai" ? "Amazon Bar Raiser (Director / PE):" : "Candidate Response:"}
+                          </span>
+                          <span>{item.time}</span>
+                        </div>
+                        <div className="text-sm font-sans">{item.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Input Bar */}
+              <div className="p-4 bg-[#181C24] border-t border-white/10 space-y-3 shrink-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={isRecording ? stopAndSubmitRecording : startRecording}
+                      disabled={isTranscribing}
+                      className={"flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md cursor-pointer disabled:opacity-50 " + (
+                        isRecording
+                          ? "bg-rose-600 hover:bg-rose-500 text-white animate-pulse shadow-rose-600/50"
+                          : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30"
+                      )}
+                    >
+                      {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                      <span>{isRecording ? ("Recording... Click to Stop (" + recordingSeconds + "s)") : "Voice Response (Microphone)"}</span>
+                    </button>
+                    {isRecording && (
+                      <span className="text-xs font-mono text-rose-400 animate-pulse">
+                        Listening to candidate response...
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] font-mono text-slate-400">
+                    Press Enter to send or use Voice
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={candidateInputText}
+                    onChange={(e) => setCandidateInputText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleCandidateSubmit();
+                    }}
+                    placeholder={isRecording ? "Transcribing speech input..." : "Type your STAR response or state your situation..."}
+                    className="flex-1 bg-[#13161C] border border-white/10 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors"
+                  />
+                  <button
+                    onClick={() => handleCandidateSubmit()}
+                    disabled={!candidateInputText.trim() && !isRecording}
+                    className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-5 py-3 rounded-xl flex items-center gap-1.5 text-xs shadow-md disabled:opacity-40 cursor-pointer"
+                  >
+                    <span>Submit Response</span>
+                    <SendHorizonal className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            </section>
+          ) : (
+<section className="flex-1 min-w-0 flex flex-col overflow-hidden bg-[#1A1A1A]">
 
           {/* Editor toolbar */}
           <div className="h-11 bg-[#262626] border-b border-black/40 px-4 flex items-center justify-between shrink-0">
@@ -1157,6 +1311,7 @@ export default function CrucibleCockpitPage({
             )}
           </div>
         </section>
+          )}
       </div>
 
       {/* ───────── Modal: Next problem ───────── */}
