@@ -152,6 +152,10 @@ export default function CrucibleCockpitPage({
 
   const [selectedRole, setSelectedRole] = useState<AmazonRole>(roleParam);
   const [selectedSetId, setSelectedSetId] = useState<number>(setParam);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [allSetHistory, setAllSetHistory] = useState<any[]>([]);
+  const [questionCompleted, setQuestionCompleted] = useState<boolean>(false);
+  const [isSetFinished, setIsSetFinished] = useState<boolean>(false);
 
   const companyData = getCompanyTrackData(companySlug);
 
@@ -199,7 +203,7 @@ export default function CrucibleCockpitPage({
 
   const [vivaPhase, setVivaPhase] = useState<"INITIAL" | "CODING" | "FOLLOW_UPS" | "VERDICT">("INITIAL");
   const [followUpCount, setFollowUpCount] = useState<number>(0);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+
 
   const [aiVoiceMuted, setAiVoiceMuted] = useState<boolean>(false);
   const [isAiSpeaking, setIsAiSpeaking] = useState<boolean>(false);
@@ -249,6 +253,8 @@ export default function CrucibleCockpitPage({
 
   const [showNextModal, setShowNextModal] = useState<boolean>(false);
   const [showCompletionScorecard, setShowCompletionScorecard] = useState<boolean>(false);
+  const [behavioralScorecard, setBehavioralScorecard] = useState<any>(null);
+  const [isGeneratingScorecard, setIsGeneratingScorecard] = useState<boolean>(false);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(90 * 60);
 
   const dialogueContainerRef = useRef<HTMLDivElement>(null);
@@ -346,13 +352,17 @@ export default function CrucibleCockpitPage({
           company: companySlug,
           problemTitle: problem.title,
           problemDescription: (problem.paragraphs || []).join(" "),
-          category: problem.category || "Algorithms",
-          difficulty: problem.difficulty || "Medium",
+          isRound4: isRound4,
+          roundSlug: roundSlug,
+          category: isRound4 ? "Behavioral" : (problem.category || "Algorithms"),
+          difficulty: isRound4 ? "Bar Raiser" : (problem.difficulty || "Medium"),
           candidateMessage: candidateMsg,
           dialogueHistory: dialogue.slice(-6),
           vivaPhase,
           code,
-          questionIndex: currentQuestionIndex
+          questionIndex: currentQuestionIndex,
+          totalQuestions: 2,
+          
         })
       });
       const data = await res.json();
@@ -362,7 +372,7 @@ export default function CrucibleCockpitPage({
       }
       postAiMessage(aiReply);
 
-      if (vivaPhase === "INITIAL" && !candidateMsg.toLowerCase().includes("didn't get") && !candidateMsg.toLowerCase().includes("help") && !candidateMsg.toLowerCase().includes("should i")) {
+      if (!isRound4 && vivaPhase === "INITIAL" && !candidateMsg.toLowerCase().includes("didn't get") && !candidateMsg.toLowerCase().includes("help") && !candidateMsg.toLowerCase().includes("should i")) {
         setVivaPhase("CODING");
       } else if (vivaPhase === "FOLLOW_UPS") {
         setFollowUpCount(prev => {
@@ -399,7 +409,9 @@ export default function CrucibleCockpitPage({
       setDialogue([]);
 
       if (!isRound1) {
-        const greeting = "Hello. Welcome to the " + (companyData?.companyName || "technical") + " round. You are solving " + problem.title + ". Before writing code, state your intended algorithm and data structure.";
+        const greeting = isRound4
+        ? "Hello. I am your Amazon Bar Raiser for this session. We will be diving into your experience regarding: " + problem.title + ". Please begin by walking me through the Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and quantifiable metrics."
+        : "Hello. Welcome to the " + (companyData?.companyName || "technical") + " round. You are solving " + problem.title + ". Before writing code, state your intended algorithm and data structure.";
         postAiMessage(greeting);
       }
     }
@@ -419,21 +431,56 @@ export default function CrucibleCockpitPage({
     return h.toString().padStart(2, "0") + ":" + m.toString().padStart(2, "0") + ":" + s.toString().padStart(2, "0");
   };
 
-  const handleCandidateSubmit = (textToSend?: string) => {
+  const handleCandidateSubmit = async (textToSend?: string) => {
     const text = (textToSend !== undefined ? textToSend : candidateInputText).trim();
     if (!text) return;
 
-    setDialogue(prev => [
-      ...prev,
-      {
-        id: Math.random().toString(36).substring(2, 9),
-        sender: "candidate",
-        text,
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      }
-    ]);
+    // Count turns already submitted for the current active question
+    const currentCandidateTurns = dialogue.filter(m => m.sender === "candidate").length;
+    const isFifthTurn = isRound4 && (currentCandidateTurns + 1 >= 5);
+
+    // 1. Candidate message object
+    const candidateMsg = {
+      id: Math.random().toString(36).substring(2, 9),
+      sender: "candidate" as const,
+      text,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    };
 
     setCandidateInputText("");
+
+    // 2. Turn 5 Hard Stop (Q1 -> Next Question | Q2 -> Final Scorecard)
+    if (isFifthTurn) {
+      setQuestionCompleted(true);
+      const isQuestion1 = (currentQuestionIndex === 0);
+
+      const finishText = isQuestion1
+        ? "Thank you for the thorough walkthrough. We have completed Question 1 of this set! Please click 'Conclude & Score' at the top right to proceed to Question 2."
+        : "Thank you. You have successfully completed both questions of this Bar Raiser set! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive scorecard.";
+
+      if (!isQuestion1) {
+        setIsSetFinished(true);
+      }
+
+      setDialogue(prev => [
+        ...prev,
+        candidateMsg,
+        {
+          id: Math.random().toString(36).substring(2, 9),
+          sender: "ai" as const,
+          text: finishText,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        }
+      ]);
+
+      if (typeof speakText === "function") {
+        speakText(finishText);
+      }
+      return;
+    }
+
+    // Otherwise, append message and query AI normally (Turns 1-4)
+    setDialogue(prev => [...prev, candidateMsg]);
     askAiInterviewer(text);
   };
 
@@ -606,6 +653,33 @@ export default function CrucibleCockpitPage({
     }
   };
 
+  const handleFinishBarRaiserRound = async () => {
+    setIsGeneratingScorecard(true);
+    setShowCompletionScorecard(true);
+    try {
+      const res = await fetch("/api/crucible/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isRound4: true,
+          roundSlug: roundSlug,
+          problemTitle: problem.title,
+          problemDescription: (problem.paragraphs || []).join(" "),
+          dialogueHistory: [...allSetHistory, ...dialogue],
+          evaluateScorecard: true
+        })
+      });
+      const data = await res.json();
+      if (data?.scorecard) {
+        setBehavioralScorecard(data.scorecard);
+      }
+    } catch (e) {
+      console.error("Failed to generate scorecard:", e);
+    } finally {
+      setIsGeneratingScorecard(false);
+    }
+  };
+
   const handleReturnToPipeline = () => {
     router.push("/tracks/" + companySlug + "?round1Completed=true");
   };
@@ -666,7 +740,7 @@ export default function CrucibleCockpitPage({
           <span className="h-4 w-[1px] bg-white/20 mx-1" />
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-slate-300 bg-[#333333] px-2.5 py-1 rounded-md border border-white/10">
-              Set {selectedSetId} • Task {problem?.taskIndex || 1}/{problem?.totalTasks || 2}
+              Set {selectedSetId} • Task {isRound4 ? (currentQuestionIndex + 1) : (problem?.taskIndex || 1)}/{problem?.totalTasks || 2}
             </span>
             <span className="text-xs font-semibold text-amber-400 bg-amber-950/40 border border-amber-500/30 px-3 py-1 rounded-md">
               {problem?.title || "Amazon Assessment Problem"}
@@ -793,6 +867,13 @@ export default function CrucibleCockpitPage({
                   <span className="text-[11px] font-mono text-amber-400 bg-amber-950/40 border border-amber-500/30 px-3 py-1 rounded-md font-bold">
                     STAR Rigor Level: High
                   </span>
+                  <button
+                    onClick={handleFinishBarRaiserRound}
+                    disabled={isGeneratingScorecard || dialogue.length < 3}
+                    className="ml-2 px-3 py-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white rounded-md text-xs font-bold font-mono transition-all cursor-pointer shadow"
+                  >
+                    {isGeneratingScorecard ? "Evaluating..." : "Conclude & Score"}
+                  </button>
                 </div>
               </div>
 
@@ -1353,52 +1434,176 @@ export default function CrucibleCockpitPage({
       )}
 
       {/* ───────── Modal: Completion Scorecard ───────── */}
-      {showCompletionScorecard && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-6">
-          <div className="bg-[#1E293B] border-2 border-primary rounded-2xl max-w-lg w-full p-8 shadow-2xl text-center space-y-6">
-            <div className="w-16 h-16 bg-primary/20 text-primary-light rounded-full flex items-center justify-center mx-auto border-2 border-primary/40 shadow-inner">
-              <Trophy className="h-9 w-9 text-amber-400" />
-            </div>
-
-            <div>
-              <span className="text-xs font-mono font-bold text-emerald-400 tracking-wider uppercase bg-emerald-950/70 border border-emerald-800 px-3 py-1 rounded-full">
-                ROUND 01 EVALUATION COMPLETE
-              </span>
-              <h2 className="text-2xl font-black text-white mt-3">
-                {companyData?.companyName} Algorithmic Screen Passed
-              </h2>
-              <p className="text-xs text-slate-300 mt-1.5 font-medium">
-                Automated HackerRank OA test vectors and complexity bounds verified.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-slate-900/90 border border-slate-700 text-left font-mono">
-              <div className="p-2">
-                <div className="text-[10px] text-slate-400 uppercase font-bold">Total Score</div>
-                <div className="text-lg font-black text-emerald-400 mt-0.5">100 / 100</div>
+        {showCompletionScorecard && (
+          <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-6">
+            <div className="bg-[#1E293B] border-2 border-primary rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl text-center space-y-5 my-auto">
+              {/* Question 1 specific transition header */}
+              {isRound4 && currentQuestionIndex === 0 && (
+                <div className="space-y-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                    Task 1 Completed
+                  </div>
+                  <h2 className="text-xl font-black text-white">Question 1 Milestone Reached</h2>
+                  <p className="text-xs text-slate-400">
+                    You have completed all 5 response turns for Question 1. Ready to proceed to Question 2 of this set?
+                  </p>
+                </div>
+              )}
+              <div className="w-16 h-16 bg-primary/20 text-primary-light rounded-full flex items-center justify-center mx-auto border-2 border-primary/40 shadow-inner">
+                <Trophy className="h-9 w-9 text-amber-400" />
               </div>
-              <div className="p-2 border-x border-slate-800">
-                <div className="text-[10px] text-slate-400 uppercase font-bold">OA Status</div>
-                <div className="text-lg font-black text-white mt-0.5">Verified</div>
-              </div>
-              <div className="p-2">
-                <div className="text-[10px] text-slate-400 uppercase font-bold">Runtime SLA</div>
-                <div className="text-lg font-black text-amber-400 mt-0.5">Optimal</div>
-              </div>
-            </div>
 
-            <div className="pt-2">
-              <button
-                onClick={handleReturnToPipeline}
-                className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
-              >
-                <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : "Return to Pipeline (View Final Decision)"}</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              {isRound4 && behavioralScorecard ? (
+                <div className="space-y-4 text-left">
+                  <div className="text-center pb-2 border-b border-white/10">
+                    <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                      Amazon Executive Bar Raiser Debrief
+                    </span>
+                    <div className="mt-3 flex items-center justify-center gap-4">
+                      <div className="text-5xl font-black font-mono text-white">
+                        {behavioralScorecard.score}<span className="text-2xl text-slate-400">/100</span>
+                      </div>
+                      <div className={"px-3 py-1 rounded-lg text-xs font-bold uppercase " + (
+                        behavioralScorecard.score >= 75 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border border-rose-500/40"
+                      )}>
+                        Verdict: {behavioralScorecard.verdict || "Evaluated"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#13161C] p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
+                    <div className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">STAR Method Breakdown:</div>
+                    <div className="text-slate-300"><strong className="text-amber-400">S & T:</strong> {behavioralScorecard.starBreakdown?.situationAndTask}</div>
+                    <div className="text-slate-300"><strong className="text-amber-400">Action:</strong> {behavioralScorecard.starBreakdown?.actionDepth}</div>
+                    <div className="text-slate-300"><strong className="text-amber-400">Result:</strong> {behavioralScorecard.starBreakdown?.resultAndMetrics}</div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="bg-emerald-950/30 border border-emerald-800/40 p-3 rounded-xl">
+                      <div className="font-bold text-emerald-400 mb-1">Key Strengths</div>
+                      <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                        {(behavioralScorecard.strengths || []).map((s: string, idx: number) => (
+                          <li key={idx}>{s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-rose-950/30 border border-rose-800/40 p-3 rounded-xl">
+                      <div className="font-bold text-rose-400 mb-1">Areas for Improvement</div>
+                      <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                        {(behavioralScorecard.areasForImprovement || []).map((a: string, idx: number) => (
+                          <li key={idx}>{a}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#181C24] p-3 rounded-xl border border-white/10 text-xs text-slate-300">
+                    <strong className="text-white">Bar Raiser Summary: </strong>
+                    {behavioralScorecard.barRaiserDebriefNote}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {isRound1 && (
+                <div>
+                  <span className="text-xs font-mono font-bold text-emerald-400 tracking-wider uppercase bg-emerald-950/70 border border-emerald-800 px-3 py-1 rounded-full">
+                    ROUND 01 EVALUATION COMPLETE
+                  </span>
+                  <h2 className="text-2xl font-black text-white mt-3">
+                    {companyData?.companyName} Algorithmic Screen Passed
+                  </h2>
+                  <p className="text-xs text-slate-300 mt-1.5 font-medium">
+                    Automated HackerRank OA test vectors and complexity bounds verified.
+                  </p>
+                  <div className="grid grid-cols-3 gap-3 p-4 mt-4 rounded-xl bg-slate-900/90 border border-slate-700 text-left font-mono">
+                    <div className="p-2">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Total Score</div>
+                      <div className="text-lg font-black text-emerald-400 mt-0.5">100 / 100</div>
+                    </div>
+                    <div className="p-2 border-x border-slate-800">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">OA Status</div>
+                      <div className="text-lg font-black text-white mt-0.5">Verified</div>
+                    </div>
+                    <div className="p-2">
+                      <div className="text-[10px] text-slate-400 uppercase font-bold">Runtime SLA</div>
+                      <div className="text-lg font-black text-amber-400 mt-0.5">Optimal</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+                </>
+              )}
+
+              <div className="pt-2">
+                {isRound4 && (currentQuestionIndex === 0 || !isSetFinished) ? (
+                  <button
+                    onClick={() => {
+                      // 1. Archive current dialogue
+                      setAllSetHistory(prev => [...prev, ...dialogue]);
+                      
+                      // 2. Resolve Question 2 problem ID dynamically for current role & set
+                      const prefixMap = {
+                        sde_intern: "intern",
+                        sde_1: "sde1",
+                        sde_2: "sde2",
+                        sde_3: "sde3",
+                        principal: "principal"
+                      };
+                      const prefix = prefixMap[selectedRole] || "sde1";
+                      // Check if Round 4 / Bar Raiser is active
+                      let q2Id = "";
+                      if (isRound4) {
+                        q2Id = "amz-" + prefix + "-r4-s" + (selectedSetId || 1) + "-q2";
+                        // Fallback check against track if present
+                        if (typeof AMAZON_TRACKS !== "undefined") {
+                          const track = (AMAZON_TRACKS as any)[selectedRole];
+                          const r4 = track?.rounds?.find((r: any) => r.roundId === "round-4");
+                          const s = r4?.sets?.find((s: any) => s.setId === selectedSetId);
+                          if (s?.problemIds && s.problemIds[1]) {
+                            q2Id = s.problemIds[1];
+                          }
+                        }
+                      } else {
+                        q2Id = "amz-" + prefix + "-s" + (selectedSetId || 1) + "-q2";
+                      }
+                      
+                      // 3. Update currentProblemId so left pane updates immediately!
+                      setCurrentProblemId(q2Id);
+                      setCurrentQuestionIndex(1);
+                      setShowCompletionScorecard(false);
+                      setQuestionCompleted(false);
+                      setIsSetFinished(false);
+
+                      // 4. Look up problem details for Q2 or fallback cleanly
+                      const nextProb = typeof getProblemById === "function" ? getProblemById(q2Id) : null;
+                      const nextTitle = nextProb?.title || "Task 2 of Set " + selectedSetId;
+
+                      // 5. Initialize dialogue with the actual Q2 problem
+                      setDialogue([{
+                        id: Math.random().toString(36).substring(2, 9),
+                        sender: "ai",
+                        text: "Hello. Let's move to Question 2 of this set: " + nextTitle + ". Please begin by walking me through your Situation and Task using the STAR framework.",
+                        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                      }]);
+                    }}
+                    className="w-full py-4 rounded-xl text-base font-black text-white bg-emerald-600 hover:bg-emerald-500 shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all sticky bottom-0 z-10"
+                  >
+                    <span>Proceed to Question 2 of Set →</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleReturnToPipeline}
+                    className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  >
+                    <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : "Return to Pipeline (View Final Decision)"}</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
 }
