@@ -1,3 +1,4 @@
+import { AMAZON_ROUND3_PROBLEMS } from "./amazonRound3Registry";
 import { AMAZON_ROUND2_PROBLEMS } from "./amazonRound2Registry";
 import { AMAZON_OA_ALL_PROBLEMS } from "./problems/amazon/oaSets";
 import { ProblemDefinition } from "./types";
@@ -4469,6 +4470,8 @@ export const PROBLEMS_DATABASE: Record<string, ProblemDefinition> = {
         "space": "High Ownership & Quantifiable Metrics"
     }
 }
+,
+  ...AMAZON_ROUND3_PROBLEMS
 };
 
 export function getProblemById(id: string): ProblemDefinition | undefined {

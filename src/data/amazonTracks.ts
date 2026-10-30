@@ -208,6 +208,95 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
         ]
       },
       {
+        "roundId": "round-3",
+        "roundNumber": 3,
+        "title": "Object-Oriented Design (OOD) & Systems Extensibility",
+        "type": "lld",
+        "durationMinutes": 45,
+        "sets": [
+          {
+            "setId": 1,
+            "setName": "Set 1: Amazon Smart Parcel Locker System",
+            "problemIds": [
+              "amz-intern-r3-s1-q1"
+            ],
+            "description": "Multi-size locker allocation, PIN verification, and timeout reclamation"
+          },
+          {
+            "setId": 2,
+            "setName": "Set 2: In-Memory File System",
+            "problemIds": [
+              "amz-intern-r3-s2-q1"
+            ],
+            "description": "Trie-based directory traversal, file metadata, and permission models"
+          },
+          {
+            "setId": 3,
+            "setName": "Set 3: Multi-Level Parking Garage",
+            "problemIds": [
+              "amz-intern-r3-s3-q1"
+            ],
+            "description": "Spot allocation strategy, vehicle sizing, and dynamic tariff calculation"
+          },
+          {
+            "setId": 4,
+            "setName": "Set 4: E-Commerce Shopping Cart & Coupon Engine",
+            "problemIds": [
+              "amz-intern-r3-s4-q1"
+            ],
+            "description": "Discount strategy patterns, coupon stacking rules, and cart state"
+          },
+          {
+            "setId": 5,
+            "setName": "Set 5: Prime Video Licensing & Access Gate",
+            "problemIds": [
+              "amz-intern-r3-s5-q1"
+            ],
+            "description": "Device limits, DRM entitlement checking, and concurrent stream control"
+          },
+          {
+            "setId": 6,
+            "setName": "Set 6: Multi-Floor Elevator Controller",
+            "problemIds": [
+              "amz-intern-r3-s6-q1"
+            ],
+            "description": "Dispatch algorithms (SCAN/LOOK), priority handling, and load sensing"
+          },
+          {
+            "setId": 7,
+            "setName": "Set 7: Blackjack & Deck Engine",
+            "problemIds": [
+              "amz-intern-r3-s7-q1"
+            ],
+            "description": "Card dealing mechanics, dealer rules, and hand score evaluation"
+          },
+          {
+            "setId": 8,
+            "setName": "Set 8: Splitwise Debt Simplification",
+            "problemIds": [
+              "amz-intern-r3-s8-q1"
+            ],
+            "description": "Expense graph modeling and greedy debt-settlement reduction"
+          },
+          {
+            "setId": 9,
+            "setName": "Set 9: ATM Terminal State Controller",
+            "problemIds": [
+              "amz-intern-r3-s9-q1"
+            ],
+            "description": "Cash cassette distribution invariants, transaction rollback, and card capture"
+          },
+          {
+            "setId": 10,
+            "setName": "Set 10: Hotel Room Reservation Inventory",
+            "problemIds": [
+              "amz-intern-r3-s10-q1"
+            ],
+            "description": "Date range indexing, double-booking prevention, and hold expiration"
+          }
+        ]
+      },
+      {
         "roundId": "round-4",
         "roundNumber": 4,
         "title": "Amazon Bar Raiser & Core Leadership Principles",
@@ -488,6 +577,95 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
               "amzn-top-k-frequent"
             ],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 10"
+          }
+        ]
+      },
+      {
+        "roundId": "round-3",
+        "roundNumber": 3,
+        "title": "Low-Level Design (LLD) & Concurrent Architecture",
+        "type": "lld",
+        "durationMinutes": 60,
+        "sets": [
+          {
+            "setId": 1,
+            "setName": "Set 1: Thread-Safe In-Memory Pub-Sub Bus",
+            "problemIds": [
+              "amz-sde1-r3-s1-q1"
+            ],
+            "description": "Topic subscriptions, fan-out dispatching, and consumer backpressure"
+          },
+          {
+            "setId": 2,
+            "setName": "Set 2: High-Throughput Token Bucket Rate Limiter",
+            "problemIds": [
+              "amz-sde1-r3-s2-q1"
+            ],
+            "description": "Atomic token replenishment, burst smoothing, and multi-tenant quotas"
+          },
+          {
+            "setId": 3,
+            "setName": "Set 3: In-Memory Key-Value Store with TTL",
+            "problemIds": [
+              "amz-sde1-r3-s3-q1"
+            ],
+            "description": "Write-ahead log simulation, lazy eviction, and concurrent segment locks"
+          },
+          {
+            "setId": 4,
+            "setName": "Set 4: Task Execution DAG Engine",
+            "problemIds": [
+              "amz-sde1-r3-s4-q1"
+            ],
+            "description": "Topological worker scheduling, failure retries, and cycle detection"
+          },
+          {
+            "setId": 5,
+            "setName": "Set 5: Fulfillment Robotics Dispatcher",
+            "problemIds": [
+              "amz-sde1-r3-s5-q1"
+            ],
+            "description": "Pod transportation routing, station assignment, and traffic contention"
+          },
+          {
+            "setId": 6,
+            "setName": "Set 6: Multi-Threaded Distributed LRU Cache",
+            "problemIds": [
+              "amz-sde1-r3-s6-q1"
+            ],
+            "description": "Read-write lock partitioning, doubly-linked lists, and eviction race prevention"
+          },
+          {
+            "setId": 7,
+            "setName": "Set 7: Multi-Channel Notification Gateway",
+            "problemIds": [
+              "amz-sde1-r3-s7-q1"
+            ],
+            "description": "SMS/Email/Push adapters, circuit breakers, and rate pacing"
+          },
+          {
+            "setId": 8,
+            "setName": "Set 8: Online Code Sandbox Job Queue",
+            "problemIds": [
+              "amz-sde1-r3-s8-q1"
+            ],
+            "description": "Worker thread pooling, memory limits, and timeout isolation"
+          },
+          {
+            "setId": 9,
+            "setName": "Set 9: Idempotent Payment Webhook Processor",
+            "problemIds": [
+              "amz-sde1-r3-s9-q1"
+            ],
+            "description": "Deduplication windows, status transitions, and dead-letter queue routing"
+          },
+          {
+            "setId": 10,
+            "setName": "Set 10: Review Moderation Rule Pipeline",
+            "problemIds": [
+              "amz-sde1-r3-s10-q1"
+            ],
+            "description": "Pluggable filter chain, regex scanning, and sentiment scoring"
           }
         ]
       },
@@ -776,6 +954,95 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
         ]
       },
       {
+        "roundId": "round-3",
+        "roundNumber": 3,
+        "title": "High-Level Distributed System Design (HLD)",
+        "type": "hld",
+        "durationMinutes": 60,
+        "sets": [
+          {
+            "setId": 1,
+            "setName": "Set 1: Planetary URL Shortener (TinyURL)",
+            "problemIds": [
+              "amz-sde2-r3-s1-q1"
+            ],
+            "description": "10B URLs, 100k writes/sec, base62 encoding, and cache tiering"
+          },
+          {
+            "setId": 2,
+            "setName": "Set 2: Flash-Sale Inventory Reservation Engine",
+            "problemIds": [
+              "amz-sde2-r3-s2-q1"
+            ],
+            "description": "Zero overselling under high concurrency, Redis Lua scripts, and DB locks"
+          },
+          {
+            "setId": 3,
+            "setName": "Set 3: Distributed Web Crawler",
+            "problemIds": [
+              "amz-sde2-r3-s3-q1"
+            ],
+            "description": "Frontier priority queues, robots.txt caching, and content deduplication"
+          },
+          {
+            "setId": 4,
+            "setName": "Set 4: Real-Time Driver-Rider Geospatial Matcher",
+            "problemIds": [
+              "amz-sde2-r3-s4-q1"
+            ],
+            "description": "QuadTree / H3 cell spatial indexing, WebSocket updates, and dispatch locks"
+          },
+          {
+            "setId": 5,
+            "setName": "Set 5: Video Streaming & Chunk Transcoding Platform",
+            "problemIds": [
+              "amz-sde2-r3-s5-q1"
+            ],
+            "description": "S3 storage, HLS segmented transcoding, and CloudFront edge delivery"
+          },
+          {
+            "setId": 6,
+            "setName": "Set 6: Distributed Chat & Messaging Cluster",
+            "problemIds": [
+              "amz-sde2-r3-s6-q1"
+            ],
+            "description": "WebSocket gateways, channel partitioning, and message ordering"
+          },
+          {
+            "setId": 7,
+            "setName": "Set 7: High-Volume Telemetry Ingestion Platform",
+            "problemIds": [
+              "amz-sde2-r3-s7-q1"
+            ],
+            "description": "Time-series logging, multi-region Kafka ingestion, and Cassandra aggregation"
+          },
+          {
+            "setId": 8,
+            "setName": "Set 8: Amazon S3 Blob Storage Architecture",
+            "problemIds": [
+              "amz-sde2-r3-s8-q1"
+            ],
+            "description": "Chunk placement, metadata stores, erasure coding, and garbage collection"
+          },
+          {
+            "setId": 9,
+            "setName": "Set 9: Global Search Autocomplete System",
+            "problemIds": [
+              "amz-sde2-r3-s9-q1"
+            ],
+            "description": "Trie sharding, frequent query caching, and async log aggregation"
+          },
+          {
+            "setId": 10,
+            "setName": "Set 10: E-Commerce Order Tracking Event Pipeline",
+            "problemIds": [
+              "amz-sde2-r3-s10-q1"
+            ],
+            "description": "State machine transitions, Kafka change-data capture, and real-time alerts"
+          }
+        ]
+      },
+      {
         "roundId": "round-4",
         "roundNumber": 4,
         "title": "Senior Bar Raiser: Ownership, Scaling & High Standards",
@@ -1060,6 +1327,95 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
         ]
       },
       {
+        "roundId": "round-3",
+        "roundNumber": 3,
+        "title": "Resilient Systems & Distributed Consensus",
+        "type": "hld",
+        "durationMinutes": 60,
+        "sets": [
+          {
+            "setId": 1,
+            "setName": "Set 1: Cross-Region Distributed Transaction Engine",
+            "problemIds": [
+              "amz-sde3-r3-s1-q1"
+            ],
+            "description": "Two-Phase Commit vs Saga orchestrators with compensation rollback"
+          },
+          {
+            "setId": 2,
+            "setName": "Set 2: High-Throughput Distributed Commit Log",
+            "problemIds": [
+              "amz-sde3-r3-s2-q1"
+            ],
+            "description": "Zero-copy socket transfer, append-only disk segments, and replica ISRs"
+          },
+          {
+            "setId": 3,
+            "setName": "Set 3: Multi-Region Distributed Key-Value Store",
+            "problemIds": [
+              "amz-sde3-r3-s3-q1"
+            ],
+            "description": "Tunable quorum consistency (W+R>N), anti-entropy, and vector clocks"
+          },
+          {
+            "setId": 4,
+            "setName": "Set 4: Disaster Recovery Active-Active Orchestrator",
+            "problemIds": [
+              "amz-sde3-r3-s4-q1"
+            ],
+            "description": "Split-brain mitigation, DNS failover, and asynchronous cross-region sync"
+          },
+          {
+            "setId": 5,
+            "setName": "Set 5: Planetary Financial Clearing & Double-Entry Ledger",
+            "problemIds": [
+              "amz-sde3-r3-s5-q1"
+            ],
+            "description": "Strict serializability, zero data loss, and cryptographic auditability"
+          },
+          {
+            "setId": 6,
+            "setName": "Set 6: Massive Distributed Graph Processing Engine",
+            "problemIds": [
+              "amz-sde3-r3-s6-q1"
+            ],
+            "description": "Pregel bulk synchronous parallel model for fraud detection graphs"
+          },
+          {
+            "setId": 7,
+            "setName": "Set 7: Real-Time Ad-Click Fraud Detection Engine",
+            "problemIds": [
+              "amz-sde3-r3-s7-q1"
+            ],
+            "description": "5 million events/sec stream processing, sliding window state, and Bloom filters"
+          },
+          {
+            "setId": 8,
+            "setName": "Set 8: Planetary Deployment Blast-Radius Controller",
+            "problemIds": [
+              "amz-sde3-r3-s8-q1"
+            ],
+            "description": "Progressive cell-based rollout, anomaly rollback triggers, and traffic shedding"
+          },
+          {
+            "setId": 9,
+            "setName": "Set 9: Edge Serverless Function Execution Runtime",
+            "problemIds": [
+              "amz-sde3-r3-s9-q1"
+            ],
+            "description": "Firecracker microVM isolation, sub-10ms warm starts, and memory sandboxes"
+          },
+          {
+            "setId": 10,
+            "setName": "Set 10: Distributed Leader Lease & Lock Manager",
+            "problemIds": [
+              "amz-sde3-r3-s10-q1"
+            ],
+            "description": "Raft consensus, fencing tokens, and clock drift resilience"
+          }
+        ]
+      },
+      {
         "roundId": "round-4",
         "roundNumber": 4,
         "title": "Principal Bar Raiser: Strategic Leadership & High Stakes",
@@ -1340,6 +1696,95 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
               "amzn-segment-latency-monitor"
             ],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 10"
+          }
+        ]
+      },
+      {
+        "roundId": "round-3",
+        "roundNumber": 3,
+        "title": "Planetary Enterprise Architecture & Tenancy",
+        "type": "hld",
+        "durationMinutes": 75,
+        "sets": [
+          {
+            "setId": 1,
+            "setName": "Set 1: Global Multi-Tenant Retail Core Backbone",
+            "problemIds": [
+              "amz-principal-r3-s1-q1"
+            ],
+            "description": "Cell-based partitioning, multi-tenant noisy neighbor isolation, and zero-blast radius"
+          },
+          {
+            "setId": 2,
+            "setName": "Set 2: Byzantine-Resilient Global Cloud Control Plane",
+            "problemIds": [
+              "amz-principal-r3-s2-q1"
+            ],
+            "description": "Decentralized consensus, automated self-healing, and partition survivability"
+          },
+          {
+            "setId": 3,
+            "setName": "Set 3: Planetary Zero-Trust Cryptographic Data Fabric",
+            "problemIds": [
+              "amz-principal-r3-s3-q1"
+            ],
+            "description": "Cryptographic enclave data sharing, homomorphic verification, and tenancy governance"
+          },
+          {
+            "setId": 4,
+            "setName": "Set 4: Autonomous Global Backbone Traffic Optimizer",
+            "problemIds": [
+              "amz-principal-r3-s4-q1"
+            ],
+            "description": "BGP edge route steering, real-time fiber congestion avoidance, and bandwidth slicing"
+          },
+          {
+            "setId": 5,
+            "setName": "Set 5: Planetary Autonomous Fleet Sensor Mesh",
+            "problemIds": [
+              "amz-principal-r3-s5-q1"
+            ],
+            "description": "Edge vehicle telemetry compaction, eventual consistency synchronization, and geofence events"
+          },
+          {
+            "setId": 6,
+            "setName": "Set 6: Enterprise-Wide Privilege Verification Fabric",
+            "problemIds": [
+              "amz-principal-r3-s6-q1"
+            ],
+            "description": "Global policy evaluation under 2ms, distributed revocation lists, and ABAC proofs"
+          },
+          {
+            "setId": 7,
+            "setName": "Set 7: Zero-Downtime Heterogeneous Cloud Migrator",
+            "problemIds": [
+              "amz-principal-r3-s7-q1"
+            ],
+            "description": "Dual-write validation, real-time shadow traffic diffing, and live cutover"
+          },
+          {
+            "setId": 8,
+            "setName": "Set 8: Mission-Critical Global Settlement Engine",
+            "problemIds": [
+              "amz-principal-r3-s8-q1"
+            ],
+            "description": "Handling $100B daily settlement volume with zero balance deviation guarantees"
+          },
+          {
+            "setId": 9,
+            "setName": "Set 9: AI Hyper-Cluster Distributed Training Infrastructure",
+            "problemIds": [
+              "amz-principal-r3-s9-q1"
+            ],
+            "description": "RoCE v2 network fabric, tensor parallelism orchestration, and fast-checkpoint recovery"
+          },
+          {
+            "setId": 10,
+            "setName": "Set 10: Planetary Disruption Disaster Survival Architecture",
+            "problemIds": [
+              "amz-principal-r3-s10-q1"
+            ],
+            "description": "Autonomous survival during entire cloud provider blackout and multi-continental partitions"
           }
         ]
       },

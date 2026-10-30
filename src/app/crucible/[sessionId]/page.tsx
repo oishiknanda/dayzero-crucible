@@ -7,7 +7,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { getProblemById, getProblemForRound, ProblemDefinition } from "@/data/problemsRegistry";
 import { PROBLEMS_DATABASE } from "@/data/problemsRegistry";
 import { getCompanyTrackData } from "@/data/companyTracks";
-import {  AmazonRole , AMAZON_TRACKS } from "@/data/amazonTracks";
+import { AmazonRole, AMAZON_TRACKS } from "@/data/amazonTracks";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
   Play,
@@ -30,7 +30,8 @@ import {
   Mic,
   MicOff,
   SendHorizonal,
-  Loader2
+  Loader2,
+  Award
 } from "lucide-react";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
@@ -79,7 +80,7 @@ export default function CrucibleCockpitPage({
   const companySlug = searchParams.get("company") || "google";
   const roundSlug = searchParams.get("round") || "round-1";
 
-  // Check if current stage is Online Assessment / Round 1
+  // Check current round stages
   const getIsRound1 = (): boolean => {
     if (typeof window !== "undefined") {
       const p = new URLSearchParams(window.location.search).get("round");
@@ -89,6 +90,17 @@ export default function CrucibleCockpitPage({
     return !r || r.toLowerCase() === "round-1" || r.toLowerCase() === "oa";
   };
   const isRound1 = getIsRound1();
+
+  const getIsRound3 = (): boolean => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search).get("round");
+      if (p) return p.toLowerCase() === "round-3" || p.toLowerCase() === "lld" || p.toLowerCase() === "architecture";
+    }
+    const r = searchParams.get("round");
+    return r ? (r.toLowerCase() === "round-3" || r.toLowerCase() === "lld" || r.toLowerCase() === "architecture") : false;
+  };
+  const isRound3 = getIsRound3();
+
   const getIsRound4 = (): boolean => {
     if (typeof window !== "undefined") {
       const p = new URLSearchParams(window.location.search).get("round");
@@ -99,13 +111,12 @@ export default function CrucibleCockpitPage({
   };
   const isRound4 = getIsRound4();
 
-  const isStrictMode = searchParams.get("strict") === "true";
+  const isStrict = searchParams.get("strict") === "true";
   const problemParam = searchParams.get("problem");
 
-    const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
+  const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
     if (override && PROBLEMS_DATABASE && PROBLEMS_DATABASE[override]) return override;
-    
-    // Check AMAZON_TRACKS directly based on company, round, role, and setId
+
     if (c && c.toLowerCase() === "amazon" && typeof AMAZON_TRACKS !== "undefined") {
       const track = (AMAZON_TRACKS as any)[role];
       if (track && track.rounds) {
@@ -120,8 +131,7 @@ export default function CrucibleCockpitPage({
           }
         }
       }
-      
-      // Fallback for OA / Round 1 if not matched above
+
       const prefixMap: Record<string, string> = {
         sde_intern: "intern",
         sde_1: "sde1",
@@ -138,7 +148,6 @@ export default function CrucibleCockpitPage({
     return def ? def.id : (PROBLEMS_DATABASE ? Object.keys(PROBLEMS_DATABASE)[0] : "amz-sde1-s1-q1");
   };
 
-  // Parse direct window search query immediately (synchronous fallback)
   const getInitialParam = (key: string, fallback: string): string => {
     if (typeof window !== "undefined") {
       const p = new URLSearchParams(window.location.search).get(key);
@@ -170,28 +179,6 @@ export default function CrucibleCockpitPage({
   const [language, setLanguage] = useState<SupportedLanguage>("cpp");
   const [code, setCode] = useState<string>(problem?.starterTemplates?.cpp || "");
 
-  const handleRoleChange = (newRole: AmazonRole) => {
-    setSelectedRole(newRole);
-    const newProblemId = getResolvedProblemId(companySlug, roundSlug, newRole, selectedSetId);
-    setCurrentProblemId(newProblemId);
-    const p = getProblemById(newProblemId);
-    if (p && p.starterTemplates && p.starterTemplates[language]) {
-      setCode(p.starterTemplates[language]);
-    }
-    router.replace("?company=" + companySlug + "&round=" + roundSlug + "&role=" + newRole + "&set=" + selectedSetId);
-  };
-
-  const handleSetChange = (newSet: number) => {
-    setSelectedSetId(newSet);
-    const newProblemId = getResolvedProblemId(companySlug, roundSlug, selectedRole, newSet);
-    setCurrentProblemId(newProblemId);
-    const p = getProblemById(newProblemId);
-    if (p && p.starterTemplates && p.starterTemplates[language]) {
-      setCode(p.starterTemplates[language]);
-    }
-    router.replace("?company=" + companySlug + "&round=" + roundSlug + "&role=" + selectedRole + "&set=" + newSet);
-  };
-
   const [leftWidthPercent, setLeftWidthPercent] = useState<number>(44);
   const [isDraggingH, setIsDraggingH] = useState<boolean>(false);
   const [isConsoleCollapsed, setIsConsoleCollapsed] = useState<boolean>(false);
@@ -204,7 +191,7 @@ export default function CrucibleCockpitPage({
   const [vivaPhase, setVivaPhase] = useState<"INITIAL" | "CODING" | "FOLLOW_UPS" | "VERDICT">("INITIAL");
   const [followUpCount, setFollowUpCount] = useState<number>(0);
 
-
+  const [isVoiceActive, setIsVoiceActive] = useState<boolean>(true);
   const [aiVoiceMuted, setAiVoiceMuted] = useState<boolean>(false);
   const [isAiSpeaking, setIsAiSpeaking] = useState<boolean>(false);
   const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
@@ -220,7 +207,6 @@ export default function CrucibleCockpitPage({
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
-  // Synchronize problem and starter code whenever URL parameters or selected language change
   useEffect(() => {
     let qRole = searchParams.get("role");
     let qSet = searchParams.get("set");
@@ -245,7 +231,6 @@ export default function CrucibleCockpitPage({
         setCode(p.starterTemplates[language]);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, companySlug, roundSlug, problemParam, language]);
 
   const [isRunning, setIsRunning] = useState<boolean>(false);
@@ -279,26 +264,10 @@ export default function CrucibleCockpitPage({
     };
   }, [isRecording]);
 
-  const speakText = useCallback((text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    if (aiVoiceMuted) return;
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.02;  // Natural conversational tempo
-      utterance.pitch = 0.96; // Slightly deeper, authoritative interviewer tone
-      const bestVoice = selectOptimalBarRaiserVoice(window.speechSynthesis);
-      if (bestVoice) {
-        utterance.voice = bestVoice;
-      }
-      window.speechSynthesis.speak(utterance);
-  }, [aiVoiceMuted]);
-
   const selectOptimalBarRaiserVoice = (synth: SpeechSynthesis): SpeechSynthesisVoice | null => {
     const voices = synth.getVoices();
     if (!voices || voices.length === 0) return null;
 
-    // Prioritize natural neural English voices (Edge/Chrome/Safari)
     const preferredNames = [
       "Microsoft Guy Online (Natural) - English (United States)",
       "Microsoft Christopher Online (Natural) - English (United States)",
@@ -314,9 +283,23 @@ export default function CrucibleCockpitPage({
       if (match) return match;
     }
 
-    // Fallback: any en-US or English voice
     return voices.find(v => v.lang.startsWith("en-US")) || voices.find(v => v.lang.startsWith("en")) || voices[0];
   };
+
+  const speakText = useCallback((text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (aiVoiceMuted || !isVoiceActive) return;
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.02;
+    utterance.pitch = 0.96;
+    const bestVoice = selectOptimalBarRaiserVoice(window.speechSynthesis);
+    if (bestVoice) {
+      utterance.voice = bestVoice;
+    }
+    window.speechSynthesis.speak(utterance);
+  }, [aiVoiceMuted, isVoiceActive]);
 
   const postAiMessage = useCallback((text: string) => {
     if (!text || text.trim().length === 0) return;
@@ -352,6 +335,7 @@ export default function CrucibleCockpitPage({
           company: companySlug,
           problemTitle: problem.title,
           problemDescription: (problem.paragraphs || []).join(" "),
+          isRound3: isRound3,
           isRound4: isRound4,
           roundSlug: roundSlug,
           category: isRound4 ? "Behavioral" : (problem.category || "Algorithms"),
@@ -362,7 +346,6 @@ export default function CrucibleCockpitPage({
           code,
           questionIndex: currentQuestionIndex,
           totalQuestions: 2,
-          
         })
       });
       const data = await res.json();
@@ -377,15 +360,21 @@ export default function CrucibleCockpitPage({
       } else if (vivaPhase === "FOLLOW_UPS") {
         setFollowUpCount(prev => {
           const next = prev + 1;
-          if (next >= 4) {
+          if (next >= 3) {
             setVivaPhase("VERDICT");
-            setTimeout(() => {
-              if (problem?.nextProblemId) {
-                setShowNextModal(true);
-              } else {
-                setShowCompletionScorecard(true);
-              }
-            }, 1500);
+            if (isRound3) {
+              const finishMsg = "Thank you for the comprehensive architectural defense. You have concluded your Round 3 System Design assessment! Please click 'Conclude & Score' at the top right to finalize your round and review your technical scorecard.";
+              postAiMessage(finishMsg);
+              if (typeof speakText === "function") speakText(finishMsg);
+            } else {
+              setTimeout(() => {
+                if (problem?.nextProblemId) {
+                  setShowNextModal(true);
+                } else {
+                  setShowCompletionScorecard(true);
+                }
+              }, 1500);
+            }
           }
           return next;
         });
@@ -409,13 +398,16 @@ export default function CrucibleCockpitPage({
       setDialogue([]);
 
       if (!isRound1) {
-        const greeting = isRound4
-        ? "Hello. I am your Amazon Bar Raiser for this session. We will be diving into your experience regarding: " + problem.title + ". Please begin by walking me through the Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and quantifiable metrics."
-        : "Hello. Welcome to the " + (companyData?.companyName || "technical") + " round. You are solving " + problem.title + ". Before writing code, state your intended algorithm and data structure.";
+        let greeting = "Hello. Welcome to the " + (companyData?.companyName || "technical") + " round. You are solving " + problem.title + ". Before writing code, state your intended algorithm and data structure.";
+        if (isRound3) {
+          greeting = "Welcome to your Amazon Round 3 Technical Loop: " + problem.title + ". First, outline your core class interfaces, thread-safe data structures, and backpressure strategy in the editor above. When ready, click 'Submit Architecture Defense' or walk me through your planned design.";
+        } else if (isRound4) {
+          greeting = "Hello. I am your Amazon Bar Raiser for this session. We will be diving into your experience regarding: " + problem.title + ". Please begin by walking me through the Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and quantifiable metrics.";
+        }
         postAiMessage(greeting);
       }
     }
-  }, [problem, companyData, language, postAiMessage]);
+  }, [problem, companyData, language, isRound1, isRound3, isRound4, postAiMessage]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -435,11 +427,9 @@ export default function CrucibleCockpitPage({
     const text = (textToSend !== undefined ? textToSend : candidateInputText).trim();
     if (!text) return;
 
-    // Count turns already submitted for the current active question
     const currentCandidateTurns = dialogue.filter(m => m.sender === "candidate").length;
     const isFifthTurn = isRound4 && (currentCandidateTurns + 1 >= 5);
 
-    // 1. Candidate message object
     const candidateMsg = {
       id: Math.random().toString(36).substring(2, 9),
       sender: "candidate" as const,
@@ -449,7 +439,6 @@ export default function CrucibleCockpitPage({
 
     setCandidateInputText("");
 
-    // 2. Turn 5 Hard Stop (Q1 -> Next Question | Q2 -> Final Scorecard)
     if (isFifthTurn) {
       setQuestionCompleted(true);
       const isQuestion1 = (currentQuestionIndex === 0);
@@ -479,7 +468,6 @@ export default function CrucibleCockpitPage({
       return;
     }
 
-    // Otherwise, append message and query AI normally (Turns 1-4)
     setDialogue(prev => [...prev, candidateMsg]);
     askAiInterviewer(text);
   };
@@ -581,6 +569,27 @@ export default function CrucibleCockpitPage({
   };
 
   const handleSubmitCode = () => {
+    if (isRound3) {
+      const trimmedCode = code.trim();
+      if (!trimmedCode || trimmedCode.length < 40) {
+        postAiMessage("Please outline your core class interfaces, concurrency primitives, or architectural components in the editor before submitting for technical defense.");
+        setActiveConsoleTab("interviewer");
+        return;
+      }
+      setIsRunning(true);
+      setActiveConsoleTab("interviewer");
+      setVivaPhase("FOLLOW_UPS");
+      setFollowUpCount(0);
+
+      setTimeout(() => {
+        setIsRunning(false);
+        const designPrompt = "I have reviewed your architectural specifications and class definitions. Let's dive deep into your design: Walk me through your concurrency model, how you handle subscriber backpressure, and your failure recovery mechanisms.";
+        postAiMessage(designPrompt);
+        if (typeof speakText === "function") speakText(designPrompt);
+      }, 600);
+      return;
+    }
+
     setIsRunning(true);
     setIsConsoleCollapsed(false);
     setActiveConsoleTab("results");
@@ -591,8 +600,6 @@ export default function CrucibleCockpitPage({
       const totalHidden = hiddenCases.length || 3;
       const totalCases = totalVisible + totalHidden;
 
-      // Realistic evaluation: verify non-empty code and signature
-      // Real code presence check: non-trivial implementation that returns or computes
       const cleanCode = code.trim();
       const isSyntaxValid = cleanCode.length > 25 && (cleanCode.includes("return") || cleanCode.includes("def ") || cleanCode.includes("function") || cleanCode.includes("class"));
       const passedCount = isSyntaxValid ? totalCases : 0;
@@ -622,7 +629,6 @@ export default function CrucibleCockpitPage({
       setTestResults(results as unknown as EvaluationReport);
 
       if (isRound1) {
-        // ROUND 1: Strictly automated. No AI Viva conversation.
         if (isAccepted) {
           setTimeout(() => {
             if (problem?.nextProblemId) {
@@ -633,7 +639,6 @@ export default function CrucibleCockpitPage({
           }, 900);
         }
       } else {
-        // ROUND 2+: Interactive AI Interviewer & Viva Defense
         if (isAccepted) {
           setActiveConsoleTab("interviewer");
           setVivaPhase("FOLLOW_UPS");
@@ -661,11 +666,13 @@ export default function CrucibleCockpitPage({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          isRound4: true,
+          code: code || "",
+          isRound3: isRound3,
+          isRound4: isRound4,
           roundSlug: roundSlug,
-          problemTitle: problem.title,
-          problemDescription: (problem.paragraphs || []).join(" "),
-          dialogueHistory: [...allSetHistory, ...dialogue],
+          problemTitle: problem ? problem.title : "Technical Round",
+          problemDescription: problem ? (problem.paragraphs || []).join(" ") : "",
+          dialogueHistory: [...(allSetHistory || []), ...(dialogue || [])],
           evaluateScorecard: true
         })
       });
@@ -749,298 +756,125 @@ export default function CrucibleCockpitPage({
         </div>
 
         <div className="flex items-center gap-3">
-          {!isRound1 && (
-            <button
-              onClick={() => {
-                const nextMuted = !aiVoiceMuted;
-                setAiVoiceMuted(nextMuted);
-                if (nextMuted && typeof window !== "undefined") window.speechSynthesis.cancel();
-              }}
-              className={"flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-md border cursor-pointer transition-colors " + (
-                aiVoiceMuted ? "bg-slate-800 text-slate-400 border-slate-700" : "bg-indigo-950/70 text-indigo-300 border-indigo-700"
-              )}
-            >
-              {aiVoiceMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5 text-indigo-400" />}
-              <span>{aiVoiceMuted ? "Voice Muted" : "AI Voice On"}</span>
-            </button>
-          )}
+          <button
+            onClick={() => setIsVoiceActive(!isVoiceActive)}
+            className={"flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer " + (isVoiceActive ? "bg-indigo-600/30 border-indigo-500/40 text-indigo-300" : "bg-[#333333] border-white/10 text-slate-400 hover:text-slate-200")}
+          >
+            {isVoiceActive ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            <span>{isVoiceActive ? "AI Voice On" : "AI Voice Muted"}</span>
+          </button>
 
-          {isStrictMode ? (
-            <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-rose-400 bg-rose-950/60 border border-rose-800 px-3 py-1 rounded-md">
+          {isStrict && (
+            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-rose-400 bg-rose-950/40 border border-rose-500/30">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              LOCKDOWN ACTIVE
-            </span>
-          ) : (
-            <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800 px-3 py-1 rounded-md">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
-              DEV BYPASS
+              <span>LOCKDOWN ACTIVE</span>
             </span>
           )}
 
-          <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-200 bg-[#333333] border border-white/10 px-3 py-1 rounded-md">
-            <Clock className="h-3.5 w-3.5 text-amber-400" />
-            {formatTimer(timeLeftSeconds)}
-          </span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#333333] border border-white/10 text-amber-400">
+            <Clock className="h-3.5 w-3.5" />
+            <span>{formatTimer(timeLeftSeconds)}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleRunCode}
+              disabled={isRunning}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-100 bg-[#3D3D3D] hover:bg-[#4A4A4A] border border-white/10 cursor-pointer disabled:opacity-50"
+            >
+              <Play className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Run</span>
+            </button>
+            <button
+              onClick={handleSubmitCode}
+              disabled={isRunning}
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-md cursor-pointer disabled:opacity-50"
+            >
+              <Send className="h-3.5 w-3.5" />
+              <span>{isRound3 ? "Submit Architecture Defense" : "Submit Solution"}</span>
+            </button>
+            {(isRound3 || isRound4) && (
+              <button
+                onClick={handleFinishBarRaiserRound}
+                disabled={isRunning || isGeneratingScorecard}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 border border-amber-400/30 shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                title="Conclude assessment and review evaluation scorecard"
+              >
+                <Award className="h-3.5 w-3.5 text-amber-200" />
+                <span>Conclude &amp; Score</span>
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* ───────── Main workspace ───────── */}
-      <div className="flex-1 flex overflow-hidden relative">
-
-        {/* Left: problem statement */}
+      {/* ───────── Main Content Split Panes ───────── */}
+      <div className="flex-1 flex min-h-0 relative">
+        {/* Left Pane: Problem Description */}
         <section
-          className="h-full overflow-y-auto bg-[#1E1E1E] p-6 select-text"
-          style={{ width: leftWidthPercent + "%" }}
+          style={{ width: `${leftWidthPercent}%` }}
+          className="h-full bg-[#1F1F1F] border-r border-black/40 overflow-y-auto p-6 space-y-6"
         >
-          <h1 className="text-xl font-bold text-white mb-4">{problem?.title}</h1>
-
-          <div className="space-y-3 text-[15px] leading-relaxed text-slate-300">
-            {paragraphs.map((para: string, i: number) => (
-              <p key={i}>
-                <FormatText text={para} />
-              </p>
-            ))}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-500 font-mono">
+                {isRound4 ? "Behavioral Leadership Principle" : isRound3 ? "Architecture Specification" : (problem?.category || "Problem Description")}
+              </span>
+            </div>
+            <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
           </div>
 
-          {bulletPoints.length > 0 && (
-            <ul className="list-disc pl-6 mt-4 space-y-1.5 text-[15px] text-slate-300">
-              {bulletPoints.map((b: string, i: number) => (
-                <li key={i}>
-                  <FormatText text={b} />
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="space-y-4 text-sm leading-relaxed text-slate-300">
+            {paragraphs.map((p, idx) => (
+              <p key={idx}><FormatText text={p} /></p>
+            ))}
+
+            {bulletPoints.length > 0 && (
+              <ul className="list-disc pl-5 space-y-2">
+                {bulletPoints.map((b, idx) => (
+                  <li key={idx}><FormatText text={b} /></li>
+                ))}
+              </ul>
+            )}
+          </div>
 
           {examples.length > 0 && (
-            <div className="mt-6 space-y-4">
-              {examples.map((ex: any, i: number) => (
-                <div key={i} className="bg-[#262626] border border-white/10 rounded-xl p-4 font-mono text-[13px]">
-                  <div className="text-xs font-sans font-bold text-slate-400 mb-2">Example {i + 1}</div>
-                  {ex.input !== undefined && (
-                    <div><span className="text-slate-400">Input: </span><span className="text-white">{String(ex.input)}</span></div>
-                  )}
-                  {(ex.output ?? ex.expectedOutput) !== undefined && (
-                    <div><span className="text-slate-400">Output: </span><span className="text-emerald-400">{String(ex.output ?? ex.expectedOutput)}</span></div>
-                  )}
-                  {ex.explanation && (
-                    <div className="mt-2 font-sans text-slate-300"><span className="text-slate-400">Explanation: </span>{ex.explanation}</div>
-                  )}
+            <div className="space-y-4 pt-4 border-t border-white/5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">Examples</h2>
+              {examples.map((ex, idx) => (
+                <div key={idx} className="bg-[#262626] border border-white/5 rounded-xl p-3.5 space-y-2 text-xs font-mono">
+                  <div><span className="text-slate-400">Input:</span> <span className="text-slate-200">{ex.input}</span></div>
+                  <div><span className="text-slate-400">Output:</span> <span className="text-emerald-400 font-bold">{ex.output}</span></div>
+                  {ex.explanation && <div><span className="text-slate-400">Explanation:</span> <span className="text-slate-300">{ex.explanation}</span></div>}
                 </div>
               ))}
             </div>
           )}
 
           {constraints.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-sm font-bold text-white mb-2">Constraints</h3>
-              <ul className="list-disc pl-6 space-y-1 text-sm text-slate-300 font-mono">
-                {constraints.map((c: string, i: number) => (
-                  <li key={i}>{c}</li>
+            <div className="space-y-3 pt-4 border-t border-white/5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">Constraints</h2>
+              <ul className="list-disc pl-5 space-y-1.5 text-xs text-slate-300 font-mono">
+                {constraints.map((c, idx) => (
+                  <li key={idx}>{c}</li>
                 ))}
               </ul>
             </div>
           )}
         </section>
 
-        {/* Horizontal drag handle */}
+        {/* Horizontal Drag Handle */}
         <div
           onMouseDown={handleMouseDownH}
-          className="w-1.5 bg-black/40 hover:bg-amber-500/60 cursor-col-resize shrink-0 transition-colors"
+          className="w-1.5 bg-black/40 hover:bg-amber-500/60 cursor-col-resize shrink-0 transition-colors z-20"
         />
 
-        {/* Right: editor + console */}
-        {isRound4 ? (
-            <section className="flex-1 min-w-0 flex flex-col overflow-hidden bg-[#13161C] border-l border-white/10">
-              {/* Studio Header */}
-              <div className="h-14 bg-[#181C24] border-b border-white/10 px-6 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-3">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500" />
-                  <span className="text-xs font-mono font-bold tracking-wider text-emerald-400 uppercase">
-                    Amazon Executive Bar Raiser Session Active
-                  </span>
-                  <span className="text-xs font-mono text-slate-400 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-md">
-                    Non-Technical Evaluation
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-amber-400 bg-amber-950/40 border border-amber-500/30 px-3 py-1 rounded-md font-bold">
-                    STAR Rigor Level: High
-                  </span>
-                  <button
-                    onClick={handleFinishBarRaiserRound}
-                    disabled={isGeneratingScorecard || dialogue.length < 3}
-                    className="ml-2 px-3 py-1 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white rounded-md text-xs font-bold font-mono transition-all cursor-pointer shadow"
-                  >
-                    {isGeneratingScorecard ? "Evaluating..." : "Conclude & Score"}
-                  </button>
-                </div>
-              </div>
-
-              {/* Boardroom Cockpit Feed */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-5">
-                {/* LP Focus Badge and Socratic Interrogation Banner */}
-                <div className="bg-[#1C222D] border border-amber-500/30 rounded-2xl p-5 shadow-lg relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[11px] font-mono uppercase tracking-wider font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full">
-                      Primary LP Calibration
-                    </span>
-                    <span className="text-xs font-mono text-slate-400">
-                      Standard Bar: &ldquo;I&rdquo; vs &ldquo;We&rdquo; Ownership + Quantifiable Metric
-                    </span>
-                  </div>
-                  <h2 className="text-base font-bold text-white mb-2">
-                    {problem?.title || "Behavioral Leadership Scenario"}
-                  </h2>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    The Bar Raiser evaluates depth, individual actions, metrics, and systemic learnings under direct pushback. Ensure your answers isolate your specific contribution rather than the broader team.
-                  </p>
-                </div>
-
-                {/* STAR Method Progress Pipeline */}
-                <div className="grid grid-cols-4 gap-3">
-                  {[
-                    { key: "S", title: "Situation", desc: "Context & stakes" },
-                    { key: "T", title: "Task", desc: "Your ownership" },
-                    { key: "A", title: "Action", desc: "Specific steps taken" },
-                    { key: "R", title: "Result", desc: "Quantifiable metrics" }
-                  ].map((stage) => (
-                    <div
-                      key={stage.key}
-                      className="bg-[#181C24] border border-white/5 rounded-xl p-3 text-center transition-all hover:border-amber-500/40"
-                    >
-                      <div className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-mono font-black text-xs flex items-center justify-center mx-auto mb-1">
-                        {stage.key}
-                      </div>
-                      <div className="text-xs font-bold text-white">{stage.title}</div>
-                      <div className="text-[10px] text-slate-400 font-mono mt-0.5">{stage.desc}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Dialogue Transcript Feed */}
-                <div className="bg-[#181C24] border border-white/10 rounded-2xl p-4 space-y-3">
-                  <div className="flex items-center justify-between text-xs font-mono text-slate-400 pb-2 border-b border-white/10">
-                    <span className="font-bold text-white flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-indigo-500" />
-                      Executive Bar Raiser Transcript
-                    </span>
-                    <span>{dialogue.length} messages logged</span>
-                  </div>
-
-                  <div ref={dialogueContainerRef} className="space-y-3 max-h-72 overflow-y-auto pr-1">
-                    {dialogue.map((item) => (
-                      <div
-                        key={item.id}
-                        className={"p-4 rounded-xl text-xs leading-relaxed border " + (
-                          item.sender === "ai"
-                            ? "bg-[#1E2430] border-indigo-500/40 text-slate-100"
-                            : "bg-emerald-950/40 border-emerald-600/50 text-emerald-200 ml-8"
-                        )}
-                      >
-                        <div className="flex items-center justify-between font-mono font-bold uppercase mb-1.5 text-[11px] text-slate-400">
-                          <span className={item.sender === "ai" ? "text-indigo-400 font-bold" : "text-emerald-400 font-bold"}>
-                            {item.sender === "ai" ? "Amazon Bar Raiser (Director / PE):" : "Candidate Response:"}
-                          </span>
-                          <span>{item.time}</span>
-                        </div>
-                        <div className="text-sm font-sans">{item.text}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Interactive Input Bar */}
-              <div className="p-4 bg-[#181C24] border-t border-white/10 space-y-3 shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={isRecording ? stopAndSubmitRecording : startRecording}
-                      disabled={isTranscribing}
-                      className={"flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md cursor-pointer disabled:opacity-50 " + (
-                        isRecording
-                          ? "bg-rose-600 hover:bg-rose-500 text-white animate-pulse shadow-rose-600/50"
-                          : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30"
-                      )}
-                    >
-                      {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                      <span>{isRecording ? ("Recording... Click to Stop (" + recordingSeconds + "s)") : "Voice Response (Microphone)"}</span>
-                    </button>
-                    {isRecording && (
-                      <span className="text-xs font-mono text-rose-400 animate-pulse">
-                        Listening to candidate response...
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Press Enter to send or use Voice
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={candidateInputText}
-                    onChange={(e) => setCandidateInputText(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleCandidateSubmit();
-                    }}
-                    placeholder={isRecording ? "Transcribing speech input..." : "Type your STAR response or state your situation..."}
-                    className="flex-1 bg-[#13161C] border border-white/10 focus:border-amber-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition-colors"
-                  />
-                  <button
-                    onClick={() => handleCandidateSubmit()}
-                    disabled={!candidateInputText.trim() && !isRecording}
-                    className="bg-amber-600 hover:bg-amber-500 text-white font-bold px-5 py-3 rounded-xl flex items-center gap-1.5 text-xs shadow-md disabled:opacity-40 cursor-pointer"
-                  >
-                    <span>Submit Response</span>
-                    <SendHorizonal className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            </section>
-          ) : (
-<section className="flex-1 min-w-0 flex flex-col overflow-hidden bg-[#1A1A1A]">
-
-          {/* Editor toolbar */}
-          <div className="h-11 bg-[#262626] border-b border-black/40 px-4 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2">
-              <Code2 className="h-4 w-4 text-amber-400" />
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as SupportedLanguage)}
-                className="bg-[#333333] text-slate-200 text-xs font-mono rounded-md border border-white/10 px-2 py-1 focus:outline-none cursor-pointer"
-              >
-                <option value="cpp">C++</option>
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-                <option value="javascript">JavaScript</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleRunCode}
-                disabled={isRunning}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-100 bg-[#3D3D3D] hover:bg-[#4A4A4A] border border-white/10 cursor-pointer disabled:opacity-50"
-              >
-                <Play className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Run</span>
-              </button>
-              <button
-                onClick={handleSubmitCode}
-                disabled={isRunning}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-md cursor-pointer disabled:opacity-50"
-              >
-                <Send className="h-3.5 w-3.5" />
-                <span>Submit Solution</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Monaco editor */}
+        {/* Right Pane: Code Editor + Interactive Viva Console */}
+        <section
+          style={{ width: `${100 - leftWidthPercent}%` }}
+          className="h-full flex flex-col min-w-0"
+        >
+          {/* Monaco Editor */}
           <div className="flex-1 min-h-0">
             <Editor
               height="100%"
@@ -1236,118 +1070,92 @@ export default function CrucibleCockpitPage({
                       ))}
                     </div>
 
-                    <div className="flex items-center gap-2 pt-1">
-                      <div className="relative flex-1">
-                        <input
-                          type="text"
-                          value={candidateInputText}
-                          onChange={(e) => setCandidateInputText(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") handleCandidateSubmit();
-                          }}
-                          placeholder={isRecording ? "Recording your voice... Click 'Stop & Submit' when finished." : "Type your answer or click Speak via Microphone..."}
-                          className={"w-full bg-[#181818] border rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none transition-colors " + (
-                            isRecording ? "border-rose-500 ring-2 ring-rose-500/20" : "border-white/10 focus:border-indigo-500"
-                          )}
-                        />
-                        {isRecording && (
-                          <span className="absolute right-3 top-3 w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                        )}
-                      </div>
-
+                    <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                      <input
+                        type="text"
+                        value={candidateInputText}
+                        onChange={(e) => setCandidateInputText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleCandidateSubmit();
+                          }
+                        }}
+                        placeholder="Type your response to the interviewer..."
+                        className="flex-1 bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                      />
                       <button
                         onClick={() => handleCandidateSubmit()}
-                        disabled={!candidateInputText.trim() && !isRecording}
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5 text-xs shadow-md disabled:opacity-40 cursor-pointer"
+                        disabled={!candidateInputText.trim() || isAiThinking}
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                       >
-                        <span>Send Answer</span>
                         <SendHorizonal className="h-3.5 w-3.5" />
+                        <span>Send</span>
                       </button>
                     </div>
                   </div>
                 )}
 
                 {activeConsoleTab === "cases" && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      {visibleCases.map((tc: any, idx: number) => (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      {visibleCases.map((c: any, i: number) => (
                         <button
-                          key={tc.id ?? idx}
-                          onClick={() => setSelectedCaseIdx(idx)}
-                          className={"px-3.5 py-1.5 rounded-lg text-xs font-semibold font-mono transition-all cursor-pointer " + (
-                            selectedCaseIdx === idx
-                              ? "bg-[#3D3D3D] text-white border border-white/20 shadow"
-                              : "bg-[#2D2D2D] text-slate-400 hover:text-white"
-                          )}
+                          key={i}
+                          onClick={() => setSelectedCaseIdx(i)}
+                          className={"px-3 py-1.5 rounded-lg text-xs font-mono font-bold border " + (selectedCaseIdx === i ? "bg-[#333333] border-emerald-500 text-emerald-400" : "bg-[#1F1F1F] border-white/5 text-slate-400 hover:text-white")}
                         >
-                          Case {idx + 1}
+                          Case {i + 1}
                         </button>
                       ))}
                     </div>
-
-                    <div className="space-y-3 bg-[#1E1E1E] p-4 rounded-xl border border-white/10 font-mono text-[14px]">
-                      <div>
-                        <div className="text-slate-400 text-xs font-sans mb-1">Input:</div>
-                        <div className="text-white font-bold">{visibleCases[selectedCaseIdx]?.input}</div>
+                    {visibleCases[selectedCaseIdx] && (
+                      <div className="bg-[#1A1A1A] p-4 rounded-xl border border-white/5 font-mono text-xs space-y-3">
+                        <div>
+                          <span className="text-slate-400">Input:</span>
+                          <pre className="text-slate-200 mt-1">{visibleCases[selectedCaseIdx].input}</pre>
+                        </div>
+                        <div>
+                          <span className="text-slate-400">Expected Output:</span>
+                          <pre className="text-emerald-400 font-bold mt-1">{visibleCases[selectedCaseIdx].expectedOutput}</pre>
+                        </div>
                       </div>
-                      <div className="pt-2 border-t border-white/5">
-                        <div className="text-slate-400 text-xs font-sans mb-1">Expected Output:</div>
-                        <div className="text-emerald-400 font-bold">{visibleCases[selectedCaseIdx]?.expectedOutput}</div>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 )}
 
                 {activeConsoleTab === "hidden" && (
                   <div className="space-y-3">
-                    <p className="text-xs text-slate-400 font-sans">
-                      Hidden test cases evaluate runtime complexity and boundary stress inputs. Inputs remain locked during assessment.
-                    </p>
-
-                    <div className="space-y-2">
-                      {hiddenCases.map((tc: any, i: number) => (
-                        <div key={tc.id ?? i} className="p-3.5 rounded-xl bg-[#1E1E1E] border border-white/10 flex items-center justify-between text-xs font-mono">
-                          <div className="flex items-center gap-2">
-                            <Lock className="h-4 w-4 text-amber-400" />
-                            <span className="font-bold text-white">Hidden Test Case #{i + 1}</span>
-                          </div>
-                          <span className="text-slate-400 text-[12px]">
-                            {tc.explanation || "Automated Stress & Constraint Suite"}
-                          </span>
-                        </div>
-                      ))}
+                    <div className="bg-[#1A1A1A] p-4 rounded-xl border border-white/5 font-mono text-xs space-y-2">
+                      <div className="flex items-center gap-2 text-amber-400 font-bold">
+                        <Lock className="h-4 w-4" />
+                        <span>Hidden Test Suite Locked</span>
+                      </div>
+                      <p className="text-slate-400">
+                        {hiddenCases.length} hidden edge testcases will be executed automatically against your solution when you submit.
+                      </p>
                     </div>
                   </div>
                 )}
 
                 {activeConsoleTab === "results" && (
-                  <div>
+                  <div className="space-y-4">
                     {!testResults && !isRunning && (
-                      <div className="text-slate-400 italic py-2 text-xs">
-                        Click &ldquo;Run&rdquo; or &ldquo;Submit&rdquo; to evaluate your code.
+                      <div className="text-xs text-slate-400 font-mono text-center py-6">
+                        Click &quot;Run&quot; to test your code against visible vectors, or &quot;Submit Solution&quot; to test against the full suite.
                       </div>
                     )}
 
                     {isRunning && (
-                      <div className="flex items-center gap-3 text-slate-200 py-3 text-xs font-mono">
-                        <span className="w-4 h-4 rounded-full border-2 border-amber-500 border-t-transparent animate-spin" />
-                        <span>Compiling and executing test cases...</span>
+                      <div className="flex items-center justify-center gap-2 py-8 text-xs font-mono text-indigo-400 animate-pulse">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Executing test sandbox...</span>
                       </div>
                     )}
 
                     {testResults && !isRunning && (
                       <div className="space-y-4">
-                        <div className="flex items-center gap-4 pb-2 border-b border-white/10">
-                          <h3
-                            className={
-                              "text-xl font-black " +
-                              (testResults.status === "Accepted"
-                                ? "text-[#2CBB5D]"
-                                : "text-rose-500")
-                            }
-                          >
-                            {testResults.status}
-                          </h3>
+                        <div className="flex items-center gap-4 p-3 rounded-xl bg-[#1A1A1A] border border-white/5">
                           <span className="text-white text-xs font-mono">
                             Visible Cases: {testResults.visiblePassed}/{testResults.visibleTotal}
                           </span>
@@ -1388,11 +1196,11 @@ export default function CrucibleCockpitPage({
                     )}
                   </div>
                 )}
+
               </div>
             )}
           </div>
         </section>
-          )}
       </div>
 
       {/* ───────── Modal: Next problem ───────── */}
@@ -1434,176 +1242,168 @@ export default function CrucibleCockpitPage({
       )}
 
       {/* ───────── Modal: Completion Scorecard ───────── */}
-        {showCompletionScorecard && (
-          <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-6">
-            <div className="bg-[#1E293B] border-2 border-primary rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl text-center space-y-5 my-auto">
-              {/* Question 1 specific transition header */}
-              {isRound4 && currentQuestionIndex === 0 && (
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
-                    Task 1 Completed
-                  </div>
-                  <h2 className="text-xl font-black text-white">Question 1 Milestone Reached</h2>
-                  <p className="text-xs text-slate-400">
-                    You have completed all 5 response turns for Question 1. Ready to proceed to Question 2 of this set?
-                  </p>
+      {showCompletionScorecard && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-6">
+          <div className="bg-[#1E293B] border-2 border-primary rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl text-center space-y-5 my-auto">
+            {isRound4 && currentQuestionIndex === 0 && (
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
+                  Task 1 Completed
                 </div>
-              )}
-              <div className="w-16 h-16 bg-primary/20 text-primary-light rounded-full flex items-center justify-center mx-auto border-2 border-primary/40 shadow-inner">
-                <Trophy className="h-9 w-9 text-amber-400" />
+                <h2 className="text-xl font-black text-white">Question 1 Milestone Reached</h2>
+                <p className="text-xs text-slate-400">
+                  You have completed all 5 response turns for Question 1. Ready to proceed to Question 2 of this set?
+                </p>
               </div>
+            )}
+            <div className="w-16 h-16 bg-primary/20 text-primary-light rounded-full flex items-center justify-center mx-auto border-2 border-primary/40 shadow-inner">
+              <Trophy className="h-9 w-9 text-amber-400" />
+            </div>
 
-              {isRound4 && behavioralScorecard ? (
-                <div className="space-y-4 text-left">
-                  <div className="text-center pb-2 border-b border-white/10">
-                    <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                      Amazon Executive Bar Raiser Debrief
-                    </span>
-                    <div className="mt-3 flex items-center justify-center gap-4">
-                      <div className="text-5xl font-black font-mono text-white">
-                        {behavioralScorecard.score}<span className="text-2xl text-slate-400">/100</span>
-                      </div>
-                      <div className={"px-3 py-1 rounded-lg text-xs font-bold uppercase " + (
-                        behavioralScorecard.score >= 75 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border border-rose-500/40"
-                      )}>
-                        Verdict: {behavioralScorecard.verdict || "Evaluated"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#13161C] p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
-                    <div className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">STAR Method Breakdown:</div>
-                    <div className="text-slate-300"><strong className="text-amber-400">S & T:</strong> {behavioralScorecard.starBreakdown?.situationAndTask}</div>
-                    <div className="text-slate-300"><strong className="text-amber-400">Action:</strong> {behavioralScorecard.starBreakdown?.actionDepth}</div>
-                    <div className="text-slate-300"><strong className="text-amber-400">Result:</strong> {behavioralScorecard.starBreakdown?.resultAndMetrics}</div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div className="bg-emerald-950/30 border border-emerald-800/40 p-3 rounded-xl">
-                      <div className="font-bold text-emerald-400 mb-1">Key Strengths</div>
-                      <ul className="list-disc pl-4 space-y-1 text-slate-300">
-                        {(behavioralScorecard.strengths || []).map((s: string, idx: number) => (
-                          <li key={idx}>{s}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="bg-rose-950/30 border border-rose-800/40 p-3 rounded-xl">
-                      <div className="font-bold text-rose-400 mb-1">Areas for Improvement</div>
-                      <ul className="list-disc pl-4 space-y-1 text-slate-300">
-                        {(behavioralScorecard.areasForImprovement || []).map((a: string, idx: number) => (
-                          <li key={idx}>{a}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#181C24] p-3 rounded-xl border border-white/10 text-xs text-slate-300">
-                    <strong className="text-white">Bar Raiser Summary: </strong>
-                    {behavioralScorecard.barRaiserDebriefNote}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {isRound1 && (
-                <div>
-                  <span className="text-xs font-mono font-bold text-emerald-400 tracking-wider uppercase bg-emerald-950/70 border border-emerald-800 px-3 py-1 rounded-full">
-                    ROUND 01 EVALUATION COMPLETE
+            {isRound4 && behavioralScorecard ? (
+              <div className="space-y-4 text-left">
+                <div className="text-center pb-2 border-b border-white/10">
+                  <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                    Amazon Executive Bar Raiser Debrief
                   </span>
-                  <h2 className="text-2xl font-black text-white mt-3">
-                    {companyData?.companyName} Algorithmic Screen Passed
-                  </h2>
-                  <p className="text-xs text-slate-300 mt-1.5 font-medium">
-                    Automated HackerRank OA test vectors and complexity bounds verified.
-                  </p>
-                  <div className="grid grid-cols-3 gap-3 p-4 mt-4 rounded-xl bg-slate-900/90 border border-slate-700 text-left font-mono">
-                    <div className="p-2">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">Total Score</div>
-                      <div className="text-lg font-black text-emerald-400 mt-0.5">100 / 100</div>
+                  <div className="mt-3 flex items-center justify-center gap-4">
+                    <div className="text-5xl font-black font-mono text-white">
+                      {behavioralScorecard.score}<span className="text-2xl text-slate-400">/100</span>
                     </div>
-                    <div className="p-2 border-x border-slate-800">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">OA Status</div>
-                      <div className="text-lg font-black text-white mt-0.5">Verified</div>
-                    </div>
-                    <div className="p-2">
-                      <div className="text-[10px] text-slate-400 uppercase font-bold">Runtime SLA</div>
-                      <div className="text-lg font-black text-amber-400 mt-0.5">Optimal</div>
+                    <div className={"px-3 py-1 rounded-lg text-xs font-bold uppercase " + (
+                      behavioralScorecard.score >= 75 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border border-rose-500/40"
+                    )}>
+                      Verdict: {behavioralScorecard.verdict || "Evaluated"}
                     </div>
                   </div>
                 </div>
-              )}
-                </>
-              )}
 
-              <div className="pt-2">
-                {isRound4 && (currentQuestionIndex === 0 || !isSetFinished) ? (
-                  <button
-                    onClick={() => {
-                      // 1. Archive current dialogue
-                      setAllSetHistory(prev => [...prev, ...dialogue]);
-                      
-                      // 2. Resolve Question 2 problem ID dynamically for current role & set
-                      const prefixMap = {
-                        sde_intern: "intern",
-                        sde_1: "sde1",
-                        sde_2: "sde2",
-                        sde_3: "sde3",
-                        principal: "principal"
-                      };
-                      const prefix = prefixMap[selectedRole] || "sde1";
-                      // Check if Round 4 / Bar Raiser is active
-                      let q2Id = "";
-                      if (isRound4) {
-                        q2Id = "amz-" + prefix + "-r4-s" + (selectedSetId || 1) + "-q2";
-                        // Fallback check against track if present
-                        if (typeof AMAZON_TRACKS !== "undefined") {
-                          const track = (AMAZON_TRACKS as any)[selectedRole];
-                          const r4 = track?.rounds?.find((r: any) => r.roundId === "round-4");
-                          const s = r4?.sets?.find((s: any) => s.setId === selectedSetId);
-                          if (s?.problemIds && s.problemIds[1]) {
-                            q2Id = s.problemIds[1];
-                          }
-                        }
-                      } else {
-                        q2Id = "amz-" + prefix + "-s" + (selectedSetId || 1) + "-q2";
-                      }
-                      
-                      // 3. Update currentProblemId so left pane updates immediately!
-                      setCurrentProblemId(q2Id);
-                      setCurrentQuestionIndex(1);
-                      setShowCompletionScorecard(false);
-                      setQuestionCompleted(false);
-                      setIsSetFinished(false);
+                <div className="bg-[#13161C] p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
+                  <div className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">STAR Method Breakdown:</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">S &amp; T:</strong> {behavioralScorecard.starBreakdown?.situationAndTask}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Action:</strong> {behavioralScorecard.starBreakdown?.actionDepth}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Result:</strong> {behavioralScorecard.starBreakdown?.resultAndMetrics}</div>
+                </div>
 
-                      // 4. Look up problem details for Q2 or fallback cleanly
-                      const nextProb = typeof getProblemById === "function" ? getProblemById(q2Id) : null;
-                      const nextTitle = nextProb?.title || "Task 2 of Set " + selectedSetId;
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-emerald-950/30 border border-emerald-800/40 p-3 rounded-xl">
+                    <div className="font-bold text-emerald-400 mb-1">Key Strengths</div>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      {(behavioralScorecard.strengths || []).map((s: string, idx: number) => (
+                        <li key={idx}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-rose-950/30 border border-rose-800/40 p-3 rounded-xl">
+                    <div className="font-bold text-rose-400 mb-1">Areas for Improvement</div>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      {(behavioralScorecard.areasForImprovement || []).map((a: string, idx: number) => (
+                        <li key={idx}>{a}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
 
-                      // 5. Initialize dialogue with the actual Q2 problem
-                      setDialogue([{
-                        id: Math.random().toString(36).substring(2, 9),
-                        sender: "ai",
-                        text: "Hello. Let's move to Question 2 of this set: " + nextTitle + ". Please begin by walking me through your Situation and Task using the STAR framework.",
-                        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                      }]);
-                    }}
-                    className="w-full py-4 rounded-xl text-base font-black text-white bg-emerald-600 hover:bg-emerald-500 shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all sticky bottom-0 z-10"
-                  >
-                    <span>Proceed to Question 2 of Set →</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleReturnToPipeline}
-                    className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
-                  >
-                    <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : "Return to Pipeline (View Final Decision)"}</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
+                <div className="bg-[#181C24] p-3 rounded-xl border border-white/10 text-xs text-slate-300">
+                  <strong className="text-white">Bar Raiser Summary: </strong>
+                  {behavioralScorecard.barRaiserDebriefNote}
+                </div>
               </div>
+            ) : (
+              <>
+                {isRound1 && (
+                  <div>
+                    <span className="text-xs font-mono font-bold text-emerald-400 tracking-wider uppercase bg-emerald-950/70 border border-emerald-800 px-3 py-1 rounded-full">
+                      ROUND 01 EVALUATION COMPLETE
+                    </span>
+                    <h2 className="text-2xl font-black text-white mt-3">
+                      {companyData?.companyName} Algorithmic Screen Passed
+                    </h2>
+                    <p className="text-xs text-slate-300 mt-1.5 font-medium">
+                      Automated HackerRank OA test vectors and complexity bounds verified.
+                    </p>
+                    <div className="grid grid-cols-3 gap-3 p-4 mt-4 rounded-xl bg-slate-900/90 border border-slate-700 text-left font-mono">
+                      <div className="p-2">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold">Total Score</div>
+                        <div className="text-lg font-black text-emerald-400 mt-0.5">100 / 100</div>
+                      </div>
+                      <div className="p-2 border-x border-slate-800">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold">OA Status</div>
+                        <div className="text-lg font-black text-white mt-0.5">Verified</div>
+                      </div>
+                      <div className="p-2">
+                        <div className="text-[10px] text-slate-400 uppercase font-bold">Runtime SLA</div>
+                        <div className="text-lg font-black text-amber-400 mt-0.5">Optimal</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            <div className="pt-2">
+              {isRound4 && (currentQuestionIndex === 0 || !isSetFinished) ? (
+                <button
+                  onClick={() => {
+                    setAllSetHistory(prev => [...prev, ...dialogue]);
+
+                    const prefixMap: Record<string, string> = {
+                      sde_intern: "intern",
+                      sde_1: "sde1",
+                      sde_2: "sde2",
+                      sde_3: "sde3",
+                      principal: "principal"
+                    };
+                    const prefix = prefixMap[selectedRole] || "sde1";
+                    let q2Id = "";
+                    if (isRound4) {
+                      q2Id = "amz-" + prefix + "-r4-s" + (selectedSetId || 1) + "-q2";
+                      if (typeof AMAZON_TRACKS !== "undefined") {
+                        const track = (AMAZON_TRACKS as any)[selectedRole];
+                        const r4 = track?.rounds?.find((r: any) => r.roundId === "round-4");
+                        const s = r4?.sets?.find((s: any) => s.setId === selectedSetId);
+                        if (s?.problemIds && s.problemIds[1]) {
+                          q2Id = s.problemIds[1];
+                        }
+                      }
+                    } else {
+                      q2Id = "amz-" + prefix + "-s" + (selectedSetId || 1) + "-q2";
+                    }
+
+                    setCurrentProblemId(q2Id);
+                    setCurrentQuestionIndex(1);
+                    setShowCompletionScorecard(false);
+                    setQuestionCompleted(false);
+                    setIsSetFinished(false);
+
+                    const nextProb = typeof getProblemById === "function" ? getProblemById(q2Id) : null;
+                    const nextTitle = nextProb?.title || "Task 2 of Set " + selectedSetId;
+
+                    setDialogue([{
+                      id: Math.random().toString(36).substring(2, 9),
+                      sender: "ai",
+                      text: "Hello. Let's move to Question 2 of this set: " + nextTitle + ". Please begin by walking me through your Situation and Task using the STAR framework.",
+                      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                    }]);
+                  }}
+                  className="w-full py-4 rounded-xl text-base font-black text-white bg-emerald-600 hover:bg-emerald-500 shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all sticky bottom-0 z-10"
+                >
+                  <span>Proceed to Question 2 of Set →</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleReturnToPipeline}
+                  className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+                >
+                  <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : "Return to Pipeline (View Final Decision)"}</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
-        )}
-      </div>
-    );
+        </div>
+      )}
+    </div>
+  );
 }
