@@ -7,10 +7,11 @@
 }
 
 export interface StarterTemplates {
-  python: string;
-  javascript: string;
-  cpp: string;
-  java: string;
+  python?: string;
+  javascript?: string;
+  cpp?: string;
+  java?: string;
+  behavioral?: string;
 }
 
 export interface ProblemDefinition {
