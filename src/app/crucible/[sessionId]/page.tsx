@@ -7,7 +7,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { getProblemById, getProblemForRound, ProblemDefinition } from "@/data/problemsRegistry";
 import { PROBLEMS_DATABASE } from "@/data/problemsRegistry";
 import { getCompanyTrackData } from "@/data/companyTracks";
-import { AmazonRole, AMAZON_TRACKS } from "@/data/amazonTracks";
+import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTracks";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
   Play,
@@ -377,19 +377,18 @@ export default function CrucibleCockpitPage({
       lower.includes("end");
 
     if (isRound2 && wantsToSkip) {
-      if (currentQuestionIndex === 0 && problem?.nextProblemId) {
-        postAiMessage("Understood. Moving you to Question 2 of this set. Please review the problem statement and outline your approach.");
-        setTimeout(() => {
-          handleProceedToNextProblem();
-        }, 1200);
-        return;
-      } else {
-        postAiMessage("Understood. Concluding your Technical Viva assessment now. Generating your evaluation scorecard...");
-        setTimeout(() => {
-          handleFinishBarRaiserRound();
-        }, 1200);
-        return;
+      if (currentQuestionIndex === 0) {
+        const qSet = getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId);
+        if (qSet && qSet.problemIds && qSet.problemIds.length > 1) {
+            handleProceedToNextProblem();
+            return;
+        }
       }
+      postAiMessage("Understood. Concluding your Technical Viva assessment now. Generating your evaluation scorecard...");
+      setTimeout(() => {
+        handleFinishBarRaiserRound();
+      }, 1200);
+      return;
     }
 
     // STRICT RULE: If we are in INITIAL phase, ANY answer from candidate immediately
@@ -713,11 +712,33 @@ export default function CrucibleCockpitPage({
   };
 
   const handleProceedToNextProblem = () => {
-    if (problem?.nextProblemId) {
-      setCurrentProblemId(problem.nextProblemId);
+    const qSet = getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId);
+    if (qSet && qSet.problemIds && qSet.problemIds.length > 1) {
+      const nextProblemId = qSet.problemIds[1];
+
+      // Archive current dialogue history before switching
+      setAllSetHistory(prev => [...prev, ...dialogue]);
+
+      setCurrentProblemId(nextProblemId);
+      setCurrentQuestionIndex(1);
       setShowNextModal(false);
       setTestResults(null);
+      setVivaPhase("INITIAL");
       setActiveConsoleTab(isRound1 ? "cases" : "interviewer");
+
+      const p = getProblemById(nextProblemId);
+      if (p && p.starterTemplates && p.starterTemplates[language]) {
+        setCode(p.starterTemplates[language]);
+      }
+
+      // Start fresh dialogue for Question 2
+      const nextTitle = p?.title || "Question 2";
+      setDialogue([{
+        id: "q2-init-" + Date.now(),
+        sender: "ai",
+        text: "Hello! We are now on Question 2: " + nextTitle + ". Before writing any code, walk me through your planned algorithm, data structures, and expected time and space complexity.",
+        time: "Just now"
+      }]);
     }
   };
 
@@ -730,12 +751,14 @@ export default function CrucibleCockpitPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: code || "",
+          isRound2: isRound2,
           isRound3: isRound3,
           isRound4: isRound4,
           roundSlug: roundSlug,
           problemTitle: problem ? problem.title : "Technical Round",
           problemDescription: problem ? (problem.paragraphs || []).join(" ") : "",
           dialogueHistory: [...(allSetHistory || []), ...(dialogue || [])],
+          candidateTestScore: ((taskScores[0] || 0) / 2) + ((taskScores[1] || 0) / 2),
           evaluateScorecard: true
         })
       });
@@ -1362,7 +1385,64 @@ export default function CrucibleCockpitPage({
               <Trophy className="h-9 w-9 text-amber-400" />
             </div>
 
-            {isRound4 && behavioralScorecard ? (
+            {isRound2 && behavioralScorecard ? (
+              <div className="space-y-4 text-left">
+                <div className="text-center pb-2 border-b border-white/10">
+                  <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                    ROUND 2: TECHNICAL DSA VIVA EVALUATION
+                  </span>
+                  <div className="mt-3 flex items-center justify-center gap-4">
+                    <div className="text-5xl font-black font-mono text-white">
+                      {behavioralScorecard.score ?? 0}<span className="text-2xl text-slate-400">/100</span>
+                    </div>
+                    <div className={"px-3 py-1 rounded-lg text-xs font-bold uppercase " + (
+                      (behavioralScorecard.verdict === "Strong Hire" || behavioralScorecard.verdict === "Hire")
+                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                        : behavioralScorecard.verdict === "Leaning No Hire"
+                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/40"
+                        : "bg-rose-500/20 text-rose-400 border border-rose-500/40"
+                    )}>
+                      Verdict: {behavioralScorecard.verdict || "Evaluated"}
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs font-mono text-slate-300 flex justify-center gap-4">
+                    <span>Test Cases Passed: <strong className="text-white">{behavioralScorecard.testScore ?? 0} / 50 pts</strong></span>
+                    <span>Viva Technical Defense: <strong className="text-white">{behavioralScorecard.vivaScore ?? 0} / 50 pts</strong></span>
+                  </div>
+                </div>
+
+                <div className="bg-[#13161C] p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
+                  <div className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">Detailed Breakdown:</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Algorithmic Decomposition:</strong> {behavioralScorecard.starBreakdown?.situationAndTask}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Code Execution & Correctness:</strong> {behavioralScorecard.starBreakdown?.actionDepth}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Complexity & Defense:</strong> {behavioralScorecard.starBreakdown?.resultAndMetrics}</div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-emerald-950/30 border border-emerald-800/40 p-3 rounded-xl">
+                    <div className="font-bold text-emerald-400 mb-1">Key Strengths</div>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      {(behavioralScorecard.strengths || []).map((s: string, idx: number) => (
+                        <li key={idx}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-rose-950/30 border border-rose-800/40 p-3 rounded-xl">
+                    <div className="font-bold text-rose-400 mb-1">Areas for Improvement</div>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      {(behavioralScorecard.areasForImprovement || []).map((a: string, idx: number) => (
+                        <li key={idx}>{a}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-[#181C24] p-3 rounded-xl border border-white/10 text-xs text-slate-300">
+                  <strong className="text-white">Bar Raiser Debrief Note: </strong>
+                  {behavioralScorecard.barRaiserDebriefNote}
+                </div>
+              </div>
+            ) : isRound4 && behavioralScorecard ? (
               <div className="space-y-4 text-left">
                 <div className="text-center pb-2 border-b border-white/10">
                   <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">

@@ -129,81 +129,61 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
           {
             "setId": 1,
             "setName": "Technical Loop Set 1",
-            "problemIds": [
-              "amzn-tree-max-path"
-            ],
+            "problemIds": ["amzn-tree-max-path", "amzn-word-break"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 1"
           },
           {
             "setId": 2,
             "setName": "Technical Loop Set 2",
-            "problemIds": [
-              "amzn-word-break"
-            ],
+            "problemIds": ["amzn-word-break", "amzn-trie-autocomplete"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 2"
           },
           {
             "setId": 3,
             "setName": "Technical Loop Set 3",
-            "problemIds": [
-              "amzn-tree-max-path"
-            ],
+            "problemIds": ["amzn-trie-autocomplete", "amzn-top-k-frequent"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 3"
           },
           {
             "setId": 4,
             "setName": "Technical Loop Set 4",
-            "problemIds": [
-              "amzn-word-break"
-            ],
+            "problemIds": ["amzn-top-k-frequent", "amzn-network-delay"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 4"
           },
           {
             "setId": 5,
             "setName": "Technical Loop Set 5",
-            "problemIds": [
-              "amzn-tree-max-path"
-            ],
+            "problemIds": ["amzn-network-delay", "amzn-critical-connections"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 5"
           },
           {
             "setId": 6,
             "setName": "Technical Loop Set 6",
-            "problemIds": [
-              "amzn-word-break"
-            ],
+            "problemIds": ["amzn-critical-connections", "amzn-sliding-rate-limiter"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 6"
           },
           {
             "setId": 7,
             "setName": "Technical Loop Set 7",
-            "problemIds": [
-              "amzn-tree-max-path"
-            ],
+            "problemIds": ["amzn-sliding-rate-limiter", "amzn-segment-latency-monitor"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 7"
           },
           {
             "setId": 8,
             "setName": "Technical Loop Set 8",
-            "problemIds": [
-              "amzn-word-break"
-            ],
+            "problemIds": ["amzn-segment-latency-monitor", "amzn-tree-max-path"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 8"
           },
           {
             "setId": 9,
             "setName": "Technical Loop Set 9",
-            "problemIds": [
-              "amzn-tree-max-path"
-            ],
+            "problemIds": ["amzn-tree-max-path", "amzn-trie-autocomplete"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 9"
           },
           {
             "setId": 10,
             "setName": "Technical Loop Set 10",
-            "problemIds": [
-              "amzn-word-break"
-            ],
+            "problemIds": ["amzn-word-break", "amzn-top-k-frequent"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 10"
           }
         ]
@@ -502,81 +482,61 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
           {
             "setId": 1,
             "setName": "Technical Loop Set 1",
-            "problemIds": [
-              "amzn-trie-autocomplete"
-            ],
+            "problemIds": ["amzn-trie-autocomplete", "amzn-top-k-frequent"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 1"
           },
           {
             "setId": 2,
             "setName": "Technical Loop Set 2",
-            "problemIds": [
-              "amzn-top-k-frequent"
-            ],
+            "problemIds": ["amzn-top-k-frequent", "amzn-network-delay"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 2"
           },
           {
             "setId": 3,
             "setName": "Technical Loop Set 3",
-            "problemIds": [
-              "amzn-trie-autocomplete"
-            ],
+            "problemIds": ["amzn-network-delay", "amzn-critical-connections"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 3"
           },
           {
             "setId": 4,
             "setName": "Technical Loop Set 4",
-            "problemIds": [
-              "amzn-top-k-frequent"
-            ],
+            "problemIds": ["amzn-critical-connections", "amzn-sliding-rate-limiter"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 4"
           },
           {
             "setId": 5,
             "setName": "Technical Loop Set 5",
-            "problemIds": [
-              "amzn-trie-autocomplete"
-            ],
+            "problemIds": ["amzn-sliding-rate-limiter", "amzn-segment-latency-monitor"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 5"
           },
           {
             "setId": 6,
             "setName": "Technical Loop Set 6",
-            "problemIds": [
-              "amzn-top-k-frequent"
-            ],
+            "problemIds": ["amzn-segment-latency-monitor", "amzn-tree-max-path"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 6"
           },
           {
             "setId": 7,
             "setName": "Technical Loop Set 7",
-            "problemIds": [
-              "amzn-trie-autocomplete"
-            ],
+            "problemIds": ["amzn-tree-max-path", "amzn-word-break"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 7"
           },
           {
             "setId": 8,
             "setName": "Technical Loop Set 8",
-            "problemIds": [
-              "amzn-top-k-frequent"
-            ],
+            "problemIds": ["amzn-word-break", "amzn-trie-autocomplete"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 8"
           },
           {
             "setId": 9,
             "setName": "Technical Loop Set 9",
-            "problemIds": [
-              "amzn-trie-autocomplete"
-            ],
+            "problemIds": ["amzn-trie-autocomplete", "amzn-network-delay"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 9"
           },
           {
             "setId": 10,
             "setName": "Technical Loop Set 10",
-            "problemIds": [
-              "amzn-top-k-frequent"
-            ],
+            "problemIds": ["amzn-top-k-frequent", "amzn-critical-connections"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 10"
           }
         ]
@@ -875,81 +835,61 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
           {
             "setId": 1,
             "setName": "Technical Loop Set 1",
-            "problemIds": [
-              "amzn-network-delay"
-            ],
+            "problemIds": ["amzn-network-delay", "amzn-critical-connections"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 1"
           },
           {
             "setId": 2,
             "setName": "Technical Loop Set 2",
-            "problemIds": [
-              "amzn-critical-connections"
-            ],
+            "problemIds": ["amzn-critical-connections", "amzn-sliding-rate-limiter"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 2"
           },
           {
             "setId": 3,
             "setName": "Technical Loop Set 3",
-            "problemIds": [
-              "amzn-network-delay"
-            ],
+            "problemIds": ["amzn-sliding-rate-limiter", "amzn-segment-latency-monitor"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 3"
           },
           {
             "setId": 4,
             "setName": "Technical Loop Set 4",
-            "problemIds": [
-              "amzn-critical-connections"
-            ],
+            "problemIds": ["amzn-segment-latency-monitor", "amzn-tree-max-path"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 4"
           },
           {
             "setId": 5,
             "setName": "Technical Loop Set 5",
-            "problemIds": [
-              "amzn-network-delay"
-            ],
+            "problemIds": ["amzn-tree-max-path", "amzn-word-break"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 5"
           },
           {
             "setId": 6,
             "setName": "Technical Loop Set 6",
-            "problemIds": [
-              "amzn-critical-connections"
-            ],
+            "problemIds": ["amzn-word-break", "amzn-trie-autocomplete"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 6"
           },
           {
             "setId": 7,
             "setName": "Technical Loop Set 7",
-            "problemIds": [
-              "amzn-network-delay"
-            ],
+            "problemIds": ["amzn-trie-autocomplete", "amzn-top-k-frequent"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 7"
           },
           {
             "setId": 8,
             "setName": "Technical Loop Set 8",
-            "problemIds": [
-              "amzn-critical-connections"
-            ],
+            "problemIds": ["amzn-top-k-frequent", "amzn-network-delay"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 8"
           },
           {
             "setId": 9,
             "setName": "Technical Loop Set 9",
-            "problemIds": [
-              "amzn-network-delay"
-            ],
+            "problemIds": ["amzn-network-delay", "amzn-sliding-rate-limiter"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 9"
           },
           {
             "setId": 10,
             "setName": "Technical Loop Set 10",
-            "problemIds": [
-              "amzn-critical-connections"
-            ],
+            "problemIds": ["amzn-critical-connections", "amzn-segment-latency-monitor"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 10"
           }
         ]
@@ -1248,81 +1188,61 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
           {
             "setId": 1,
             "setName": "Technical Loop Set 1",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-sliding-rate-limiter", "amzn-segment-latency-monitor"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 1"
           },
           {
             "setId": 2,
             "setName": "Technical Loop Set 2",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-segment-latency-monitor", "amzn-tree-max-path"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 2"
           },
           {
             "setId": 3,
             "setName": "Technical Loop Set 3",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-tree-max-path", "amzn-word-break"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 3"
           },
           {
             "setId": 4,
             "setName": "Technical Loop Set 4",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-word-break", "amzn-trie-autocomplete"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 4"
           },
           {
             "setId": 5,
             "setName": "Technical Loop Set 5",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-trie-autocomplete", "amzn-top-k-frequent"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 5"
           },
           {
             "setId": 6,
             "setName": "Technical Loop Set 6",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-top-k-frequent", "amzn-network-delay"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 6"
           },
           {
             "setId": 7,
             "setName": "Technical Loop Set 7",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-network-delay", "amzn-critical-connections"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 7"
           },
           {
             "setId": 8,
             "setName": "Technical Loop Set 8",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-critical-connections", "amzn-sliding-rate-limiter"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 8"
           },
           {
             "setId": 9,
             "setName": "Technical Loop Set 9",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-sliding-rate-limiter", "amzn-tree-max-path"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 9"
           },
           {
             "setId": 10,
             "setName": "Technical Loop Set 10",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-segment-latency-monitor", "amzn-word-break"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 10"
           }
         ]
@@ -1621,81 +1541,61 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
           {
             "setId": 1,
             "setName": "Technical Loop Set 1",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-sliding-rate-limiter", "amzn-segment-latency-monitor"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 1"
           },
           {
             "setId": 2,
             "setName": "Technical Loop Set 2",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-segment-latency-monitor", "amzn-critical-connections"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 2"
           },
           {
             "setId": 3,
             "setName": "Technical Loop Set 3",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-critical-connections", "amzn-network-delay"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 3"
           },
           {
             "setId": 4,
             "setName": "Technical Loop Set 4",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-network-delay", "amzn-top-k-frequent"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 4"
           },
           {
             "setId": 5,
             "setName": "Technical Loop Set 5",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-top-k-frequent", "amzn-trie-autocomplete"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 5"
           },
           {
             "setId": 6,
             "setName": "Technical Loop Set 6",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-trie-autocomplete", "amzn-word-break"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 6"
           },
           {
             "setId": 7,
             "setName": "Technical Loop Set 7",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-word-break", "amzn-tree-max-path"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 7"
           },
           {
             "setId": 8,
             "setName": "Technical Loop Set 8",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-tree-max-path", "amzn-sliding-rate-limiter"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 8"
           },
           {
             "setId": 9,
             "setName": "Technical Loop Set 9",
-            "problemIds": [
-              "amzn-sliding-rate-limiter"
-            ],
+            "problemIds": ["amzn-sliding-rate-limiter", "amzn-network-delay"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 9"
           },
           {
             "setId": 10,
             "setName": "Technical Loop Set 10",
-            "problemIds": [
-              "amzn-segment-latency-monitor"
-            ],
+            "problemIds": ["amzn-segment-latency-monitor", "amzn-critical-connections"],
             "description": "Authentic Amazon Round 2 Technical Assessment Set 10"
           }
         ]

@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
       vivaPhase = "INITIAL",
       questionIndex = 0,
       totalQuestions = 2,
+      candidateTestScore = 0,
       evaluateScorecard = false
     } = await req.json();
 
@@ -245,7 +246,7 @@ INTERVIEWER GUIDELINES:
       if (vivaPhase === "FOLLOW_UPS" && candidateTurnCount >= 3) {
         const isTask1 = questionIndex === 0;
         const conclusionReply = isTask1
-          ? "Thank you for defending your implementation. We have completed Question 1 of this Technical Viva! Please click 'Proceed to Task 2' at the top right to load your next challenge."
+          ? "Thank you for defending your implementation. We have successfully completed Question 1 of this Technical Viva! Please type 'next' or 'proceed' to load Question 2."
           : "Excellent defense. You have completed both technical problems and algorithmic grilling for this round! Please click 'Conclude & Score' at the top right to review your comprehensive evaluation.";
 
         return NextResponse.json({
@@ -351,7 +352,14 @@ BEHAVIOR DIRECTIVES:
     // 3. SCORECARD GENERATION
     // ─────────────────────────────────────────────────────────────
     if (evaluateScorecard) {
-      const isRound2Eval = Boolean(isRound2 || roundSlug === "round-2" || roundSlug === "technical_viva");
+      const isRound2Eval = Boolean(
+        isRound2 ||
+        roundSlug === "round-2" ||
+        roundSlug === "technical_viva" ||
+        roundSlug === "dsa_deep_dive" ||
+        roundSlug === "viva"
+      );
+
       const evaluationPrompt = isRound2Eval
         ? `You are an Amazon Principal Bar Raiser evaluating a Round 2 (Technical DSA Viva) candidate.
 The candidate was assigned 2 algorithmic problems with live test validation and a technical viva defense.
@@ -359,31 +367,36 @@ The candidate was assigned 2 algorithmic problems with live test validation and 
 TRANSCRIPT & CODE SUBMISSION:
 ${JSON.stringify(dialogueHistory, null, 2)}
 
+TEST SCORE (0-50): ${candidateTestScore}
+
 EVALUATION RULES:
 1. TEST EXECUTION (50% WEIGHT):
-   - If the candidate failed test cases, submitted empty/broken code, or opted to skip without working solutions, score between 20 and 48 (Verdict: "No Hire").
-   - If the candidate passed test cases but gave weak viva defense, score between 50 and 65 (Verdict: "Leaning No Hire").
-   - If the candidate passed test cases AND defended time/space complexity, edge cases, and scalability clearly, score between 70 and 92 (Verdict: "Hire" or "Strong Hire").
-2. DO NOT GIVE A STATIC 100/100. Grade realistically based on actual code and viva defense.
+   - The testScore provided is ${candidateTestScore}.
+2. VIVA DEFENSE (50% WEIGHT):
+   - Evaluate the quality of technical defense in dialogueHistory.
+   - If candidate skipped or failed tests (testScore = 0), vivaScore MUST be 0.
+   - Otherwise, grade viva defense between 0-50 based on rigor, scalability, and edge case handling.
+3. FINAL SCORE (0-100) = testScore + vivaScore.
+4. VERDICT:
+   - 0-45: "No Hire"
+   - 46-65: "Leaning No Hire"
+   - 66-84: "Hire"
+   - 85-100: "Strong Hire"
 
 Respond strictly in valid JSON format with NO markdown fences, no backticks, and no extra prose:
 {
-  "score": <number between 20 and 92>,
+  "score": <totalScore between 0 and 100>,
+  "testScore": ${candidateTestScore},
+  "vivaScore": <vivaScore between 0 and 50>,
   "verdict": "<Strong Hire | Hire | Leaning No Hire | No Hire>",
   "starBreakdown": {
     "situationAndTask": "<1-2 sentences evaluating algorithmic understanding and problem decomposition>",
     "actionDepth": "<1-2 sentences assessing implementation correctness, test validation, and code structure>",
     "resultAndMetrics": "<1-2 sentences evaluating their viva defense on Big-O complexity, edge cases, and scale>"
   },
-  "strengths": [
-    "<specific observed technical or defense strength 1>",
-    "<specific observed technical or defense strength 2>"
-  ],
-  "areasForImprovement": [
-    "<specific area where code or viva defense fell short 1>",
-    "<specific actionable technical improvement 2>"
-  ],
-  "barRaiserDebriefNote": "<2-3 executive sentences summarizing whether the candidate clears the Amazon SDE-2 bar>"
+  "strengths": ["<strength1>", "<strength2>"],
+  "areasForImprovement": ["<improvement1>", "<improvement2>"],
+  "barRaiserDebriefNote": "<2-3 executive sentences summarizing whether the candidate clears the Amazon SDE bar>"
 }`
         : `You are a Principal Amazon Bar Raiser completing the comprehensive hiring scorecard for an Executive Round.
 Evaluate the candidate's complete dialogue transcript across all answered questions in this set against Amazon Leadership Principles (STAR method, "I" vs "We" ownership, concrete quantifiable metrics, and depth of technical/business trade-offs).
@@ -433,6 +446,21 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
             const data = await gRes.json();
             const text = data?.choices?.[0]?.message?.content?.trim();
             const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+            if (isRound2Eval && parsed) {
+              parsed.testScore = Math.min(50, Math.max(0, Math.round(candidateTestScore || 0)));
+              if (parsed.testScore === 0) {
+                parsed.vivaScore = 0;
+                parsed.score = 0;
+                parsed.verdict = "No Hire";
+              } else {
+                parsed.vivaScore = Math.min(50, Math.max(0, Number(parsed.vivaScore || 25)));
+                parsed.score = Math.min(100, Math.max(0, parsed.testScore + parsed.vivaScore));
+                if (parsed.score >= 85) parsed.verdict = "Strong Hire";
+                else if (parsed.score >= 66) parsed.verdict = "Hire";
+                else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
+                else parsed.verdict = "No Hire";
+              }
+            }
             return NextResponse.json({ scorecard: parsed });
           }
         } catch (e) {
@@ -454,6 +482,21 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
             const data = await res.json();
             const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
             const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+            if (isRound2Eval && parsed) {
+              parsed.testScore = Math.min(50, Math.max(0, Math.round(candidateTestScore || 0)));
+              if (parsed.testScore === 0) {
+                parsed.vivaScore = 0;
+                parsed.score = 0;
+                parsed.verdict = "No Hire";
+              } else {
+                parsed.vivaScore = Math.min(50, Math.max(0, Number(parsed.vivaScore || 25)));
+                parsed.score = Math.min(100, Math.max(0, parsed.testScore + parsed.vivaScore));
+                if (parsed.score >= 85) parsed.verdict = "Strong Hire";
+                else if (parsed.score >= 66) parsed.verdict = "Hire";
+                else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
+                else parsed.verdict = "No Hire";
+              }
+            }
             return NextResponse.json({ scorecard: parsed });
           }
         } catch (e) {
@@ -462,6 +505,44 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
       }
 
       // Fallback Scorecard
+      if (isRound2Eval) {
+        const testScore = Math.min(50, Math.max(0, Math.round(candidateTestScore || 0)));
+        // If testScore is 0, strict zero guardrails apply
+        const vivaScore = testScore === 0 ? 0 : 35;
+        const totalScore = testScore + vivaScore;
+        let verdict = "No Hire";
+        if (totalScore >= 85) verdict = "Strong Hire";
+        else if (totalScore >= 66) verdict = "Hire";
+        else if (totalScore >= 46) verdict = "Leaning No Hire";
+
+        return NextResponse.json({
+          scorecard: {
+            score: totalScore,
+            testScore,
+            vivaScore,
+            verdict,
+            starBreakdown: {
+              situationAndTask: testScore > 0 ? "Clear breakdown of problem requirements and algorithmic constraints." : "Candidate failed to decompose problem constraints effectively.",
+              actionDepth: testScore > 0 ? `Passed automated test suites earning ${testScore}/50 test execution points.` : "Code failed automated stress test suites or was omitted.",
+              resultAndMetrics: vivaScore > 0 ? "Articulated Big-O asymptotic complexity bounds and edge case handling." : "No valid viva defense conducted on passing implementation."
+            },
+            strengths: testScore > 0 ? [
+              "Validated solution against visible and hidden test vectors.",
+              "Structured approach to algorithm selection and complexity."
+            ] : [
+              "Attempted problem initialization and initial discussion."
+            ],
+            areasForImprovement: [
+              "Ensure all hidden edge cases (integer limits, null structures) are guarded against.",
+              "Provide deeper analysis on peak memory allocations under streaming workloads."
+            ],
+            barRaiserDebriefNote: testScore > 0
+              ? "Candidate demonstrated competent problem-solving and technical defense, clearing the technical viva bar."
+              : "Candidate failed to produce a working implementation passing stress tests, resulting in a No Hire recommendation."
+          }
+        });
+      }
+
       return NextResponse.json({
         scorecard: {
           score: 82,

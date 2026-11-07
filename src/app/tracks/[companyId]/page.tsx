@@ -1,14 +1,20 @@
 ﻿"use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/landing/Navbar";
 import { Button } from "@/components/ui/Button";
 import { getCompanyTrackData } from "@/data/companyTracks";
 import { Terminal, PlayCircle, ShieldAlert, Cpu, CheckCircle2, Award, Info, Sparkles } from "lucide-react";
 
 export default function CompanyTrackPage({ params }: { params: { companyId: string } }) {
+  const searchParams = useSearchParams();
   const [selectedRole, setSelectedRole] = useState<string>("sde1");
+
+  const round1Completed = searchParams.get("round1Completed") === "true";
+  const round2Completed = searchParams.get("round2Completed") === "true";
+  const round3Completed = searchParams.get("round3Completed") === "true";
 
   const companyData = getCompanyTrackData(params.companyId);
   const currentRole = companyData.roles[selectedRole] || companyData.roles["sde1"];
@@ -37,6 +43,41 @@ export default function CompanyTrackPage({ params }: { params: { companyId: stri
       {/* Header Section */}
       <section className="pt-16 pb-12 border-b-2 border-slate-300 bg-white">
         <div className="max-w-6xl mx-auto px-6">
+          {/* Completion Banners */}
+          {round1Completed && (
+            <div className="mb-8 bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-4 flex items-center gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="bg-emerald-500 text-white rounded-full p-2">
+                <CheckCircle2 className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-950 text-sm">Round 1 OA Complete!</h4>
+                <p className="text-xs text-slate-700 font-medium">Your automated test vectors have been verified. <span className="font-bold text-emerald-700 underline">Round 2: Technical DSA Viva</span> is now actively unlocked.</p>
+              </div>
+            </div>
+          )}
+          {round2Completed && (
+            <div className="mb-8 bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-4 flex items-center gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="bg-emerald-500 text-white rounded-full p-2">
+                <CheckCircle2 className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-950 text-sm">Round 2 Technical Viva Complete!</h4>
+                <p className="text-xs text-slate-700 font-medium">Your algorithmic performance has been verified. <span className="font-bold text-emerald-700 underline">Round 3: System Design / LLD</span> is now actively unlocked in your pipeline.</p>
+              </div>
+            </div>
+          )}
+          {round3Completed && (
+            <div className="mb-8 bg-emerald-50 border-2 border-emerald-500 rounded-2xl p-4 flex items-center gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="bg-emerald-500 text-white rounded-full p-2">
+                <CheckCircle2 className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-950 text-sm">Round 3 Architecture Complete!</h4>
+                <p className="text-xs text-slate-700 font-medium">Your system design and concurrency model have been verified. <span className="font-bold text-emerald-700 underline">Round 4: Bar Raiser Behavioral</span> is now actively unlocked.</p>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div>
               <div className="inline-flex items-center gap-2 mb-4 px-3.5 py-1.5 rounded-full bg-slate-100 border-2 border-slate-300 text-slate-800 text-xs font-mono font-bold tracking-wider">
