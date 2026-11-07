@@ -40,7 +40,8 @@ export const AMAZON_ROLES: Record<AmazonRole, AmazonRoleTrack> = {
             "setId": 1,
             "setName": "Practice Set 1",
             "problemIds": [
-              "amz-intern-s1-q1"
+              "amz-intern-s1-q1",
+                "amz-intern-s1-q2"
             ],
             "description": "Amazon Online Assessment Practice Set 1"
           },

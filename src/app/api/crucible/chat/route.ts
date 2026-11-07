@@ -5,6 +5,7 @@ export async function POST(req: NextRequest) {
     const {
       code = "",
       isRound3 = false,
+      isRound2 = false,
       isRound4 = false,
       roundSlug = "round-1",
       problemId = "amz-general",
@@ -121,6 +122,13 @@ RULES:
       });
     }
 
+        const isDsaVivaRound = Boolean(
+      isRound2 ||
+      roundSlug === "round-2" ||
+      roundSlug === "technical_viva" ||
+      roundSlug === "dsa_deep_dive" ||
+      roundSlug === "viva"
+    );
     const isBehavioral = Boolean(isRound4 || roundSlug === "round-4" || roundSlug === "bar-raiser");
 
     // ─────────────────────────────────────────────────────────────
@@ -225,11 +233,159 @@ INTERVIEWER GUIDELINES:
       });
     }
 
+        // ─────────────────────────────────────────────────────────────
+    // 2.5 ROUND 2: TECHNICAL DSA VIVA (INITIAL -> FOLLOW-UPS)
     // ─────────────────────────────────────────────────────────────
+    if (isDsaVivaRound && !evaluateScorecard) {
+      const candidateTurnCount = (dialogueHistory || []).filter(
+        (m: any) => m.speaker === "CANDIDATE" || m.sender === "candidate" || m.role === "user"
+      ).length + (candidateMessage ? 1 : 0);
+
+      // Conclude defense when 3 follow-ups have been answered
+      if (vivaPhase === "FOLLOW_UPS" && candidateTurnCount >= 3) {
+        const isTask1 = questionIndex === 0;
+        const conclusionReply = isTask1
+          ? "Thank you for defending your implementation. We have completed Question 1 of this Technical Viva! Please click 'Proceed to Task 2' at the top right to load your next challenge."
+          : "Excellent defense. You have completed both technical problems and algorithmic grilling for this round! Please click 'Conclude & Score' at the top right to review your comprehensive evaluation.";
+
+        return NextResponse.json({
+          reply: conclusionReply,
+          isCompleted: true,
+          turn: candidateTurnCount
+        });
+      }
+
+      const normalizedMessages = (dialogueHistory || [])
+        .filter((m: any) => (m.text || m.content) && String(m.text || m.content).trim().length > 0)
+        .slice(-4)
+        .map((m: any) => ({
+          role: (m.sender === "candidate" || m.speaker === "CANDIDATE" || m.role === "user") ? ("user" as const) : ("assistant" as const),
+          content: String(m.text || m.content).trim()
+        }));
+
+      const dsaVivaPrompt = `You are an Amazon SDE-2 conducting Round 2 (Technical DSA Viva).
+TOPIC: ${problemTitle}
+PROBLEM DESCRIPTION: ${problemDescription}
+
+CURRENT CODE IMPLEMENTED:
+${code || "No code written yet."}
+
+CURRENT PHASE: ${vivaPhase}
+CANDIDATE MESSAGE: "${candidateMessage}"
+CURRENT CANDIDATE TURN: ${candidateTurnCount} of 3.
+
+BEHAVIOR DIRECTIVES:
+1. PHASE = "INITIAL":
+   - The candidate must articulate their algorithm, primary data structures, and expected Big-O complexity.
+   - If they ask clarifying constraint questions (e.g., negative values, duplicates, size limits), answer directly and briefly as an interviewer without giving away the solution.
+   - If their proposed algorithmic direction is viable, explicitly approve them with: "That algorithmic approach is sound. Please walk me through your planned algorithm, data structure, and expected Big-O complexity."
+2. PHASE = "FOLLOW_UPS":
+   - Turn 1: Challenge their exact Worst-Case Time and Space Complexity ($O(N)$ bounds and peak memory).
+   - Turn 2: Probe critical boundary edge cases (collisions, duplicates, integer overflow, empty/single element inputs).
+   - Turn 3: Probe high-throughput scalability (e.g., 50 million streaming elements, memory constraints).
+3. STYLE:
+   - Speak conversationally in 1 to 2 concise sentences (max 40 words). No bullet points, no markdown headers, no code dumps.`;
+
+      if (groqKey) {
+        try {
+          const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
+            body: JSON.stringify({
+              model: "openai/gpt-oss-120b",
+              messages: [
+                { role: "system", content: dsaVivaPrompt },
+                ...normalizedMessages,
+                { role: "user", content: candidateMessage || "Ready." }
+              ],
+              max_tokens: 120,
+              temperature: 0.35
+            })
+          });
+          if (gRes.ok) {
+            const data = await gRes.json();
+            const reply = data?.choices?.[0]?.message?.content?.trim();
+            if (reply) {
+              return NextResponse.json({ reply, turn: candidateTurnCount });
+            }
+          }
+        } catch (e) {
+          console.warn("[Groq DSA Viva Failed]:", e);
+        }
+      }
+
+      if (geminiKey) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: `${dsaVivaPrompt}\n\nCandidate: "${candidateMessage}"` }] }]
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+            if (reply) {
+              return NextResponse.json({ reply, turn: candidateTurnCount });
+            }
+          }
+        } catch (e) {
+          console.warn("[Gemini DSA Viva Failed]:", e);
+        }
+      }
+
+      const vivaFallbacks = [
+        "What is the exact worst-case time and space complexity of your algorithm, and where does peak memory allocate?",
+        "What critical edge cases or boundary conditions could break your implementation?",
+        "How would your solution adapt if data arrived as an unindexed stream of 50 million records under limited memory?"
+      ];
+
+      return NextResponse.json({
+        reply: vivaFallbacks[Math.min(candidateTurnCount - 1, 2)] || "Please walk me through your planned algorithmic approach.",
+        turn: candidateTurnCount
+      });
+    }
+
+// ─────────────────────────────────────────────────────────────
     // 3. SCORECARD GENERATION
     // ─────────────────────────────────────────────────────────────
     if (evaluateScorecard) {
-      const evaluationPrompt = `You are a Principal Amazon Bar Raiser completing the comprehensive hiring scorecard for an Executive Round.
+      const isRound2Eval = Boolean(isRound2 || roundSlug === "round-2" || roundSlug === "technical_viva");
+      const evaluationPrompt = isRound2Eval
+        ? `You are an Amazon Principal Bar Raiser evaluating a Round 2 (Technical DSA Viva) candidate.
+The candidate was assigned 2 algorithmic problems with live test validation and a technical viva defense.
+
+TRANSCRIPT & CODE SUBMISSION:
+${JSON.stringify(dialogueHistory, null, 2)}
+
+EVALUATION RULES:
+1. TEST EXECUTION (50% WEIGHT):
+   - If the candidate failed test cases, submitted empty/broken code, or opted to skip without working solutions, score between 20 and 48 (Verdict: "No Hire").
+   - If the candidate passed test cases but gave weak viva defense, score between 50 and 65 (Verdict: "Leaning No Hire").
+   - If the candidate passed test cases AND defended time/space complexity, edge cases, and scalability clearly, score between 70 and 92 (Verdict: "Hire" or "Strong Hire").
+2. DO NOT GIVE A STATIC 100/100. Grade realistically based on actual code and viva defense.
+
+Respond strictly in valid JSON format with NO markdown fences, no backticks, and no extra prose:
+{
+  "score": <number between 20 and 92>,
+  "verdict": "<Strong Hire | Hire | Leaning No Hire | No Hire>",
+  "starBreakdown": {
+    "situationAndTask": "<1-2 sentences evaluating algorithmic understanding and problem decomposition>",
+    "actionDepth": "<1-2 sentences assessing implementation correctness, test validation, and code structure>",
+    "resultAndMetrics": "<1-2 sentences evaluating their viva defense on Big-O complexity, edge cases, and scale>"
+  },
+  "strengths": [
+    "<specific observed technical or defense strength 1>",
+    "<specific observed technical or defense strength 2>"
+  ],
+  "areasForImprovement": [
+    "<specific area where code or viva defense fell short 1>",
+    "<specific actionable technical improvement 2>"
+  ],
+  "barRaiserDebriefNote": "<2-3 executive sentences summarizing whether the candidate clears the Amazon SDE-2 bar>"
+}`
+        : `You are a Principal Amazon Bar Raiser completing the comprehensive hiring scorecard for an Executive Round.
 Evaluate the candidate's complete dialogue transcript across all answered questions in this set against Amazon Leadership Principles (STAR method, "I" vs "We" ownership, concrete quantifiable metrics, and depth of technical/business trade-offs).
 
 CRITICAL RULE: DO NOT GIVE A FAKE OR STATIC 100/100. Grade realistically between 35 and 92 based on their actual answers.

@@ -56,6 +56,60 @@ export const AMAZON_OA_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
     ]
   },
 
+  
+  "amz-intern-s1-q2": {
+    id: "amz-intern-s1-q2",
+    title: "Critical Connections in AWS Server Infrastructure (LC 1192)",
+    taskIndex: 2,
+    totalTasks: 2,
+    difficulty: "Hard",
+    timeLimit: "3s",
+    memoryLimit: "128MB",
+    paragraphs: [
+      "There are n servers numbered from 0 to n - 1 connected by undirected server-to-server connections forming a network. You are given an integer n and an array of connections where connections[i] = [ai, bi] represents a bidirectional link between servers ai and bi.",
+      "A critical connection is a connection that, if removed, will make some servers unable to reach some other server.",
+      "Return all critical connections in the network in any order."
+    ],
+    bulletPoints: [
+      "Find bridges in an undirected graph using Tarjan's or Kosaraju's algorithm.",
+      "Track discovery and lowest reachable node ranks through depth-first traversal.",
+      "Time complexity should be O(V + E)."
+    ],
+    examples: [
+      {
+        input: "n = 4, connections = [[0,1],[1,2],[2,0],[1,3]]",
+        output: "[[1,3]]",
+        explanation: "Removing [1,3] disconnects server 3 from the rest of the network."
+      },
+      {
+        input: "n = 2, connections = [[0,1]]",
+        output: "[[0,1]]",
+        explanation: "Removing [0,1] disconnects the only two servers."
+      }
+    ],
+    constraints: [
+      "2 <= n <= 10^5",
+      "n - 1 <= connections.length <= 10^5",
+      "0 <= ai, bi <= n - 1",
+      "ai != bi",
+      "There are no repeated connections."
+    ],
+    starterTemplates: {
+      cpp: "class Solution {\npublic:\n    vector<vector<int>> criticalConnections(int n, vector<vector<int>>& connections) {\n        // Return all bridges in the network\n        return {};\n    }\n};",
+      java: "class Solution {\n    public List<List<Integer>> criticalConnections(int n, List<List<Integer>> connections) {\n        return new ArrayList<>();\n    }\n}",
+      python: "class Solution:\n    def criticalConnections(self, n: int, connections: list[list[int]]) -> list[list[int]]:\n        return []",
+      typescript: "function criticalConnections(n: number, connections: number[][]): number[][] {\n    return [];\n}"
+    },
+    visibleTestCases: [
+      { input: "4, [[0,1],[1,2],[2,0],[1,3]]", expectedOutput: "[[1,3]]" },
+      { input: "2, [[0,1]]", expectedOutput: "[[0,1]]" }
+    ],
+    hiddenTestCases: [
+      { input: "5, [[0,1],[1,2],[2,0],[1,3],[3,4]]", expectedOutput: "[[1,3],[3,4]]" },
+      { input: "6, [[0,1],[1,2],[2,0],[1,3],[3,4],[4,5],[5,3]]", expectedOutput: "[[1,3]]" }
+    ]
+  },
+
   "amz-intern-s2-q1": {
     id: "amz-intern-s2-q1",
     title: "K Closest Amazon Lockers to Delivery Van (LC 973)",

@@ -91,6 +91,15 @@ export default function CrucibleCockpitPage({
   };
   const isRound1 = getIsRound1();
 
+  const getIsRound2 = (): boolean => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search).get("round");
+      if (p) return p.toLowerCase() === "round-2" || p.toLowerCase() === "technical_viva" || p.toLowerCase() === "dsa_deep_dive" || p.toLowerCase() === "viva";
+    }
+    return roundSlug ? (roundSlug.toLowerCase() === "round-2" || roundSlug.toLowerCase() === "technical_viva" || roundSlug.toLowerCase() === "dsa_deep_dive" || roundSlug.toLowerCase() === "viva") : false;
+  };
+  const isRound2 = getIsRound2();
+
   const getIsRound3 = (): boolean => {
     if (typeof window !== "undefined") {
       const p = new URLSearchParams(window.location.search).get("round");
@@ -162,6 +171,7 @@ export default function CrucibleCockpitPage({
   const [selectedRole, setSelectedRole] = useState<AmazonRole>(roleParam);
   const [selectedSetId, setSelectedSetId] = useState<number>(setParam);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [taskScores, setTaskScores] = useState<[number, number]>([0, 0]);
   const [allSetHistory, setAllSetHistory] = useState<any[]>([]);
   const [questionCompleted, setQuestionCompleted] = useState<boolean>(false);
   const [isSetFinished, setIsSetFinished] = useState<boolean>(false);
@@ -197,7 +207,25 @@ export default function CrucibleCockpitPage({
   const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
   const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
 
-  const [dialogue, setDialogue] = useState<Array<{ id: string; sender: "ai" | "candidate"; text: string; time: string }>>([]);
+  const [dialogue, setDialogue] = useState<Array<{ id: string; sender: "ai" | "candidate"; text: string; time: string }>>(() => {
+    if (isRound1) return [];
+    const pTitle = problem?.title || "Technical Problem";
+    const compName = companyData?.companyName || "Amazon";
+    let greet = "Hello. Welcome to the " + compName + " technical round. You are solving " + pTitle + ". Before writing code, state your intended algorithm and data structure.";
+    if (isRound2) {
+      greet = "Hello! I am your Amazon Technical Interviewer for this DSA Viva session. We will be working on " + pTitle + ". Before writing any code, walk me through your high-level algorithm, data structures, and expected time and space complexity.";
+    } else if (isRound3) {
+      greet = "Welcome to your Amazon Round 3 Technical Loop: " + pTitle + ". First, outline your core class interfaces, thread-safe data structures, and backpressure strategy in the editor above.";
+    } else if (isRound4) {
+      greet = "Hello. I am your Amazon Bar Raiser for this session. We will be diving into your experience regarding: " + pTitle + ". Please begin by walking me through the Situation and Task using the STAR framework.";
+    }
+    return [{
+      id: "init-msg-" + Date.now(),
+      sender: "ai",
+      text: greet,
+      time: "Just now"
+    }];
+  });
 
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingSeconds, setRecordingSeconds] = useState<number>(0);
@@ -241,6 +269,12 @@ export default function CrucibleCockpitPage({
   const [behavioralScorecard, setBehavioralScorecard] = useState<any>(null);
   const [isGeneratingScorecard, setIsGeneratingScorecard] = useState<boolean>(false);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(90 * 60);
+  const formatTimer = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
 
   const dialogueContainerRef = useRef<HTMLDivElement>(null);
 
@@ -310,7 +344,7 @@ export default function CrucibleCockpitPage({
         id: Math.random().toString(36).substring(2, 9),
         sender: "ai",
         text,
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        time: "Just now"
       }
     ]);
 
@@ -325,6 +359,49 @@ export default function CrucibleCockpitPage({
   const hiddenCases = (problem?.hiddenTestCases || []) as any[];
 
   const askAiInterviewer = async (candidateMsg: string) => {
+    const lower = candidateMsg.toLowerCase();
+    const wantsToSkip = 
+      lower.includes("second") || 
+      lower.includes("second problem") || 
+      lower.includes("next") || 
+      lower.includes("next problem") || 
+      lower.includes("next question") || 
+      lower.includes("question 2") || 
+      lower.includes("task 2") || 
+      lower.includes("q2") || 
+      lower.includes("skip") || 
+      lower.includes("move on") || 
+      lower.includes("conclude") || 
+      lower.includes("scorecard") || 
+      lower.includes("finish") || 
+      lower.includes("end");
+
+    if (isRound2 && wantsToSkip) {
+      if (currentQuestionIndex === 0 && problem?.nextProblemId) {
+        postAiMessage("Understood. Moving you to Question 2 of this set. Please review the problem statement and outline your approach.");
+        setTimeout(() => {
+          handleProceedToNextProblem();
+        }, 1200);
+        return;
+      } else {
+        postAiMessage("Understood. Concluding your Technical Viva assessment now. Generating your evaluation scorecard...");
+        setTimeout(() => {
+          handleFinishBarRaiserRound();
+        }, 1200);
+        return;
+      }
+    }
+
+    // STRICT RULE: If we are in INITIAL phase, ANY answer from candidate immediately
+    // commands them to write the code in the editor, and switches phase to CODING.
+    if (isRound2 && vivaPhase === "INITIAL") {
+      setVivaPhase("CODING");
+      const codingOrder = "Understood. Please go ahead and write your implementation in the code editor above. Test your solution against the sample cases, and click 'Submit Solution' when ready.";
+      postAiMessage(codingOrder);
+      if (typeof speakText === "function") speakText(codingOrder);
+      return;
+    }
+
     setIsAiThinking(true);
     try {
       const res = await fetch("/api/crucible/chat", {
@@ -335,6 +412,7 @@ export default function CrucibleCockpitPage({
           company: companySlug,
           problemTitle: problem.title,
           problemDescription: (problem.paragraphs || []).join(" "),
+          isRound2: isRound2,
           isRound3: isRound3,
           isRound4: isRound4,
           roundSlug: roundSlug,
@@ -349,31 +427,33 @@ export default function CrucibleCockpitPage({
         })
       });
       const data = await res.json();
-      const aiReply = data?.reply || "Understood. Please walk me through your planned logic.";
-      if (typeof data?.nextQuestionIndex === "number") {
-        setCurrentQuestionIndex(data.nextQuestionIndex);
-      }
+      const aiReply = data?.reply || "Understood. Please continue with your implementation.";
       postAiMessage(aiReply);
 
-      if (!isRound4 && vivaPhase === "INITIAL" && !candidateMsg.toLowerCase().includes("didn't get") && !candidateMsg.toLowerCase().includes("help") && !candidateMsg.toLowerCase().includes("should i")) {
-        setVivaPhase("CODING");
-      } else if (vivaPhase === "FOLLOW_UPS") {
+      if (vivaPhase === "FOLLOW_UPS") {
         setFollowUpCount(prev => {
           const next = prev + 1;
           if (next >= 3) {
             setVivaPhase("VERDICT");
             if (isRound3) {
-              const finishMsg = "Thank you for the comprehensive architectural defense. You have concluded your Round 3 System Design assessment! Please click 'Conclude & Score' at the top right to finalize your round and review your technical scorecard.";
+              const finishMsg = "Thank you for the comprehensive architectural defense. You have concluded your Round 3 System Design assessment! Please click 'Conclude & Score' at the top right to finalize your round.";
               postAiMessage(finishMsg);
               if (typeof speakText === "function") speakText(finishMsg);
-            } else {
-              setTimeout(() => {
-                if (problem?.nextProblemId) {
-                  setShowNextModal(true);
-                } else {
-                  setShowCompletionScorecard(true);
-                }
-              }, 1500);
+            } else if (isRound2) {
+              const isTask1 = currentQuestionIndex === 0;
+              if (isTask1) {
+                const r2FinishMsg = "Thank you for defending your implementation. We have completed Question 1 of this Technical Viva! Please proceed to Question 2.";
+                postAiMessage(r2FinishMsg);
+                if (typeof speakText === "function") speakText(r2FinishMsg);
+                setShowNextModal(true);
+              } else {
+                const r2FinalMsg = "Excellent defense. You have completed both technical problems and algorithmic grilling for this round! Finalizing your evaluation scorecard now...";
+                postAiMessage(r2FinalMsg);
+                if (typeof speakText === "function") speakText(r2FinalMsg);
+                setTimeout(() => {
+                  handleFinishBarRaiserRound();
+                }, 1500);
+              }
             }
           }
           return next;
@@ -381,46 +461,10 @@ export default function CrucibleCockpitPage({
       }
     } catch (err) {
       console.error("[AI INTERVIEWER FETCH ERROR]:", err);
-      postAiMessage("Yes, I am here. Please walk me through your high-level algorithm and data structure choice.");
+      postAiMessage("Understood. Please implement your approach in the editor and click Submit Solution.");
     } finally {
       setIsAiThinking(false);
     }
-  };
-
-  const hasInitializedRef = useRef<string>("");
-  useEffect(() => {
-    if (problem && hasInitializedRef.current !== problem.id) {
-      hasInitializedRef.current = problem.id;
-      setCode(problem.starterTemplates[language] || "");
-      setVivaPhase("INITIAL");
-      setFollowUpCount(0);
-      setTestResults(null);
-      setDialogue([]);
-
-      if (!isRound1) {
-        let greeting = "Hello. Welcome to the " + (companyData?.companyName || "technical") + " round. You are solving " + problem.title + ". Before writing code, state your intended algorithm and data structure.";
-        if (isRound3) {
-          greeting = "Welcome to your Amazon Round 3 Technical Loop: " + problem.title + ". First, outline your core class interfaces, thread-safe data structures, and backpressure strategy in the editor above. When ready, click 'Submit Architecture Defense' or walk me through your planned design.";
-        } else if (isRound4) {
-          greeting = "Hello. I am your Amazon Bar Raiser for this session. We will be diving into your experience regarding: " + problem.title + ". Please begin by walking me through the Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and quantifiable metrics.";
-        }
-        postAiMessage(greeting);
-      }
-    }
-  }, [problem, companyData, language, isRound1, isRound3, isRound4, postAiMessage]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeftSeconds(prev => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTimer = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return h.toString().padStart(2, "0") + ":" + m.toString().padStart(2, "0") + ":" + s.toString().padStart(2, "0");
   };
 
   const handleCandidateSubmit = async (textToSend?: string) => {
@@ -434,7 +478,7 @@ export default function CrucibleCockpitPage({
       id: Math.random().toString(36).substring(2, 9),
       sender: "candidate" as const,
       text,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      time: "Just now"
     };
 
     setCandidateInputText("");
@@ -458,7 +502,7 @@ export default function CrucibleCockpitPage({
           id: Math.random().toString(36).substring(2, 9),
           sender: "ai" as const,
           text: finishText,
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+          time: "Just now"
         }
       ]);
 
@@ -596,54 +640,73 @@ export default function CrucibleCockpitPage({
 
     setTimeout(() => {
       setIsRunning(false);
-      const totalVisible = visibleCases.length || 2;
-      const totalHidden = hiddenCases.length || 3;
-      const totalCases = totalVisible + totalHidden;
-
       const cleanCode = code.trim();
-      const isSyntaxValid = cleanCode.length > 25 && (cleanCode.includes("return") || cleanCode.includes("def ") || cleanCode.includes("function") || cleanCode.includes("class"));
-      const passedCount = isSyntaxValid ? totalCases : 0;
-      const isAccepted = passedCount === totalCases;
+      const starterTemplate = (problem?.starterTemplates && problem?.starterTemplates[language]) || "";
+      
+      const isBlankOrUnchanged = 
+        !cleanCode || 
+        cleanCode.length < 25 || 
+        cleanCode === starterTemplate.trim();
 
-      const results = {
-        status: isAccepted ? "Accepted" : "Wrong Answer",
-        passedTests: passedCount,
-        totalTests: totalCases,
-        visiblePassed: isAccepted ? totalVisible : Math.min(totalVisible, passedCount),
-        visibleTotal: totalVisible,
-        hiddenPassed: isAccepted ? totalHidden : Math.max(0, passedCount - totalVisible),
-        hiddenTotal: totalHidden,
-        runtimeMs: Math.floor(Math.random() * 25) + 38,
-        memoryKb: Math.floor(Math.random() * 800) + 41200,
-        cases: visibleCases.map((c: any, i: number) => ({
-          id: c.id ?? i + 1,
-          isHidden: false,
-          input: c.input,
-          expected: c.expectedOutput,
-          output: isAccepted ? c.expectedOutput : "Output mismatch at index " + i,
-          passed: isAccepted,
-          runtime: "12ms"
-        }))
-      };
+      const combinedCases = [...(visibleCases || []), ...(hiddenCases || [])];
+      let evaluation = executeCandidateCode(problem ? problem.id : "q1", code, language, combinedCases);
 
-      setTestResults(results as unknown as EvaluationReport);
+      if (isBlankOrUnchanged) {
+        evaluation = {
+          status: "Wrong Answer",
+          passedTests: 0,
+          totalTests: combinedCases.length,
+          visiblePassed: 0,
+          visibleTotal: visibleCases.length,
+          hiddenPassed: 0,
+          hiddenTotal: hiddenCases.length,
+          runtimeMs: 0,
+          memoryKb: 0,
+          cases: visibleCases.map((cs: any, i: number) => ({
+            id: cs.id ?? i + 1,
+            isHidden: false,
+            input: cs.input,
+            expected: cs.expectedOutput,
+            output: cleanCode.length === 0 ? "Empty code submitted." : "Starter template was unmodified.",
+            passed: false,
+            runtime: "0ms"
+          }))
+        } as unknown as EvaluationReport;
+      }
+
+      setTestResults(evaluation);
+
+      const passedCases = (evaluation.cases || []).filter((cs: any) => cs.passed).length;
+      const totalCount = (evaluation.cases || []).length || combinedCases.length || 1;
+      const isAccepted = evaluation.status === "Accepted" && passedCases === totalCount;
+      const taskEarned = isAccepted ? 50 : Math.round((passedCases / totalCount) * 50);
+
+      setTaskScores(prev => {
+        const updated: [number, number] = [prev[0], prev[1]];
+        updated[currentQuestionIndex] = taskEarned;
+        return updated;
+      });
 
       if (isRound1) {
-        if (isAccepted) {
-          setTimeout(() => {
-            if (problem?.nextProblemId) {
-              setShowNextModal(true);
-            } else {
-              setShowCompletionScorecard(true);
-            }
-          }, 900);
-        }
+        setTimeout(() => {
+          setShowCompletionScorecard(true);
+        }, 900);
       } else {
         if (isAccepted) {
           setActiveConsoleTab("interviewer");
           setVivaPhase("FOLLOW_UPS");
           setFollowUpCount(0);
-          postAiMessage("Your code passed all stress tests. Let's begin your technical defense: explain the runtime and space bounds of your solution.");
+          const passMsg = "Your code passed all stress tests. Let's begin your technical defense: explain the runtime and space bounds of your solution.";
+          postAiMessage(passMsg);
+          if (typeof speakText === "function") speakText(passMsg);
+        } else {
+          setActiveConsoleTab("interviewer");
+          const isTask1 = currentQuestionIndex === 0;
+          const failMsg = isTask1
+            ? `Your solution did not pass all stress test cases (${passedCases}/${totalCount} passed). In this technical round, we cannot conduct the viva defense until your implementation passes. Would you like to revise your code, or would you prefer to move to the second problem?`
+            : `Your solution did not pass all stress test cases (${passedCases}/${totalCount} passed). Because this is the final problem of Round 2, we cannot conduct the viva defense on failing code. Would you like to revise your implementation, or conclude the assessment and generate your scorecard?`;
+          postAiMessage(failMsg);
+          if (typeof speakText === "function") speakText(failMsg);
         }
       }
     }, 700);
@@ -688,7 +751,14 @@ export default function CrucibleCockpitPage({
   };
 
   const handleReturnToPipeline = () => {
-    router.push("/tracks/" + companySlug + "?round1Completed=true");
+    const flag = isRound1
+      ? "round1Completed=true"
+      : isRound2
+      ? "round2Completed=true"
+      : isRound3
+      ? "round3Completed=true"
+      : "round4Completed=true";
+    router.push(`/tracks/${companySlug}?${flag}`);
   };
 
   const handleMouseDownH = () => setIsDraggingH(true);
@@ -747,7 +817,7 @@ export default function CrucibleCockpitPage({
           <span className="h-4 w-[1px] bg-white/20 mx-1" />
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-slate-300 bg-[#333333] px-2.5 py-1 rounded-md border border-white/10">
-              Set {selectedSetId} • Task {isRound4 ? (currentQuestionIndex + 1) : (problem?.taskIndex || 1)}/{problem?.totalTasks || 2}
+              Set {selectedSetId} • Task {currentQuestionIndex + 1}/{problem?.totalTasks || 2}
             </span>
             <span className="text-xs font-semibold text-amber-400 bg-amber-950/40 border border-amber-500/30 px-3 py-1 rounded-md">
               {problem?.title || "Amazon Assessment Problem"}
@@ -793,7 +863,39 @@ export default function CrucibleCockpitPage({
               <Send className="h-3.5 w-3.5" />
               <span>{isRound3 ? "Submit Architecture Defense" : "Submit Solution"}</span>
             </button>
-            {(isRound3 || isRound4) && (
+              {isRound1 && (
+                <button
+                  onClick={() => {
+                      const clean = (code || "").trim();
+                      const hasValidCode = clean.length > 25 && (clean.includes("return") || clean.includes("def ") || clean.includes("function") || clean.includes("class"));
+                      const totalVisible = (visibleCases && visibleCases.length) || 2;
+                      const totalHidden = (hiddenCases && hiddenCases.length) || 3;
+                      const totalCases = totalVisible + totalHidden;
+                      // If candidate skipped without valid code, earned is 0; otherwise evaluate partial credit (1 test passed)
+                      const passedCount = hasValidCode ? 1 : 0;
+                      const earned = Math.round((passedCount / totalCases) * 50);
+
+                      setTaskScores(prev => {
+                        const updated: [number, number] = [prev[0], prev[1]];
+                        updated[currentQuestionIndex] = earned;
+                        return updated;
+                      });
+
+                      if (currentQuestionIndex === 0) {
+                        setShowCompletionScorecard(true);
+                      } else {
+                        setIsSetFinished(true);
+                        setShowCompletionScorecard(true);
+                      }
+                    }}
+                  disabled={isRunning}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-white/10 shadow-sm cursor-pointer disabled:opacity-50 transition-all"
+                  title="Advance to next task or finish with current test case results"
+                >
+                  <span>{currentQuestionIndex === 0 ? "Skip to Task 2 →" : "Finish Assessment"}</span>
+                </button>
+              )}
+            {(isRound2 || isRound3 || isRound4) && (
               <button
                 onClick={handleFinishBarRaiserRound}
                 disabled={isRunning || isGeneratingScorecard}
@@ -818,7 +920,7 @@ export default function CrucibleCockpitPage({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-500 font-mono">
-                {isRound4 ? "Behavioral Leadership Principle" : isRound3 ? "Architecture Specification" : (problem?.category || "Problem Description")}
+                {isRound4 ? "Behavioral Leadership Principle" : isRound3 ? "Architecture Specification" : isRound2 ? "Technical Problem & Viva Defense" : (problem?.category || "Problem Description")}
               </span>
             </div>
             <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
@@ -1313,36 +1415,63 @@ export default function CrucibleCockpitPage({
               <>
                 {isRound1 && (
                   <div>
-                    <span className="text-xs font-mono font-bold text-emerald-400 tracking-wider uppercase bg-emerald-950/70 border border-emerald-800 px-3 py-1 rounded-full">
-                      ROUND 01 EVALUATION COMPLETE
-                    </span>
-                    <h2 className="text-2xl font-black text-white mt-3">
-                      {companyData?.companyName} Algorithmic Screen Passed
-                    </h2>
-                    <p className="text-xs text-slate-300 mt-1.5 font-medium">
-                      Automated HackerRank OA test vectors and complexity bounds verified.
-                    </p>
-                    <div className="grid grid-cols-3 gap-3 p-4 mt-4 rounded-xl bg-slate-900/90 border border-slate-700 text-left font-mono">
-                      <div className="p-2">
-                        <div className="text-[10px] text-slate-400 uppercase font-bold">Total Score</div>
-                        <div className="text-lg font-black text-emerald-400 mt-0.5">100 / 100</div>
-                      </div>
-                      <div className="p-2 border-x border-slate-800">
-                        <div className="text-[10px] text-slate-400 uppercase font-bold">OA Status</div>
-                        <div className="text-lg font-black text-white mt-0.5">Verified</div>
-                      </div>
-                      <div className="p-2">
-                        <div className="text-[10px] text-slate-400 uppercase font-bold">Runtime SLA</div>
-                        <div className="text-lg font-black text-amber-400 mt-0.5">Optimal</div>
-                      </div>
-                    </div>
+                    {(() => {
+  const isTask1 = currentQuestionIndex === 0;
+  const currentScore = isTask1 ? taskScores[0] : (taskScores[0] + taskScores[1]);
+  const maxScore = isTask1 ? 50 : 100;
+  const percentage = Math.round((currentScore / maxScore) * 100);
+  const isPassed = percentage >= 70;
+  const isBorderline = percentage >= 40 && percentage < 70;
+
+  const statusColor = isPassed ? "text-emerald-400" : isBorderline ? "text-amber-400" : "text-rose-400";
+  const statusText = isPassed ? "Verified" : isBorderline ? "Borderline" : "Failed";
+  const slaText = isPassed ? "Optimal" : isBorderline ? "Suboptimal" : "Unmet";
+
+  return (
+    <div>
+      <span className={"text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full border " + (isPassed ? "text-emerald-400 bg-emerald-950/70 border-emerald-800" : isBorderline ? "text-amber-400 bg-amber-950/70 border-amber-800" : "text-rose-400 bg-rose-950/70 border-rose-800")}>
+        {isTask1 ? "TASK 01 EVALUATION COMPLETE" : isRound2 ? "ROUND 02 TECHNICAL VIVA COMPLETE" : isRound1 ? "ROUND 01 EVALUATION COMPLETE" : "EVALUATION COMPLETE"}
+      </span>
+      <h2 className="text-2xl font-black text-white mt-3">
+        {isTask1
+          ? (isPassed ? "Task 1 Verification Passed" : "Task 1 Tests Incomplete")
+          : (isPassed ? ((companyData && companyData.companyName) || "Amazon") + " Algorithmic Screen Passed" : ((companyData && companyData.companyName) || "Amazon") + " Algorithmic Screen Incomplete")}
+      </h2>
+      <p className="text-xs text-slate-300 mt-1.5 font-medium">
+        {isPassed
+          ? "Automated HackerRank OA test vectors and complexity bounds verified."
+          : "Some test cases failed or were skipped during evaluation."}
+      </p>
+      <div className="grid grid-cols-3 gap-3 p-4 mt-4 rounded-xl bg-slate-900/90 border border-slate-700 text-left font-mono">
+        <div className="p-2">
+          <div className="text-[10px] text-slate-400 uppercase font-bold">Total Score</div>
+          <div className={"text-lg font-black mt-0.5 " + statusColor}>
+            {currentScore} / {maxScore}
+          </div>
+        </div>
+        <div className="p-2 border-x border-slate-800">
+          <div className="text-[10px] text-slate-400 uppercase font-bold">OA Status</div>
+          <div className={"text-lg font-black mt-0.5 " + statusColor}>
+            {statusText}
+          </div>
+        </div>
+        <div className="p-2">
+          <div className="text-[10px] text-slate-400 uppercase font-bold">Runtime SLA</div>
+          <div className={"text-lg font-black mt-0.5 " + (isPassed ? "text-amber-400" : "text-slate-400")}>
+            {slaText}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+})()}
                   </div>
                 )}
               </>
             )}
 
             <div className="pt-2">
-              {isRound4 && (currentQuestionIndex === 0 || !isSetFinished) ? (
+              {(isRound1 || isRound2 || isRound4) && currentQuestionIndex === 0 ? (
                 <button
                   onClick={() => {
                     setAllSetHistory(prev => [...prev, ...dialogue]);
@@ -1382,8 +1511,10 @@ export default function CrucibleCockpitPage({
                     setDialogue([{
                       id: Math.random().toString(36).substring(2, 9),
                       sender: "ai",
-                      text: "Hello. Let's move to Question 2 of this set: " + nextTitle + ". Please begin by walking me through your Situation and Task using the STAR framework.",
-                      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                      text: isRound4
+        ? "Hello. Let's move to Question 2 of this set: " + nextTitle + ". Please begin by walking me through your Situation and Task using the STAR framework."
+        : "Hello! We are now on Question 2: " + nextTitle + ". Before writing any code, walk me through your planned algorithm, data structures, and expected time and space complexity.",
+                      time: "Just now"
                     }]);
                   }}
                   className="w-full py-4 rounded-xl text-base font-black text-white bg-emerald-600 hover:bg-emerald-500 shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all sticky bottom-0 z-10"
@@ -1396,7 +1527,7 @@ export default function CrucibleCockpitPage({
                   onClick={handleReturnToPipeline}
                   className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
-                  <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : "Return to Pipeline (View Final Decision)"}</span>
+                  <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : isRound2 ? "Return to Pipeline (Unlock Round 03 System Design)" : "Return to Pipeline (View Final Decision)"}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               )}
