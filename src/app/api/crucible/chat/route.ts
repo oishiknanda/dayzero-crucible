@@ -123,7 +123,7 @@ RULES:
       });
     }
 
-        const isDsaVivaRound = Boolean(
+    const isDsaVivaRound = Boolean(
       isRound2 ||
       roundSlug === "round-2" ||
       roundSlug === "technical_viva" ||
@@ -133,7 +133,7 @@ RULES:
     const isBehavioral = Boolean(isRound4 || roundSlug === "round-4" || roundSlug === "bar-raiser");
 
     // ─────────────────────────────────────────────────────────────
-    // 2. ROUND 4: BEHAVIORAL HARD STOP (5 TURNS CUTOFF)
+    // 2. ROUND 4: BEHAVIORAL HARD STOP (4-TURN LIMIT)
     // ─────────────────────────────────────────────────────────────
     if (isBehavioral && !evaluateScorecard) {
       const historyList = Array.isArray(dialogueHistory) ? dialogueHistory : [];
@@ -146,17 +146,17 @@ RULES:
       const totalQ = Number(totalQuestions || 2);
       const isLastQuestionOfSet = qIdx >= (totalQ - 1);
 
-      if (candidateTurns >= 5) {
+      if (candidateTurns >= 4) {
         if (!isLastQuestionOfSet) {
           return NextResponse.json({
-            reply: "Thank you for the thorough walkthrough. We have completed Question 1 of this set. Please click 'Conclude & Score' at the top right to proceed to Question 2.",
+            reply: "Thank you for the thorough walkthrough. We have completed Question 1 of this set! Please click 'Conclude & Score' at the top right to proceed to Question 2.",
             questionCompleted: true,
             isSetFinished: false,
             nextQuestionIndex: qIdx + 1
           });
         } else {
           return NextResponse.json({
-            reply: "Thank you. You have successfully completed both questions of this Bar Raiser set! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive scorecard.",
+            reply: "Thank you. You have successfully completed both scenarios of this Bar Raiser session! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive evaluation.",
             questionCompleted: true,
             isSetFinished: true,
             nextQuestionIndex: qIdx
@@ -176,9 +176,10 @@ INTERVIEWER GUIDELINES:
 1. Act like a real human Bar Raiser having an authentic conversation. NEVER recite canned question scripts.
 2. If the candidate says "what?", asks for clarification, or gives a confused/one-word response, directly clarify your question or note what context was missing.
 3. If the candidate gave a real answer, evaluate what they said:
-   - If they gave vague claims or "we" statements without numbers, challenge them: "Walk me through what YOU specifically designed, and what the quantitative impact was."
+   - "I" vs "We": If the candidate uses passive phrasing ("we built", "the team decided", "we shipped"), challenge aggressively: "What was your specific individual ownership in this decision versus the team's? I need to hear what YOU personally did."
+   - Quantifiable Metrics: If numbers are missing, demand metrics: "What was the baseline before your change, and what was the measured latency, throughput, or cost impact?"
    - If they gave clear metrics, probe deeper into trade-offs, discarded alternatives, or production failure modes.
-4. Keep your response to 2 to 3 natural spoken sentences maximum. Do not use bullet points or markdown fences.`;
+4. Keep your response to 1 to 3 authoritative, spoken sentences maximum. Do not use bullet points or markdown fences.`;
 
       if (groqKey) {
         try {
@@ -348,7 +349,7 @@ BEHAVIOR DIRECTIVES:
       });
     }
 
-// ─────────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────
     // 3. SCORECARD GENERATION
     // ─────────────────────────────────────────────────────────────
     if (evaluateScorecard) {
@@ -358,6 +359,13 @@ BEHAVIOR DIRECTIVES:
         roundSlug === "technical_viva" ||
         roundSlug === "dsa_deep_dive" ||
         roundSlug === "viva"
+      );
+      const isRound3Eval = Boolean(
+        isRound3 ||
+        roundSlug === "round-3" ||
+        roundSlug === "lld" ||
+        roundSlug === "hld" ||
+        (problemId && String(problemId).includes("-r3-"))
       );
 
       const evaluationPrompt = isRound2Eval
@@ -397,6 +405,48 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
   "strengths": ["<strength1>", "<strength2>"],
   "areasForImprovement": ["<improvement1>", "<improvement2>"],
   "barRaiserDebriefNote": "<2-3 executive sentences summarizing whether the candidate clears the Amazon SDE bar>"
+}`
+        : isRound3Eval
+        ? `You are an Amazon Principal Bar Raiser evaluating a Round 3 (System Design / LLD) candidate.
+Evaluate the candidate's code architecture and oral defense against Amazon architectural standards.
+
+CODE ARCHITECTURE:
+${code || "No code submitted."}
+
+ORAL DEFENSE TRANSCRIPT:
+${JSON.stringify(dialogueHistory, null, 2)}
+
+EVALUATION RULES:
+1. CODE ARCHITECTURE (0-50 pts):
+   - Clean interfaces, modularity, and separation of concerns (0-25 pts).
+   - Concurrency primitives (mutex, CAS/atomics, etc.) (0-25 pts).
+   - If code is empty/boilerplate/under 40 chars, codeScore = 0.
+2. ORAL DEFENSE (0-50 pts):
+   - Backpressure, failure modes, trade-off justification (0-50 pts).
+   - If defense skipped/evasive, defenseScore = 0.
+3. TOTAL SCORE (0-100) = codeScore + defenseScore.
+4. VERDICT:
+   - 0-45: "No Hire"
+   - 46-65: "Leaning No Hire"
+   - 66-84: "Hire"
+   - 85-100: "Strong Hire"
+
+Respond strictly in valid JSON format with NO markdown fences, no backticks, and no extra prose:
+{
+  "score": <totalScore>,
+  "codeModelingScore": <0-25>,
+  "concurrencyScore": <0-25>,
+  "backpressureScore": <0-25>,
+  "defenseScore": <0-25>,
+  "verdict": "<Strong Hire | Hire | Leaning No Hire | No Hire>",
+  "starBreakdown": {
+    "situationAndTask": "<Class/Interface modularity assessment>",
+    "actionDepth": "<Concurrency/Thread-safety assessment>",
+    "resultAndMetrics": "<Resilience/Scale assessment>"
+  },
+  "strengths": ["<strength1>", "<strength2>"],
+  "areasForImprovement": ["<improvement1>", "<improvement2>"],
+  "barRaiserDebriefNote": "<2-3 executive sentences on whether they clear the bar>"
 }`
         : `You are a Principal Amazon Bar Raiser completing the comprehensive hiring scorecard for an Executive Round.
 Evaluate the candidate's complete dialogue transcript across all answered questions in this set against Amazon Leadership Principles (STAR method, "I" vs "We" ownership, concrete quantifiable metrics, and depth of technical/business trade-offs).
@@ -460,6 +510,27 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
                 else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
                 else parsed.verdict = "No Hire";
               }
+            } else if (isRound3Eval && parsed) {
+              const codeScore = Math.min(50, Math.max(0, Number(parsed.codeModelingScore || 0) + Number(parsed.concurrencyScore || 0)));
+              const oralScore = Math.min(50, Math.max(0, Number(parsed.backpressureScore || 0) + Number(parsed.defenseScore || 0)));
+              const codeEmpty = (!code || code.trim().length < 40);
+              if (codeEmpty) {
+                parsed.score = 0;
+                parsed.verdict = "No Hire";
+              } else {
+                parsed.score = Math.min(100, Math.max(0, codeScore + oralScore));
+                if (parsed.score >= 85) parsed.verdict = "Strong Hire";
+                else if (parsed.score >= 66) parsed.verdict = "Hire";
+                else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
+                else parsed.verdict = "No Hire";
+              }
+            } else if (parsed) {
+              // ROUND 4: Enforce realistic 35-92 grading band and strict verdicts
+              parsed.score = Math.min(92, Math.max(35, Number(parsed.score) || 70));
+              if (parsed.score >= 85) parsed.verdict = "Strong Hire";
+              else if (parsed.score >= 66) parsed.verdict = "Hire";
+              else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
+              else parsed.verdict = "No Hire";
             }
             return NextResponse.json({ scorecard: parsed });
           }
@@ -496,6 +567,27 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
                 else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
                 else parsed.verdict = "No Hire";
               }
+            } else if (isRound3Eval && parsed) {
+              const codeScore = Math.min(50, Math.max(0, Number(parsed.codeModelingScore || 0) + Number(parsed.concurrencyScore || 0)));
+              const oralScore = Math.min(50, Math.max(0, Number(parsed.backpressureScore || 0) + Number(parsed.defenseScore || 0)));
+              const codeEmpty = (!code || code.trim().length < 40);
+              if (codeEmpty) {
+                parsed.score = 0;
+                parsed.verdict = "No Hire";
+              } else {
+                parsed.score = Math.min(100, Math.max(0, codeScore + oralScore));
+                if (parsed.score >= 85) parsed.verdict = "Strong Hire";
+                else if (parsed.score >= 66) parsed.verdict = "Hire";
+                else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
+                else parsed.verdict = "No Hire";
+              }
+            } else if (parsed) {
+              // ROUND 4: Enforce realistic 35-92 grading band and strict verdicts
+              parsed.score = Math.min(92, Math.max(35, Number(parsed.score) || 70));
+              if (parsed.score >= 85) parsed.verdict = "Strong Hire";
+              else if (parsed.score >= 66) parsed.verdict = "Hire";
+              else if (parsed.score >= 46) parsed.verdict = "Leaning No Hire";
+              else parsed.verdict = "No Hire";
             }
             return NextResponse.json({ scorecard: parsed });
           }
@@ -505,6 +597,64 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
       }
 
       // Fallback Scorecard
+      if (isRound3Eval) {
+        const cleanCode = (code || "").trim();
+        const codeValid = cleanCode.length >= 40;
+        const turnsAnswered = (dialogueHistory || []).filter((m: any) => {
+          const s = String(m?.sender || m?.speaker || m?.role || "").toLowerCase();
+          return s === "candidate" || s === "user";
+        }).length;
+        const defenseValid = turnsAnswered >= 1;
+
+        if (!codeValid || !defenseValid) {
+          return NextResponse.json({
+            scorecard: {
+              score: 0,
+              codeModelingScore: 0,
+              concurrencyScore: 0,
+              backpressureScore: 0,
+              defenseScore: 0,
+              verdict: "No Hire",
+              starBreakdown: {
+                situationAndTask: "No substantive class interfaces or domain models provided in editor.",
+                actionDepth: "Concurrency primitives, thread-safety, and buffer handling were absent.",
+                resultAndMetrics: "Architectural defense was incomplete or skipped."
+              },
+              strengths: [],
+              areasForImprovement: [
+                "Must write complete class interfaces and data models before submission.",
+                "Must participate in the 3-turn technical interrogation defense."
+              ],
+              barRaiserDebriefNote: "Candidate failed to submit substantive architecture code or complete technical defense. Automatic No Hire."
+            }
+          });
+        }
+
+        return NextResponse.json({
+          scorecard: {
+            score: 80,
+            codeModelingScore: 20,
+            concurrencyScore: 20,
+            backpressureScore: 20,
+            defenseScore: 20,
+            verdict: "Hire",
+            starBreakdown: {
+              situationAndTask: "Solid class interfaces with clear separation of concerns and data models.",
+              actionDepth: "Appropriate use of thread synchronization primitives and consumer backpressure policies.",
+              resultAndMetrics: "Defended architecture against failure modes, network partitions, and thread pool starvation."
+            },
+            strengths: [
+              "Clean modular interface design.",
+              "Thoughtful handling of concurrent race conditions and subscriber queues."
+            ],
+            areasForImprovement: [
+              "Provide concrete SLA memory bounds for extreme peak loads."
+            ],
+            barRaiserDebriefNote: "The candidate demonstrated solid LLD architectural design and clear technical defense, clearing the Amazon Round 3 bar."
+          }
+        });
+      }
+
       if (isRound2Eval) {
         const testScore = Math.min(50, Math.max(0, Math.round(candidateTestScore || 0)));
         // If testScore is 0, strict zero guardrails apply
@@ -543,23 +693,67 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
         });
       }
 
+      // ROUND 4: Derive a realistic fallback score from transcript evidence
+      const transcriptText = (dialogueHistory || [])
+        .map((m: any) => String(m?.text || m?.content || ""))
+        .join(" ");
+      const lowerText = transcriptText.toLowerCase();
+
+      const hasMetrics = /\d+\s*(%|ms|seconds?|minutes?|x|\/sec|throughput|rps|latency|mb|gb|cost|reduction|improvement)/i.test(transcriptText);
+      const hasIndividualOwnership = /\b(i\s+(designed|built|shipped|owned|led|implemented|wrote|created|drove|architected))\b/i.test(transcriptText);
+      const hasWeVagueness = /\b(we\s+(built|decided|shipped|did|implemented))\b/i.test(lowerText);
+      const hasStarStructure = /(situation|task|action|result)/i.test(transcriptText);
+      const isSparse = transcriptText.trim().length < 120;
+
+      let fallbackScore = 70;
+      if (isSparse) {
+        fallbackScore = 42;
+      } else {
+        if (hasMetrics) fallbackScore += 12;
+        if (hasIndividualOwnership) fallbackScore += 8;
+        if (hasWeVagueness) fallbackScore -= 12;
+        if (hasStarStructure) fallbackScore += 5;
+      }
+      fallbackScore = Math.min(92, Math.max(35, fallbackScore));
+
+      let fallbackVerdict = "Leaning No Hire";
+      if (fallbackScore >= 85) fallbackVerdict = "Strong Hire";
+      else if (fallbackScore >= 66) fallbackVerdict = "Hire";
+      else if (fallbackScore >= 46) fallbackVerdict = "Leaning No Hire";
+      else fallbackVerdict = "No Hire";
+
       return NextResponse.json({
         scorecard: {
-          score: 82,
-          verdict: "Hire",
+          score: fallbackScore,
+          verdict: fallbackVerdict,
           starBreakdown: {
-            situationAndTask: "Well-structured articulation of critical engineering bottlenecks and high-stakes business risks.",
-            actionDepth: "Demonstrated strong technical depth using queue buffering, atomic primitives, and consistency patterns.",
-            resultAndMetrics: "Reported concrete speedup numbers and long-term preventive guardrails."
+            situationAndTask: hasStarStructure
+              ? "Candidate framed context with explicit Situation/Task framing, though baseline problem scope could be more precisely bounded."
+              : "Context and problem ownership were not clearly delineated in a STAR-compliant structure.",
+            actionDepth: hasIndividualOwnership
+              ? "Individual ownership was asserted with first-person technical decisions and concrete design actions."
+              : "Technical steps were described in passive or collective terms without clear personal ownership.",
+            resultAndMetrics: hasMetrics
+              ? "Outcomes were anchored to quantifiable metrics, indicating measurement-driven resolution."
+              : "Results were stated qualitatively without baseline comparisons or measured impact."
           },
-          strengths: [
-            "Consistent use of quantifiable metrics across problem scenarios.",
-            "Strong bias for action paired with systemic architectural safeguards."
-          ],
+          strengths: hasMetrics
+            ? [
+              "Anchored outcomes to measurable latency, throughput, or cost deltas.",
+              "Demonstrated individual ownership of technical decisions."
+            ]
+            : [
+              "Participated in the behavioral scenarios and attempted STAR alignment."
+            ],
           areasForImprovement: [
-            "Ensure baseline performance statistics are explicitly stated upfront before detailing interventions."
+            hasWeVagueness
+              ? "Replace 'we built / we decided' phrasing with explicit first-person ownership of each decision."
+              : "State explicit baseline metrics before describing the impact of each change.",
+            "Quantify trade-offs and long-term guardrails rather than describing outcomes qualitatively."
           ],
-          barRaiserDebriefNote: "The candidate demonstrated solid engineering judgment and clear ownership across the set, meeting the Bar Raiser standard."
+          barRaiserDebriefNote: fallbackScore >= 66
+            ? "Candidate demonstrated sufficient individual ownership and structured reasoning to clear the Amazon Bar Raiser, with measurable outcomes strengthening the recommendation."
+            : "Candidate fell short of the Bar Raiser standard: responses lacked concrete metrics and first-person ownership, weakening the case for hire."
         }
       });
     }

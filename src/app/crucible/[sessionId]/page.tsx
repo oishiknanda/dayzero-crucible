@@ -217,7 +217,7 @@ export default function CrucibleCockpitPage({
     } else if (isRound3) {
       greet = "Welcome to your Amazon Round 3 Technical Loop: " + pTitle + ". First, outline your core class interfaces, thread-safe data structures, and backpressure strategy in the editor above.";
     } else if (isRound4) {
-      greet = "Hello. I am your Amazon Bar Raiser for this session. We will be diving into your experience regarding: " + pTitle + ". Please begin by walking me through the Situation and Task using the STAR framework.";
+      greet = "Hello. I am your Amazon Bar Raiser for this session. As an independent evaluator, my goal is to assess your alignment with Amazon's Leadership Principles and your technical decision-making in real-world scenarios. We will begin with: " + pTitle + ". Please walk me through your Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and measurable metrics.";
     }
     return [{
       id: "init-msg-" + Date.now(),
@@ -471,7 +471,7 @@ export default function CrucibleCockpitPage({
     if (!text) return;
 
     const currentCandidateTurns = dialogue.filter(m => m.sender === "candidate").length;
-    const isFifthTurn = isRound4 && (currentCandidateTurns + 1 >= 5);
+    const isFourthTurn = isRound4 && (currentCandidateTurns + 1 >= 4);
 
     const candidateMsg = {
       id: Math.random().toString(36).substring(2, 9),
@@ -482,13 +482,13 @@ export default function CrucibleCockpitPage({
 
     setCandidateInputText("");
 
-    if (isFifthTurn) {
+    if (isFourthTurn) {
       setQuestionCompleted(true);
       const isQuestion1 = (currentQuestionIndex === 0);
 
       const finishText = isQuestion1
         ? "Thank you for the thorough walkthrough. We have completed Question 1 of this set! Please click 'Conclude & Score' at the top right to proceed to Question 2."
-        : "Thank you. You have successfully completed both questions of this Bar Raiser set! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive scorecard.";
+        : "Thank you. You have successfully completed both scenarios of this Bar Raiser session! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive evaluation.";
 
       if (!isQuestion1) {
         setIsSetFinished(true);
@@ -736,7 +736,7 @@ export default function CrucibleCockpitPage({
       setDialogue([{
         id: "q2-init-" + Date.now(),
         sender: "ai",
-        text: "Hello! We are now on Question 2: " + nextTitle + ". Before writing any code, walk me through your planned algorithm, data structures, and expected time and space complexity.",
+        text: "Thank you. Let's move to our second Leadership Principle scenario: " + nextTitle + ". Walk me through a situation where you faced this challenge, focusing on your individual ownership and the end result.",
         time: "Just now"
       }]);
     }
@@ -870,14 +870,16 @@ export default function CrucibleCockpitPage({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleRunCode}
-              disabled={isRunning}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-100 bg-[#3D3D3D] hover:bg-[#4A4A4A] border border-white/10 cursor-pointer disabled:opacity-50"
-            >
-              <Play className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Run</span>
-            </button>
+            {!isRound3 && (
+              <button
+                onClick={handleRunCode}
+                disabled={isRunning}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-100 bg-[#3D3D3D] hover:bg-[#4A4A4A] border border-white/10 cursor-pointer disabled:opacity-50"
+              >
+                <Play className="h-3.5 w-3.5 text-emerald-400" />
+                <span>Run</span>
+              </button>
+            )}
             <button
               onClick={handleSubmitCode}
               disabled={isRunning}
@@ -886,6 +888,17 @@ export default function CrucibleCockpitPage({
               <Send className="h-3.5 w-3.5" />
               <span>{isRound3 ? "Submit Architecture Defense" : "Submit Solution"}</span>
             </button>
+            {isRound3 && (
+              <button
+                onClick={handleFinishBarRaiserRound}
+                disabled={isRunning || isGeneratingScorecard}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 border border-amber-400/30 shadow-md cursor-pointer disabled:opacity-50 transition-all"
+                title="Conclude assessment and review evaluation scorecard"
+              >
+                <Award className="h-3.5 w-3.5 text-amber-200" />
+                <span>Conclude &amp; Score</span>
+              </button>
+            )}
               {isRound1 && (
                 <button
                   onClick={() => {
@@ -918,7 +931,7 @@ export default function CrucibleCockpitPage({
                   <span>{currentQuestionIndex === 0 ? "Skip to Task 2 →" : "Finish Assessment"}</span>
                 </button>
               )}
-            {(isRound2 || isRound3 || isRound4) && (
+            {(isRound2 || isRound4) && (
               <button
                 onClick={handleFinishBarRaiserRound}
                 disabled={isRunning || isGeneratingScorecard}
@@ -1385,11 +1398,11 @@ export default function CrucibleCockpitPage({
               <Trophy className="h-9 w-9 text-amber-400" />
             </div>
 
-            {isRound2 && behavioralScorecard ? (
+            {isRound3 && behavioralScorecard ? (
               <div className="space-y-4 text-left">
                 <div className="text-center pb-2 border-b border-white/10">
                   <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                    ROUND 2: TECHNICAL DSA VIVA EVALUATION
+                    ROUND 3: SYSTEM DESIGN & LLD ARCHITECTURE EVALUATION
                   </span>
                   <div className="mt-3 flex items-center justify-center gap-4">
                     <div className="text-5xl font-black font-mono text-white">
@@ -1405,17 +1418,31 @@ export default function CrucibleCockpitPage({
                       Verdict: {behavioralScorecard.verdict || "Evaluated"}
                     </div>
                   </div>
-                  <div className="mt-2 text-xs font-mono text-slate-300 flex justify-center gap-4">
-                    <span>Test Cases Passed: <strong className="text-white">{behavioralScorecard.testScore ?? 0} / 50 pts</strong></span>
-                    <span>Viva Technical Defense: <strong className="text-white">{behavioralScorecard.vivaScore ?? 0} / 50 pts</strong></span>
+                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div className="bg-slate-900/50 p-2 rounded border border-white/5 text-center">
+                      <div className="text-[9px] text-slate-400 uppercase font-bold">Modeling</div>
+                      <div className="text-xs font-bold text-white">{behavioralScorecard.codeModelingScore ?? 25}/25</div>
+                    </div>
+                    <div className="bg-slate-900/50 p-2 rounded border border-white/5 text-center">
+                      <div className="text-[9px] text-slate-400 uppercase font-bold">Concurrency</div>
+                      <div className="text-xs font-bold text-white">{behavioralScorecard.concurrencyScore ?? 25}/25</div>
+                    </div>
+                    <div className="bg-slate-900/50 p-2 rounded border border-white/5 text-center">
+                      <div className="text-[9px] text-slate-400 uppercase font-bold">Resilience</div>
+                      <div className="text-xs font-bold text-white">{behavioralScorecard.backpressureScore ?? 25}/25</div>
+                    </div>
+                    <div className="bg-slate-900/50 p-2 rounded border border-white/5 text-center">
+                      <div className="text-[9px] text-slate-400 uppercase font-bold">Defense</div>
+                      <div className="text-xs font-bold text-white">{behavioralScorecard.defenseScore ?? 25}/25</div>
+                    </div>
                   </div>
                 </div>
 
                 <div className="bg-[#13161C] p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
-                  <div className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">Detailed Breakdown:</div>
-                  <div className="text-slate-300"><strong className="text-amber-400">Algorithmic Decomposition:</strong> {behavioralScorecard.starBreakdown?.situationAndTask}</div>
-                  <div className="text-slate-300"><strong className="text-amber-400">Code Execution & Correctness:</strong> {behavioralScorecard.starBreakdown?.actionDepth}</div>
-                  <div className="text-slate-300"><strong className="text-amber-400">Complexity & Defense:</strong> {behavioralScorecard.starBreakdown?.resultAndMetrics}</div>
+                  <div className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">Architectural Breakdown:</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Interface Modeling:</strong> {behavioralScorecard.starBreakdown?.situationAndTask}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Concurrency & Performance:</strong> {behavioralScorecard.starBreakdown?.actionDepth}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Fault Tolerance & Scale:</strong> {behavioralScorecard.starBreakdown?.resultAndMetrics}</div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 text-xs">
@@ -1438,11 +1465,60 @@ export default function CrucibleCockpitPage({
                 </div>
 
                 <div className="bg-[#181C24] p-3 rounded-xl border border-white/10 text-xs text-slate-300">
-                  <strong className="text-white">Bar Raiser Debrief Note: </strong>
+                  <strong className="text-white">Bar Raiser Summary: </strong>
                   {behavioralScorecard.barRaiserDebriefNote}
                 </div>
               </div>
             ) : isRound4 && behavioralScorecard ? (
+              <div className="space-y-4 text-left">
+                <div className="text-center pb-2 border-b border-white/10">
+                  <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                    Amazon Executive Bar Raiser Debrief
+                  </span>
+                  <div className="mt-3 flex items-center justify-center gap-4">
+                    <div className="text-5xl font-black font-mono text-white">
+                      {behavioralScorecard.score}<span className="text-2xl text-slate-400">/100</span>
+                    </div>
+                    <div className={"px-3 py-1 rounded-lg text-xs font-bold uppercase " + (
+                      behavioralScorecard.score >= 75 ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-rose-500/20 text-rose-400 border border-rose-500/40"
+                    )}>
+                      Verdict: {behavioralScorecard.verdict || "Evaluated"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#13161C] p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
+                  <div className="font-bold text-slate-200 uppercase tracking-wider text-[11px]">STAR Method Breakdown:</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">S &amp; T:</strong> {behavioralScorecard.starBreakdown?.situationAndTask}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Action:</strong> {behavioralScorecard.starBreakdown?.actionDepth}</div>
+                  <div className="text-slate-300"><strong className="text-amber-400">Result:</strong> {behavioralScorecard.starBreakdown?.resultAndMetrics}</div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-emerald-950/30 border border-emerald-800/40 p-3 rounded-xl">
+                    <div className="font-bold text-emerald-400 mb-1">Key Strengths</div>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      {(behavioralScorecard.strengths || []).map((s: string, idx: number) => (
+                        <li key={idx}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="bg-rose-950/30 border border-rose-800/40 p-3 rounded-xl">
+                    <div className="font-bold text-rose-400 mb-1">Areas for Improvement</div>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      {(behavioralScorecard.areasForImprovement || []).map((a: string, idx: number) => (
+                        <li key={idx}>{a}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="bg-[#181C24] p-3 rounded-xl border border-white/10 text-xs text-slate-300">
+                  <strong className="text-white">Bar Raiser Summary: </strong>
+                  {behavioralScorecard.barRaiserDebriefNote}
+                </div>
+              </div>
+            ) : isRound2 && behavioralScorecard ? (
               <div className="space-y-4 text-left">
                 <div className="text-center pb-2 border-b border-white/10">
                   <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
@@ -1592,7 +1668,7 @@ export default function CrucibleCockpitPage({
                       id: Math.random().toString(36).substring(2, 9),
                       sender: "ai",
                       text: isRound4
-        ? "Hello. Let's move to Question 2 of this set: " + nextTitle + ". Please begin by walking me through your Situation and Task using the STAR framework."
+        ? "Thank you. Let's move to our second Leadership Principle scenario: " + nextTitle + ". Walk me through a situation where you faced this challenge, focusing on your individual ownership and the end result."
         : "Hello! We are now on Question 2: " + nextTitle + ". Before writing any code, walk me through your planned algorithm, data structures, and expected time and space complexity.",
                       time: "Just now"
                     }]);
@@ -1607,7 +1683,7 @@ export default function CrucibleCockpitPage({
                   onClick={handleReturnToPipeline}
                   className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
-                  <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : isRound2 ? "Return to Pipeline (Unlock Round 03 System Design)" : "Return to Pipeline (View Final Decision)"}</span>
+                  <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : isRound2 ? "Return to Pipeline (Unlock Round 03 System Design)" : isRound3 ? "Return to Pipeline (Unlock Round 04 Bar Raiser)" : isRound4 ? "Return to Pipeline (View Final Hiring Decision)" : "Return to Pipeline (View Final Decision)"}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               )}
