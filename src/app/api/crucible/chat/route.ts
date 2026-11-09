@@ -1,4 +1,45 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
+import { decideGate, buildReaskReply, buildClarificationReply, NUDGE_REPLIES } from "@/lib/crucible/answerGate";
+
+const GATE_ONLY_KINDS = ["non_answer", "clarification", "reask", "nudge"];
+
+// Drops on-screen-only messages (non-answers, re-asks, nudges). A no-op when nothing is tagged,
+// so the history is identical to what it would be had the candidate never typed a non-answer.
+function stripGateOnly(history: unknown): any[] {
+  if (!Array.isArray(history)) return [];
+  return history.filter((m: any) => !(m && typeof m.kind === "string" && GATE_ONLY_KINDS.includes(m.kind)));
+}
+
+// Server-side backstop for the answer gate. The page already blocks non-answers before calling us;
+// this only catches a stale or modified client. Fails open: any problem returns null (normal flow).
+function gateBackstop(round: 2 | 3, phase: string, message: string, history: any[], questionTitle: string): NextResponse | null {
+  try {
+    const gatePhase = round === 3 && phase === "INITIAL" ? "DRAFTING" : phase;
+    if (gatePhase === "VERDICT") return null;
+    const lastAi = [...history].reverse().find((m: any) => {
+      const s = String(m?.sender || m?.speaker || m?.role || "").toLowerCase();
+      return s !== "candidate" && s !== "user" && (m?.text || m?.content);
+    });
+    const question = lastAi ? String(lastAi.text || lastAi.content) : "Walk me through your approach for " + questionTitle + ".";
+    const decision = decideGate(
+      message,
+      { round, phase: gatePhase as "INITIAL" | "FOLLOW_UPS" | "CODING" | "DRAFTING", questionText: question, problemTitle: questionTitle },
+      { consecutiveNonAnswers: 0, clarificationsUsed: 0 }
+    );
+    if (decision.action === "proceed" || decision.action === "force_advance") return null;
+    console.info("[answerGate:server]", { class: decision.classification, round, phase: gatePhase });
+    if (decision.action === "nudge") {
+      return NextResponse.json({ reply: gatePhase === "CODING" ? NUDGE_REPLIES.CODING : NUDGE_REPLIES.DRAFTING, accepted: false, gate: "reask" });
+    }
+    if (decision.action === "clarify") {
+      return NextResponse.json({ reply: buildClarificationReply(question), accepted: false, gate: "clarification" });
+    }
+    return NextResponse.json({ reply: buildReaskReply(decision.strike, question), accepted: false, gate: "reask", reaskCount: decision.strike });
+  } catch (error) {
+    console.error("[answerGate:server] failed open:", error);
+    return null;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,13 +53,18 @@ export async function POST(req: NextRequest) {
       problemTitle = "Leadership Scenario",
       problemDescription = "",
       candidateMessage = "",
-      dialogueHistory = [],
+      dialogueHistory: rawDialogueHistory = [],
+      gateForced = false,
+      nonAnswerCount = 0,
+      unansweredQuestions = [],
       vivaPhase = "INITIAL",
       questionIndex = 0,
       totalQuestions = 2,
       candidateTestScore = 0,
       evaluateScorecard = false
     } = await req.json();
+
+    const dialogueHistory = stripGateOnly(rawDialogueHistory);
 
     const groqKey = process.env.GROQ_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
@@ -35,6 +81,10 @@ export async function POST(req: NextRequest) {
     // 1. ROUND 3: ARCHITECTURE DEFENSE (STRICT 3-QUESTION LIMIT)
     // ─────────────────────────────────────────────────────────────
     if (isSystemDesignRound && !evaluateScorecard) {
+      if (!gateForced && process.env.ANSWER_GATE_ENABLED !== "false") {
+        const blocked = gateBackstop(3, String(vivaPhase), String(candidateMessage), dialogueHistory, String(problemTitle));
+        if (blocked) return blocked;
+      }
       // Calculate turns based on history plus current message if present
       const previousTurns = (dialogueHistory || []).filter((m: any) => {
         const s = String(m?.sender || m?.speaker || m?.role || "").toLowerCase();
@@ -239,6 +289,10 @@ INTERVIEWER GUIDELINES:
     // 2.5 ROUND 2: TECHNICAL DSA VIVA (INITIAL -> FOLLOW-UPS)
     // ─────────────────────────────────────────────────────────────
     if (isDsaVivaRound && !evaluateScorecard) {
+      if (!gateForced && process.env.ANSWER_GATE_ENABLED !== "false") {
+        const blocked = gateBackstop(2, String(vivaPhase), String(candidateMessage), dialogueHistory, String(problemTitle));
+        if (blocked) return blocked;
+      }
       const candidateTurnCount = (dialogueHistory || []).filter(
         (m: any) => m.speaker === "CANDIDATE" || m.sender === "candidate" || m.role === "user"
       ).length + (candidateMessage ? 1 : 0);
@@ -368,7 +422,7 @@ BEHAVIOR DIRECTIVES:
         (problemId && String(problemId).includes("-r3-"))
       );
 
-      const evaluationPrompt = isRound2Eval
+      const baseEvaluationPrompt = isRound2Eval
         ? `You are an Amazon Principal Bar Raiser evaluating a Round 2 (Technical DSA Viva) candidate.
 The candidate was assigned 2 algorithmic problems with live test validation and a technical viva defense.
 
@@ -479,6 +533,15 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
   ],
   "barRaiserDebriefNote": "<2-3 executive summary sentences summarizing the final decision across both questions>"
 }`;
+
+      // Only when the candidate gave non-answers: one factual note. Otherwise the prompt is unchanged.
+      const gateNote = Number(nonAnswerCount) > 0
+        ? `\n\nNOTE: Candidate gave ${Number(nonAnswerCount)} non-answers that were re-asked.` +
+          (Array.isArray(unansweredQuestions) && unansweredQuestions.length > 0
+            ? `\nUNANSWERED QUESTIONS: ${JSON.stringify(unansweredQuestions)}`
+            : "")
+        : "";
+      const evaluationPrompt = baseEvaluationPrompt + gateNote;
 
       // 1. Try Groq
       if (groqKey) {

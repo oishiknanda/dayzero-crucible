@@ -10,6 +10,13 @@ import { getCompanyTrackData } from "@/data/companyTracks";
 import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTracks";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
+  decideGate,
+  buildReaskReply,
+  buildClarificationReply,
+  NUDGE_REPLIES,
+  type GatePhase
+} from "@/lib/crucible/answerGate";
+import {
   Play,
   Send,
   Terminal,
@@ -38,6 +45,15 @@ const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
 type SupportedLanguage = "cpp" | "python" | "java" | "javascript";
 type ConsoleTab = "interviewer" | "cases" | "hidden" | "results";
+
+// Answer gate (Rounds 2 and 3 only): messages that exist only on screen and never reach the model.
+type DialogueKind = "non_answer" | "clarification" | "reask" | "nudge";
+const GATE_ONLY_KINDS: ReadonlyArray<string> = ["non_answer", "clarification", "reask", "nudge"];
+
+// History as it would be had the candidate never typed a non-answer. A no-op when nothing is tagged.
+function modelHistory<T extends { kind?: string }>(list: T[]): T[] {
+  return (list || []).filter(m => !(m && m.kind && GATE_ONLY_KINDS.includes(m.kind)));
+}
 
 function FormatText({ text }: { text: string }) {
   if (!text) return null;
@@ -201,13 +217,24 @@ export default function CrucibleCockpitPage({
   const [vivaPhase, setVivaPhase] = useState<"INITIAL" | "CODING" | "FOLLOW_UPS" | "VERDICT">("INITIAL");
   const [followUpCount, setFollowUpCount] = useState<number>(0);
 
+  // Answer gate bookkeeping (Rounds 2 and 3 only).
+  const gateStrikesRef = useRef<number>(0);
+  const gateClarRef = useRef<number>(0);
+  const gateReaskTotalRef = useRef<number>(0);
+  const nonAnswerCountRef = useRef<number>(0);
+  const unansweredRef = useRef<string[]>([]);
+  const resetGate = () => {
+    gateStrikesRef.current = 0;
+    gateClarRef.current = 0;
+  };
+
   const [isVoiceActive, setIsVoiceActive] = useState<boolean>(true);
   const [aiVoiceMuted, setAiVoiceMuted] = useState<boolean>(false);
   const [isAiSpeaking, setIsAiSpeaking] = useState<boolean>(false);
   const [isAiThinking, setIsAiThinking] = useState<boolean>(false);
   const [isTranscribing, setIsTranscribing] = useState<boolean>(false);
 
-  const [dialogue, setDialogue] = useState<Array<{ id: string; sender: "ai" | "candidate"; text: string; time: string }>>(() => {
+  const [dialogue, setDialogue] = useState<Array<{ id: string; sender: "ai" | "candidate"; text: string; time: string; kind?: DialogueKind }>>(() => {
     if (isRound1) return [];
     const pTitle = problem?.title || "Technical Problem";
     const compName = companyData?.companyName || "Amazon";
@@ -335,7 +362,7 @@ export default function CrucibleCockpitPage({
     window.speechSynthesis.speak(utterance);
   }, [aiVoiceMuted, isVoiceActive]);
 
-  const postAiMessage = useCallback((text: string) => {
+  const postAiMessage = useCallback((text: string, kind?: DialogueKind) => {
     if (!text || text.trim().length === 0) return;
 
     setDialogue(prev => [
@@ -344,7 +371,8 @@ export default function CrucibleCockpitPage({
         id: Math.random().toString(36).substring(2, 9),
         sender: "ai",
         text,
-        time: "Just now"
+        time: "Just now",
+        ...(kind ? { kind } : {})
       }
     ]);
 
@@ -360,21 +388,10 @@ export default function CrucibleCockpitPage({
 
   const askAiInterviewer = async (candidateMsg: string) => {
     const lower = candidateMsg.toLowerCase();
-    const wantsToSkip = 
-      lower.includes("second") || 
-      lower.includes("second problem") || 
-      lower.includes("next") || 
-      lower.includes("next problem") || 
-      lower.includes("next question") || 
-      lower.includes("question 2") || 
-      lower.includes("task 2") || 
-      lower.includes("q2") || 
-      lower.includes("skip") || 
-      lower.includes("move on") || 
-      lower.includes("conclude") || 
-      lower.includes("scorecard") || 
-      lower.includes("finish") || 
-      lower.includes("end");
+    // Whole words only, and only for short messages: "defend", "backend" or a long answer that
+    // mentions "the second pointer" must never be mistaken for a request to skip or conclude.
+    const SKIP_WORDS_RE = /\b(second|next|skip|conclude|scorecard|finish|end|q2)\b|\bsecond problem\b|\bquestion 2\b|\btask 2\b|\bmove on\b/;
+    const wantsToSkip = lower.trim().split(/\s+/).length <= 8 && SKIP_WORDS_RE.test(lower);
 
     if (isRound2 && wantsToSkip) {
       if (currentQuestionIndex === 0) {
@@ -391,7 +408,72 @@ export default function CrucibleCockpitPage({
       return;
     }
 
-    // STRICT RULE: If we are in INITIAL phase, ANY answer from candidate immediately
+    // ANSWER GATE (Rounds 2 and 3 only): arbitrary input never advances the interview.
+    // It repeats the same question instead. Fails open: any error means "treat as a normal answer".
+    let gateForced = false;
+    if ((isRound2 || isRound3) && vivaPhase !== "VERDICT") {
+      try {
+        const gatePhase: GatePhase = isRound3 && vivaPhase === "INITIAL" ? "DRAFTING" : vivaPhase;
+        const fallbackQuestion = isRound2 && vivaPhase === "INITIAL"
+          ? "Walk me through your approach for " + (problem?.title || "this problem") + ": the algorithm, the data structure, and the expected time and space complexity."
+          : "Please walk me through your answer to my last question.";
+        const lastQuestion = [...dialogue].reverse().find(m => m.sender === "ai" && !m.kind);
+        const currentQuestion = (isRound2 && vivaPhase === "INITIAL") || !lastQuestion
+          ? fallbackQuestion
+          : lastQuestion.text;
+
+        const decision = decideGate(
+          candidateMsg,
+          { round: isRound2 ? 2 : 3, phase: gatePhase, questionText: currentQuestion, problemTitle: problem?.title },
+          { consecutiveNonAnswers: gateStrikesRef.current, clarificationsUsed: gateClarRef.current }
+        );
+        console.info("[answerGate]", { class: decision.classification, round: isRound2 ? 2 : 3, phase: gatePhase, strike: decision.strike });
+
+        const tagLastCandidate = (kind: DialogueKind) => {
+          setDialogue(prev => {
+            let idx = -1;
+            for (let i = prev.length - 1; i >= 0; i--) {
+              if (prev[i].sender === "candidate") { idx = i; break; }
+            }
+            if (idx < 0) return prev;
+            const copy = prev.slice();
+            copy[idx] = { ...copy[idx], kind };
+            return copy;
+          });
+        };
+
+        if (decision.action === "proceed") {
+          resetGate();
+        } else if (decision.action === "nudge") {
+          tagLastCandidate(decision.classification === "clarification" ? "clarification" : "non_answer");
+          postAiMessage(gatePhase === "CODING" ? NUDGE_REPLIES.CODING : NUDGE_REPLIES.DRAFTING, "nudge");
+          return;
+        } else if (decision.action === "clarify") {
+          gateClarRef.current = decision.clarificationsUsed;
+          gateReaskTotalRef.current += 1;
+          tagLastCandidate("clarification");
+          postAiMessage(buildClarificationReply(currentQuestion, gateReaskTotalRef.current), "reask");
+          return;
+        } else if (decision.action === "reask") {
+          gateStrikesRef.current = decision.strike;
+          gateReaskTotalRef.current += 1;
+          nonAnswerCountRef.current += 1;
+          tagLastCandidate("non_answer");
+          postAiMessage(buildReaskReply(decision.strike, currentQuestion, gateReaskTotalRef.current), "reask");
+          return;
+        } else if (decision.action === "force_advance") {
+          // Safety valve: after repeated non-answers, move on by the existing path of this phase.
+          gateForced = true;
+          nonAnswerCountRef.current += 1;
+          unansweredRef.current = [...unansweredRef.current, currentQuestion];
+          resetGate();
+        }
+      } catch (gateError) {
+        console.error("[answerGate] failed open:", gateError);
+      }
+    }
+
+    // STRICT RULE: If we are in INITIAL phase, ANY (real) answer from candidate immediately
     // commands them to write the code in the editor, and switches phase to CODING.
     if (isRound2 && vivaPhase === "INITIAL") {
       setVivaPhase("CODING");
@@ -418,7 +500,8 @@ export default function CrucibleCockpitPage({
           category: isRound4 ? "Behavioral" : (problem.category || "Algorithms"),
           difficulty: isRound4 ? "Bar Raiser" : (problem.difficulty || "Medium"),
           candidateMessage: candidateMsg,
-          dialogueHistory: dialogue.slice(-6),
+          dialogueHistory: modelHistory(dialogue).slice(-6),
+          ...(gateForced ? { gateForced: true } : {}),
           vivaPhase,
           code,
           questionIndex: currentQuestionIndex,
@@ -623,6 +706,7 @@ export default function CrucibleCockpitPage({
       setActiveConsoleTab("interviewer");
       setVivaPhase("FOLLOW_UPS");
       setFollowUpCount(0);
+      resetGate();
 
       setTimeout(() => {
         setIsRunning(false);
@@ -695,6 +779,7 @@ export default function CrucibleCockpitPage({
           setActiveConsoleTab("interviewer");
           setVivaPhase("FOLLOW_UPS");
           setFollowUpCount(0);
+          resetGate();
           const passMsg = "Your code passed all stress tests. Let's begin your technical defense: explain the runtime and space bounds of your solution.";
           postAiMessage(passMsg);
           if (typeof speakText === "function") speakText(passMsg);
@@ -724,6 +809,7 @@ export default function CrucibleCockpitPage({
       setShowNextModal(false);
       setTestResults(null);
       setVivaPhase("INITIAL");
+      resetGate();
       setActiveConsoleTab(isRound1 ? "cases" : "interviewer");
 
       const p = getProblemById(nextProblemId);
@@ -736,7 +822,9 @@ export default function CrucibleCockpitPage({
       setDialogue([{
         id: "q2-init-" + Date.now(),
         sender: "ai",
-        text: "Thank you. Let's move to our second Leadership Principle scenario: " + nextTitle + ". Walk me through a situation where you faced this challenge, focusing on your individual ownership and the end result.",
+        text: isRound4
+          ? "Thank you. Let's move to our second Leadership Principle scenario: " + nextTitle + ". Walk me through a situation where you faced this challenge, focusing on your individual ownership and the end result."
+          : "Hello! We are now on Question 2: " + nextTitle + ". Before writing any code, walk me through your planned algorithm, data structures, and expected time and space complexity.",
         time: "Just now"
       }]);
     }
@@ -757,8 +845,9 @@ export default function CrucibleCockpitPage({
           roundSlug: roundSlug,
           problemTitle: problem ? problem.title : "Technical Round",
           problemDescription: problem ? (problem.paragraphs || []).join(" ") : "",
-          dialogueHistory: [...(allSetHistory || []), ...(dialogue || [])],
+          dialogueHistory: modelHistory([...(allSetHistory || []), ...(dialogue || [])]),
           candidateTestScore: ((taskScores[0] || 0) / 2) + ((taskScores[1] || 0) / 2),
+          ...(nonAnswerCountRef.current > 0 ? { nonAnswerCount: nonAnswerCountRef.current, unansweredQuestions: unansweredRef.current } : {}),
           evaluateScorecard: true
         })
       });
@@ -1657,6 +1746,7 @@ export default function CrucibleCockpitPage({
 
                     setCurrentProblemId(q2Id);
                     setCurrentQuestionIndex(1);
+                    if (!isRound4) resetGate();
                     setShowCompletionScorecard(false);
                     setQuestionCompleted(false);
                     setIsSetFinished(false);
