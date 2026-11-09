@@ -863,6 +863,7 @@ export default function CrucibleCockpitPage({
       const data = await res.json();
       if (data?.scorecard) {
         setBehavioralScorecard(data.scorecard);
+        fetch("/api/history", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ company: companySlug, role: selectedRole, round: roundSlug, setId: selectedSetId, score: data.scorecard.score ?? null, verdict: data.scorecard.verdict ?? null }) }).catch(() => undefined);
       }
     } catch (e) {
       console.error("Failed to generate scorecard:", e);

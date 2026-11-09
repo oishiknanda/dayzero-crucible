@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { Terminal, ChevronDown, Search } from "lucide-react";
 
 export const Navbar = () => {
@@ -245,11 +246,7 @@ export const Navbar = () => {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3.5 shrink-0">
-          <Link href="/hub" className="hidden sm:inline-block">
-            <Button variant="ghost" size="sm" className="font-semibold text-slate-700 text-sm hover:text-slate-950">
-              Sign In
-            </Button>
-          </Link>
+          <UserMenu />
           <Link href="/hub">
             <Button variant="outline" size="md" className="hidden sm:inline-flex font-semibold border-slate-300 text-slate-800 text-sm shadow-sm hover:border-slate-900">
               Launch Diagnostic
