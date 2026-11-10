@@ -1,0 +1,8 @@
+.env
+.env.*
+*.local
+credentials.json
+service-account*.json
+id_rsa
+*.pem
+*.key

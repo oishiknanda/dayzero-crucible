@@ -37,3 +37,8 @@ next-env.d.ts
 
 # local user/history store
 .data/
+.env
+.env*.local
+.env.production
+.env.staging
+.env.test

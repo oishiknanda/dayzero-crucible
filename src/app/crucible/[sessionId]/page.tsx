@@ -1,4 +1,6 @@
-﻿"use client";
+"use client";
+
+import { GOOGLE_TRACKS } from '@/data/googleTracks';
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
@@ -94,6 +96,7 @@ export default function CrucibleCockpitPage({
   const router = useRouter();
   const searchParams = useSearchParams();
   const companySlug = searchParams.get("company") || "google";
+  const isGoogle = (companySlug || "").toLowerCase() === "google";
   const roundSlug = searchParams.get("round") || "round-1";
 
   // Check current round stages
@@ -142,6 +145,24 @@ export default function CrucibleCockpitPage({
   const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
     if (override && PROBLEMS_DATABASE && PROBLEMS_DATABASE[override]) return override;
 
+        // Check GOOGLE_TRACKS based on company, round, role, and setId
+    if (c && c.toLowerCase() === "google" && typeof GOOGLE_TRACKS !== "undefined") {
+      const normalizedRole = (role === "sde_intern" || role === "swe_intern") ? "swe_intern" : "sde_1";
+      const track = (GOOGLE_TRACKS as any)[normalizedRole];
+      if (track && track.rounds) {
+        const roundObj = track.rounds.find((rnd: any) => rnd.roundId === r);
+        if (roundObj && roundObj.sets) {
+          const targetSet = roundObj.sets.find((s: any) => s.setId === setNum) || roundObj.sets[0];
+          if (targetSet && targetSet.problemIds && targetSet.problemIds.length > 0) {
+            const trackProblemId = targetSet.problemIds[0];
+            if (PROBLEMS_DATABASE && PROBLEMS_DATABASE[trackProblemId]) {
+              return trackProblemId;
+            }
+          }
+        }
+      }
+      return "goog-swe-r1-q1";
+    }
     if (c && c.toLowerCase() === "amazon" && typeof AMAZON_TRACKS !== "undefined") {
       const track = (AMAZON_TRACKS as any)[role];
       if (track && track.rounds) {
@@ -237,15 +258,32 @@ export default function CrucibleCockpitPage({
   const [dialogue, setDialogue] = useState<Array<{ id: string; sender: "ai" | "candidate"; text: string; time: string; kind?: DialogueKind }>>(() => {
     if (isRound1) return [];
     const pTitle = problem?.title || "Technical Problem";
-    const compName = companyData?.companyName || "Amazon";
-    let greet = "Hello. Welcome to the " + compName + " technical round. You are solving " + pTitle + ". Before writing code, state your intended algorithm and data structure.";
-    if (isRound2) {
-      greet = "Hello! I am your Amazon Technical Interviewer for this DSA Viva session. We will be working on " + pTitle + ". Before writing any code, walk me through your high-level algorithm, data structures, and expected time and space complexity.";
-    } else if (isRound3) {
-      greet = "Welcome to your Amazon Round 3 Technical Loop: " + pTitle + ". First, outline your core class interfaces, thread-safe data structures, and backpressure strategy in the editor above.";
-    } else if (isRound4) {
-      greet = "Hello. I am your Amazon Bar Raiser for this session. As an independent evaluator, my goal is to assess your alignment with Amazon's Leadership Principles and your technical decision-making in real-world scenarios. We will begin with: " + pTitle + ". Please walk me through your Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and measurable metrics.";
+    const isGoogleRound = isGoogle || (companyData?.companyName || "").toLowerCase().includes("google");
+    const compName = isGoogleRound ? "Google" : (companyData?.companyName || "Amazon");
+
+    let greet = "";
+    if (isGoogleRound) {
+      if (isRound2) {
+        greet = "Hello! I am your Google Technical Interviewer for this Data Structures & Algorithms Screen. We will be working on " + pTitle + ". Before writing any code, walk me through your high-level algorithm, invariant guarantees, and expected Big-O time and space complexity.";
+      } else if (isRound3) {
+        greet = "Welcome to your Google Round 3 Technical Loop: " + pTitle + ". We are evaluating algorithmic rigor and optimal asymptotic scaling. Outline your approach and edge-case handling before writing code.";
+      } else if (isRound4) {
+        greet = "Hello. I am your Googleyness & Leadership Evaluator for this session. We are assessing how you navigate ambiguity, collaborate effectively, take ownership, and approach real-world engineering challenges. We will begin with: " + pTitle + ". Please walk me through how you approach this scenario, focusing on trade-offs, intellectual humility, and your personal decision-making.";
+      } else {
+        greet = "Hello. Welcome to your Google technical interview. We will be analyzing " + pTitle + ". Walk me through your design approach.";
+      }
+    } else {
+      if (isRound2) {
+        greet = "Hello! I am your Amazon Technical Interviewer for this DSA Viva session. We will be working on " + pTitle + ". Before writing any code, walk me through your high-level algorithm, data structures, and expected time and space complexity.";
+      } else if (isRound3) {
+        greet = "Welcome to your Amazon Round 3 Technical Loop: " + pTitle + ". First, outline your core class interfaces, thread-safe data structures, and backpressure strategy in the editor above.";
+      } else if (isRound4) {
+        greet = "Hello. I am your Amazon Bar Raiser for this session. As an independent evaluator, my goal is to assess your alignment with Amazon's Leadership Principles and your technical decision-making in real-world scenarios. We will begin with: " + pTitle + ". Please walk me through your Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and measurable metrics.";
+      } else {
+        greet = "Hello. Welcome to the " + compName + " technical round. You are solving " + pTitle + ". Before writing code, state your intended algorithm and data structure.";
+      }
     }
+
     return [{
       id: "init-msg-" + Date.now(),
       sender: "ai",
@@ -257,36 +295,9 @@ export default function CrucibleCockpitPage({
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [recordingSeconds, setRecordingSeconds] = useState<number>(0);
   const [candidateInputText, setCandidateInputText] = useState<string>("");
-
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<BlobPart[]>([]);
   const mediaStreamRef = useRef<MediaStream | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
-
-  useEffect(() => {
-    let qRole = searchParams.get("role");
-    let qSet = searchParams.get("set");
-
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (!qRole) qRole = urlParams.get("role");
-      if (!qSet) qSet = urlParams.get("set");
-    }
-
-    const activeRole = qRole || "sde_1";
-    const activeSet = parseInt(qSet || "1", 10);
-
-    setSelectedRole(activeRole as AmazonRole);
-    setSelectedSetId(activeSet);
-
-    const resolved = getResolvedProblemId(companySlug, roundSlug, activeRole, activeSet, problemParam);
-    if (resolved) {
-      setCurrentProblemId(resolved);
-      const p = PROBLEMS_DATABASE[resolved];
-      if (p && p.starterTemplates && p.starterTemplates[language]) {
-        setCode(p.starterTemplates[language]);
-      }
-    }
-  }, [searchParams, companySlug, roundSlug, problemParam, language]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [testResults, setTestResults] = useState<EvaluationReport | null>(null);
@@ -506,8 +517,8 @@ export default function CrucibleCockpitPage({
           isRound3: isRound3,
           isRound4: isRound4,
           roundSlug: roundSlug,
-          category: isRound4 ? "Behavioral" : (problem.category || "Algorithms"),
-          difficulty: isRound4 ? "Bar Raiser" : (problem.difficulty || "Medium"),
+          category: isRound4 ? (isGoogle ? "Googleyness" : "Behavioral") : (problem.category || "Algorithms"),
+          difficulty: isRound4 ? (isGoogle ? "Googleyness Loop" : "Bar Raiser") : (problem.difficulty || "Medium"),
           candidateMessage: candidateMsg,
           dialogueHistory: modelHistory(dialogue).slice(-6),
           ...(gateForced ? { gateForced: true } : {}),
@@ -1055,7 +1066,7 @@ export default function CrucibleCockpitPage({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-500 font-mono">
-                {isRound4 ? "Behavioral Leadership Principle" : isRound3 ? "Architecture Specification" : isRound2 ? "Technical Problem & Viva Defense" : (problem?.category || "Problem Description")}
+                {isRound4 ? (isGoogle ? "Googleyness & Leadership" : "Behavioral Leadership Principle") : isRound3 ? (isGoogle ? "System Architecture & Algorithms" : "Architecture Specification") : isRound2 ? "Technical Problem & Viva Defense" : (problem?.category || "Problem Description")}
               </span>
             </div>
             <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
@@ -1783,7 +1794,7 @@ export default function CrucibleCockpitPage({
                   onClick={handleReturnToPipeline}
                   className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
-                  <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : isRound2 ? "Return to Pipeline (Unlock Round 03 System Design)" : isRound3 ? "Return to Pipeline (Unlock Round 04 Bar Raiser)" : isRound4 ? "Return to Pipeline (View Final Hiring Decision)" : "Return to Pipeline (View Final Decision)"}</span>
+                  <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : isRound2 ? "Return to Pipeline (Unlock Round 03 System Design)" : isRound3 ? "Return to Pipeline (Unlock Round 04 " + (isGoogle ? "Googleyness & Leadership" : "Bar Raiser") + ")" : isRound4 ? "Return to Pipeline (View Final Hiring Decision)" : "Return to Pipeline (View Final Decision)"}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               )}

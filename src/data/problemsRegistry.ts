@@ -1,3 +1,4 @@
+import { GOOGLE_ALL_PROBLEMS } from './problems/google/googleProblems';
 import { AMAZON_ROUND3_PROBLEMS } from "./amazonRound3Registry";
 import { AMAZON_ROUND2_PROBLEMS } from "./amazonRound2Registry";
 import { AMAZON_OA_ALL_PROBLEMS } from "./problems/amazon/oaSets";
@@ -117,6 +118,7 @@ const BASE_REGISTRY: Record<string, ProblemDefinition> = {
 };
 
 export const PROBLEMS_DATABASE: Record<string, ProblemDefinition> = {
+  ...GOOGLE_ALL_PROBLEMS,
   ...AMAZON_ROUND2_PROBLEMS,
   ...AMAZON_OA_ALL_PROBLEMS,
   ...BASE_REGISTRY,

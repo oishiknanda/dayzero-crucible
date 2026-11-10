@@ -2,10 +2,12 @@
 
 import React, { useRef } from "react";
 import Link from "next/link";
+import { EXTRA_COMPANIES } from "@/data/indianCompanies";
 
 export const CompanyMarquee = () => {
   const row1Ref = useRef<HTMLDivElement>(null);
   const row2Ref = useRef<HTMLDivElement>(null);
+  const row3Ref = useRef<HTMLDivElement>(null);
 
   const setupDragScroll = (ref: React.RefObject<HTMLDivElement | null>) => {
     return {
@@ -305,7 +307,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row1Ref}
         {...setupDragScroll(row1Ref)}
-        className="flex gap-3 overflow-x-scroll cursor-grab active:cursor-grabbing [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:thin] [scrollbar-color:#475569_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-600/70 [&::-webkit-scrollbar-thumb]:rounded-full pb-2 pt-1 px-6 sm:px-10 lg:px-14"
       >
         {row1.map((item, i) => (
           <Link
@@ -323,7 +325,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row2Ref}
         {...setupDragScroll(row2Ref)}
-        className="flex gap-3 overflow-x-scroll cursor-grab active:cursor-grabbing [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14 mt-3"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:thin] [scrollbar-color:#475569_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-600/70 [&::-webkit-scrollbar-thumb]:rounded-full pb-2 pt-1 px-6 sm:px-10 lg:px-14 mt-3"
       >
         {row2.map((item, i) => (
           <Link
@@ -333,6 +335,29 @@ export const CompanyMarquee = () => {
           >
             {item.svg}
             <span className="whitespace-nowrap">{item.name}</span>
+          </Link>
+        ))}
+      </div>
+      {/* Row 3: Indian and global companies (coming soon) */}
+      <div
+        ref={row3Ref}
+        {...setupDragScroll(row3Ref)}
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:thin] [scrollbar-color:#475569_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-600/70 [&::-webkit-scrollbar-thumb]:rounded-full pb-2 pt-1 px-6 sm:px-10 lg:px-14 mt-3"
+      >
+        {EXTRA_COMPANIES.map((item) => (
+          <Link
+            key={item.name}
+            href={`/tracks/${getSlug(item.name)}`}
+            className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-900 font-sans font-bold text-sm tracking-tight shadow-sm hover:border-slate-800 transition-colors shrink-0 cursor-pointer"
+          >
+            <span
+              className="w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-extrabold text-white"
+              style={{ backgroundColor: item.color }}
+            >
+              {item.name.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase()}
+            </span>
+            <span className="whitespace-nowrap">{item.name}</span>
+            <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400">Soon</span>
           </Link>
         ))}
       </div>
