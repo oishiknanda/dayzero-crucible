@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { prettyCompany } from "@/lib/waitlist";
+import { EXTRA_COMPANIES, slugOf } from "@/data/indianCompanies";
 
 interface Overview {
   founder: boolean;
@@ -38,6 +39,11 @@ export default function FounderPage() {
     const res = await fetch("/api/founder", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
     if (res.ok) {
       setCode("");
+      const next = new URLSearchParams(window.location.search).get("next") || "";
+      if (/^\/tracks\/[a-z0-9-]+$/.test(next)) {
+        window.location.href = next;
+        return;
+      }
       load();
     } else {
       setError(((await res.json().catch(() => ({}))) as { error?: string }).error || "Wrong code.");
@@ -91,6 +97,15 @@ export default function FounderPage() {
           <div className={card}><p className="text-xs font-bold uppercase text-slate-500">Accounts</p><p className="text-3xl font-extrabold">{data.users ?? 0}</p></div>
           <div className={card}><p className="text-xs font-bold uppercase text-slate-500">Interviews scored</p><p className="text-3xl font-extrabold">{data.interviews ?? 0}</p></div>
         </div>
+
+        <section className={card}>
+          <h2 className="mb-3 text-lg font-extrabold">Open a company</h2>
+          <div className="flex flex-wrap gap-2">
+            {EXTRA_COMPANIES.map((c) => (
+              <Link key={c.name} href={"/tracks/" + slugOf(c.name)} className="rounded-lg border-2 border-slate-300 px-3 py-1.5 text-sm font-bold hover:border-slate-800">{c.name}</Link>
+            ))}
+          </div>
+        </section>
 
         <section className={card}>
           <h2 className="mb-3 text-lg font-extrabold">Votes by company (live)</h2>

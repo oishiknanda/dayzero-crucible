@@ -76,7 +76,7 @@ export function ComingSoon({ slug }: { slug: string }) {
 
         <div className="mt-6 flex items-center justify-center gap-5 text-sm font-semibold">
           <Link href="/" className="text-slate-700 hover:text-slate-950">Back to home</Link>
-          <Link href="/founder" className="text-slate-400 hover:text-slate-700">Founder access</Link>
+          <Link href={"/founder?next=/tracks/" + slug} className="text-slate-400 hover:text-slate-700">Founder access</Link>
         </div>
       </div>
     </main>
