@@ -307,7 +307,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row1Ref}
         {...setupDragScroll(row1Ref)}
-        className="flex gap-3 overflow-x-scroll cursor-grab active:cursor-grabbing [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14"
       >
         {row1.map((item, i) => (
           <Link
@@ -325,7 +325,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row2Ref}
         {...setupDragScroll(row2Ref)}
-        className="flex gap-3 overflow-x-scroll cursor-grab active:cursor-grabbing [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14 mt-3"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14 mt-3"
       >
         {row2.map((item, i) => (
           <Link
@@ -343,7 +343,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row3Ref}
         {...setupDragScroll(row3Ref)}
-        className="flex gap-3 overflow-x-scroll cursor-grab active:cursor-grabbing [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14 mt-3"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14 mt-3"
       >
         {EXTRA_COMPANIES.map((item) => (
           <Link
