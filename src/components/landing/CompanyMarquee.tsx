@@ -307,7 +307,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row1Ref}
         {...setupDragScroll(row1Ref)}
-        className="flex gap-3 overflow-x-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:thin] [scrollbar-color:#475569_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-600/70 [&::-webkit-scrollbar-thumb]:rounded-full pb-2 pt-1 px-6 sm:px-10 lg:px-14"
       >
         {row1.map((item, i) => (
           <Link
@@ -325,7 +325,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row2Ref}
         {...setupDragScroll(row2Ref)}
-        className="flex gap-3 overflow-x-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14 mt-3"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:thin] [scrollbar-color:#475569_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-600/70 [&::-webkit-scrollbar-thumb]:rounded-full pb-2 pt-1 px-6 sm:px-10 lg:px-14 mt-3"
       >
         {row2.map((item, i) => (
           <Link
@@ -343,7 +343,7 @@ export const CompanyMarquee = () => {
       <div
         ref={row3Ref}
         {...setupDragScroll(row3Ref)}
-        className="flex gap-3 overflow-x-scroll [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1 px-6 sm:px-10 lg:px-14 mt-3"
+        className="flex gap-3 overflow-x-scroll [scrollbar-width:thin] [scrollbar-color:#475569_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-600/70 [&::-webkit-scrollbar-thumb]:rounded-full pb-2 pt-1 px-6 sm:px-10 lg:px-14 mt-3"
       >
         {EXTRA_COMPANIES.map((item) => (
           <Link
