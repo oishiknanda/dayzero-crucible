@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
@@ -13,7 +13,9 @@ function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const { status } = useSession();
-  const callbackUrl = params.get("callbackUrl") || "/";
+  
+  const nextUrl = params.get("next") || params.get("callbackUrl") || "/";
+  const urlError = params.get("error");
 
   const [mode, setMode] = useState<"signin" | "signup">(params.get("mode") === "signup" ? "signup" : "signin");
   const [name, setName] = useState("");
@@ -24,19 +26,29 @@ function LoginForm() {
   const [oauth, setOauth] = useState<string[]>([]);
 
   useEffect(() => {
+    if (urlError === "OAuthAccountNotFound") {
+      setError("No account found with this social account. Please create an account first.");
+      setMode("signup");
+    } else if (urlError) {
+      setError("Authentication failed. Please try again.");
+    }
+  }, [urlError]);
+
+  useEffect(() => {
     getProviders()
       .then((p) => setOauth(Object.keys(p ?? {}).filter((id) => id === "google" || id === "github")))
       .catch(() => setOauth([]));
   }, []);
 
   useEffect(() => {
-    if (status === "authenticated") router.replace(callbackUrl);
-  }, [status, router, callbackUrl]);
+    if (status === "authenticated") router.replace(nextUrl);
+  }, [status, router, nextUrl]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setBusy(true);
+
     try {
       if (mode === "signup") {
         const res = await fetch("/api/auth/signup", {
@@ -46,19 +58,55 @@ function LoginForm() {
         });
         if (!res.ok) {
           const data = (await res.json().catch(() => ({}))) as { error?: string };
+          if (data.error?.toLowerCase().includes("exists")) {
+            setError("An account with this email already exists. Please switch to Sign in below.");
+            return;
+          }
           setError(data.error || "Could not create your account.");
           return;
         }
-      }
-      const result = await signIn("credentials", { email, password, redirect: false });
-      if (!result || result.error) {
-        setError("Incorrect email or password.");
+
+        const signInResult = await signIn("credentials", {
+          email,
+          password,
+          callbackUrl: nextUrl,
+          redirect: false,
+        });
+
+        if (signInResult?.ok) {
+          router.replace(nextUrl);
+        } else {
+          setMode("signin");
+          setError("Account created! Please sign in with your credentials.");
+        }
         return;
       }
-      router.replace(callbackUrl);
+
+      const result = await signIn("credentials", {
+        email,
+        password,
+        callbackUrl: nextUrl,
+        redirect: false,
+      });
+
+      if (!result || result.error) {
+        if (result?.error?.includes("NO_ACCOUNT_FOUND")) {
+          setError("No account found with this email. Please create an account first.");
+        } else {
+          setError("Incorrect password or credentials.");
+        }
+        return;
+      }
+
+      router.replace(nextUrl);
     } finally {
       setBusy(false);
     }
+  };
+
+  const handleOAuthClick = async (providerId: string) => {
+    setError("");
+    await signIn(providerId, { callbackUrl: nextUrl });
   };
 
   const input = "w-full rounded-lg border-2 border-slate-300 px-3.5 py-2.5 text-sm font-medium focus:border-slate-800 focus:outline-none";
@@ -82,7 +130,14 @@ function LoginForm() {
       {oauth.length > 0 && (
         <div className="mt-6 space-y-2.5">
           {oauth.map((id) => (
-            <Button key={id} type="button" variant="outline" size="md" className="w-full" onClick={() => signIn(id, { callbackUrl })}>
+            <Button
+              key={id}
+              type="button"
+              variant="outline"
+              size="md"
+              className="w-full"
+              onClick={() => handleOAuthClick(id)}
+            >
               {OAUTH_LABELS[id]}
             </Button>
           ))}

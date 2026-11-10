@@ -205,7 +205,7 @@ export const Navbar = () => {
                   {filteredCompanies.map((c, i) => (
                     <Link
                       key={i}
-                      href={`/tracks/${getSlug(c.name)}`}
+                      href={`/login?next=/tracks/${getSlug(c.name)}`}
                       onClick={() => setIsDropdownOpen(false)}
                       className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border-2 border-slate-200 bg-slate-50 hover:bg-white hover:border-slate-800 transition-colors cursor-pointer"
                     >
@@ -247,12 +247,12 @@ export const Navbar = () => {
         {/* Action Buttons */}
         <div className="flex items-center gap-3.5 shrink-0">
           <UserMenu />
-          <Link href="/hub">
+          <Link href="#tracks">
             <Button variant="outline" size="md" className="hidden sm:inline-flex font-semibold border-slate-300 text-slate-800 text-sm shadow-sm hover:border-slate-900">
               Launch Diagnostic
             </Button>
           </Link>
-          <Link href="/hub">
+          <Link href="#tracks">
             <Button variant="primary" size="md" className="font-semibold text-sm px-5 shadow-sm">
               Enter Cockpit →
             </Button>
