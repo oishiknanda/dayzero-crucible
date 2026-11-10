@@ -1,6 +1,6 @@
 "use client";
 
-import { GOOGLE_TRACKS } from '@/data/googleTracks';
+import { GOOGLE_TRACKS, normalizeGoogleRole, getGoogleQuestionSet } from '@/data/googleTracks';
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
@@ -145,23 +145,12 @@ export default function CrucibleCockpitPage({
   const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
     if (override && PROBLEMS_DATABASE && PROBLEMS_DATABASE[override]) return override;
 
-        // Check GOOGLE_TRACKS based on company, round, role, and setId
-    if (c && c.toLowerCase() === "google" && typeof GOOGLE_TRACKS !== "undefined") {
-      const normalizedRole = (role === "sde_intern" || role === "swe_intern") ? "swe_intern" : "sde_1";
-      const track = (GOOGLE_TRACKS as any)[normalizedRole];
-      if (track && track.rounds) {
-        const roundObj = track.rounds.find((rnd: any) => rnd.roundId === r);
-        if (roundObj && roundObj.sets) {
-          const targetSet = roundObj.sets.find((s: any) => s.setId === setNum) || roundObj.sets[0];
-          if (targetSet && targetSet.problemIds && targetSet.problemIds.length > 0) {
-            const trackProblemId = targetSet.problemIds[0];
-            if (PROBLEMS_DATABASE && PROBLEMS_DATABASE[trackProblemId]) {
-              return trackProblemId;
-            }
-          }
-        }
-      }
-      return "goog-swe-r1-q1";
+    // Google: resolve from the generated track (role, round, set) and fall back to Set 1.
+    if (c && c.toLowerCase() === "google") {
+      const fallbackId = "goog-" + (normalizeGoogleRole(role) === "swe_intern" ? "intern" : normalizeGoogleRole(role) === "l4_swe" ? "l4" : "l3") + "-s1-r1-q1";
+      const targetSet = getGoogleQuestionSet(role, r, setNum);
+      const trackProblemId = targetSet && targetSet.problemIds ? targetSet.problemIds[0] : "";
+      return trackProblemId && PROBLEMS_DATABASE && PROBLEMS_DATABASE[trackProblemId] ? trackProblemId : fallbackId;
     }
     if (c && c.toLowerCase() === "amazon" && typeof AMAZON_TRACKS !== "undefined") {
       const track = (AMAZON_TRACKS as any)[role];
@@ -202,11 +191,14 @@ export default function CrucibleCockpitPage({
     return searchParams.get(key) || fallback;
   };
 
-  const roleParam = getInitialParam("role", "sde_1") as AmazonRole;
+  const roleParam = (isGoogle ? normalizeGoogleRole(getInitialParam("role", "l3_swe")) : getInitialParam("role", "sde_1")) as AmazonRole;
   const setParam = parseInt(getInitialParam("set", "1"), 10);
 
   const [selectedRole, setSelectedRole] = useState<AmazonRole>(roleParam);
   const [selectedSetId, setSelectedSetId] = useState<number>(setParam);
+  // Google Rounds 2-4 have one problem per set; Round 1 has two tasks.
+  const singleTask = isGoogle && !isRound1;
+  const getQSet = () => (isGoogle ? getGoogleQuestionSet(selectedRole, roundSlug, selectedSetId) : getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId));
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [taskScores, setTaskScores] = useState<[number, number]>([0, 0]);
   const [allSetHistory, setAllSetHistory] = useState<any[]>([]);
@@ -406,7 +398,7 @@ export default function CrucibleCockpitPage({
 
     if (isRound2 && wantsToSkip) {
       if (currentQuestionIndex === 0) {
-        const qSet = getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId);
+        const qSet = getQSet();
         if (qSet && qSet.problemIds && qSet.problemIds.length > 1) {
             handleProceedToNextProblem();
             return;
@@ -486,7 +478,7 @@ export default function CrucibleCockpitPage({
 
     // VIVA_LOCK: Round 2 viva cannot start until the code passes every stress test.
     if (isRound2 && vivaPhase === "CODING" && /\b(viva|defen[cs]e|defend|follow[- ]?ups?|start|begin|interview)\b/i.test(candidateMsg)) {
-      const lockMsg = currentQuestionIndex === 0
+      const lockMsg = (currentQuestionIndex === 0 && !singleTask)
         ? "We cannot start the viva until your solution passes all stress test cases. Please revise your code and click 'Submit Solution' again, or type 'next' to move to the second problem."
         : "We cannot start the viva until your solution passes all stress test cases. Please revise your code and click 'Submit Solution' again, or type 'conclude' to finish the assessment.";
       postAiMessage(lockMsg);
@@ -525,7 +517,7 @@ export default function CrucibleCockpitPage({
           vivaPhase,
           code,
           questionIndex: currentQuestionIndex,
-          totalQuestions: 2,
+          totalQuestions: singleTask ? 1 : 2,
         })
       });
       const data = await res.json();
@@ -542,7 +534,7 @@ export default function CrucibleCockpitPage({
               postAiMessage(finishMsg);
               if (typeof speakText === "function") speakText(finishMsg);
             } else if (isRound2) {
-              const isTask1 = currentQuestionIndex === 0;
+              const isTask1 = currentQuestionIndex === 0 && !singleTask;
               if (isTask1) {
                 const r2FinishMsg = "Thank you for defending your implementation. We have completed Question 1 of this Technical Viva! Please proceed to Question 2.";
                 postAiMessage(r2FinishMsg);
@@ -587,7 +579,7 @@ export default function CrucibleCockpitPage({
 
     if (isFourthTurn) {
       setQuestionCompleted(true);
-      const isQuestion1 = (currentQuestionIndex === 0);
+      const isQuestion1 = (currentQuestionIndex === 0 && !singleTask);
 
       const finishText = isQuestion1
         ? "Thank you for the thorough walkthrough. We have completed Question 1 of this set! Please click 'Conclude & Score' at the top right to proceed to Question 2."
@@ -805,7 +797,7 @@ export default function CrucibleCockpitPage({
           if (typeof speakText === "function") speakText(passMsg);
         } else {
           setActiveConsoleTab("interviewer");
-          const isTask1 = currentQuestionIndex === 0;
+          const isTask1 = currentQuestionIndex === 0 && !singleTask;
           const failMsg = isTask1
             ? `Your solution did not pass all stress test cases (${passedCases}/${totalCount} passed). In this technical round, we cannot conduct the viva defense until your implementation passes. Would you like to revise your code, or would you prefer to move to the second problem?`
             : `Your solution did not pass all stress test cases (${passedCases}/${totalCount} passed). Because this is the final problem of Round 2, we cannot conduct the viva defense on failing code. Would you like to revise your implementation, or conclude the assessment and generate your scorecard?`;
@@ -817,7 +809,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleProceedToNextProblem = () => {
-    const qSet = getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId);
+    const qSet = getQSet();
     if (qSet && qSet.problemIds && qSet.problemIds.length > 1) {
       const nextProblemId = qSet.problemIds[1];
 
@@ -863,10 +855,12 @@ export default function CrucibleCockpitPage({
           isRound3: isRound3,
           isRound4: isRound4,
           roundSlug: roundSlug,
+          problemId: problem ? problem.id : "",
+          company: companySlug,
           problemTitle: problem ? problem.title : "Technical Round",
           problemDescription: problem ? (problem.paragraphs || []).join(" ") : "",
           dialogueHistory: modelHistory([...(allSetHistory || []), ...(dialogue || [])]),
-          candidateTestScore: ((taskScores[0] || 0) / 2) + ((taskScores[1] || 0) / 2),
+          candidateTestScore: singleTask ? (taskScores[0] || 0) : ((taskScores[0] || 0) / 2) + ((taskScores[1] || 0) / 2),
           ...(nonAnswerCountRef.current > 0 ? { nonAnswerCount: nonAnswerCountRef.current, unansweredQuestions: unansweredRef.current } : {}),
           evaluateScorecard: true
         })
@@ -1493,7 +1487,7 @@ export default function CrucibleCockpitPage({
       {showCompletionScorecard && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-6">
           <div className="bg-[#1E293B] border-2 border-primary rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl text-center space-y-5 my-auto">
-            {isRound4 && currentQuestionIndex === 0 && (
+            {isRound4 && currentQuestionIndex === 0 && !singleTask && (
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
                   Task 1 Completed
@@ -1682,9 +1676,9 @@ export default function CrucibleCockpitPage({
                 {isRound1 && (
                   <div>
                     {(() => {
-  const isTask1 = currentQuestionIndex === 0;
-  const currentScore = isTask1 ? taskScores[0] : (taskScores[0] + taskScores[1]);
-  const maxScore = isTask1 ? 50 : 100;
+  const isTask1 = currentQuestionIndex === 0 && !singleTask;
+  const currentScore = (isTask1 || singleTask) ? taskScores[0] : (taskScores[0] + taskScores[1]);
+  const maxScore = (isTask1 || singleTask) ? 50 : 100;
   const percentage = Math.round((currentScore / maxScore) * 100);
   const isPassed = percentage >= 70;
   const isBorderline = percentage >= 40 && percentage < 70;
@@ -1737,7 +1731,7 @@ export default function CrucibleCockpitPage({
             )}
 
             <div className="pt-2">
-              {(isRound1 || isRound2 || isRound4) && currentQuestionIndex === 0 ? (
+              {(isRound1 || ((isRound2 || isRound4) && !singleTask)) && currentQuestionIndex === 0 ? (
                 <button
                   onClick={() => {
                     setAllSetHistory(prev => [...prev, ...dialogue]);
@@ -1751,7 +1745,9 @@ export default function CrucibleCockpitPage({
                     };
                     const prefix = prefixMap[selectedRole] || "sde1";
                     let q2Id = "";
-                    if (isRound4) {
+                    if (isGoogle) {
+                      q2Id = getQSet().problemIds[1] || getQSet().problemIds[0];
+                    } else if (isRound4) {
                       q2Id = "amz-" + prefix + "-r4-s" + (selectedSetId || 1) + "-q2";
                       if (typeof AMAZON_TRACKS !== "undefined") {
                         const track = (AMAZON_TRACKS as any)[selectedRole];
@@ -1766,6 +1762,15 @@ export default function CrucibleCockpitPage({
                     }
 
                     setCurrentProblemId(q2Id);
+                    {
+                      // Load Task 2 cleanly: its own starter code, no stale results or viva state from Task 1.
+                      const np2 = getProblemById(q2Id);
+                      const st2 = np2?.starterTemplates ? np2.starterTemplates[language] : undefined;
+                      if (st2) setCode(st2);
+                      setTestResults(null);
+                      setVivaPhase("INITIAL");
+                      setActiveConsoleTab(isRound1 ? "cases" : "interviewer");
+                    }
                     setCurrentQuestionIndex(1);
                     if (!isRound4) resetGate();
                     setShowCompletionScorecard(false);

@@ -66,6 +66,43 @@ export async function POST(req: NextRequest) {
 
     const dialogueHistory = stripGateOnly(rawDialogueHistory);
 
+    // Google track: Google personas and rubrics (no Amazon Bar Raiser, STAR or Leadership Principles).
+    const isGoogle = String(problemId || "").startsWith("goog-");
+    const gp = (prompt: string, kind: "r2" | "r3" | "r4" | "eval"): string => {
+      if (!isGoogle) return prompt;
+      if (kind === "r4") {
+        return `You are a Googleyness & Leadership Evaluator conducting a behavioral interview.
+Scenario: ${problemTitle}
+Description: ${problemDescription}
+
+Candidate Just Said: "${candidateMessage}"
+Recent Conversation History:
+${JSON.stringify((dialogueHistory || []).slice(-6))}
+
+GUIDELINES:
+1. Assess Google's four pillars: thriving in ambiguity, intellectual humility, bias to action, doing the right thing. This is NOT an Amazon Leadership Principles or STAR interview.
+2. If the candidate asks for clarification or gives a confused or one-word response, briefly clarify the scenario.
+3. Probe what they would do first under incomplete information, how they weigh evidence and stakeholders, what would change their mind, and the user or ethical impact where relevant.
+4. If they only say "we", ask what they personally did or would do. Do not demand metrics for hypothetical scenarios.
+5. Speak naturally in 1 to 3 sentences. No bullet points or markdown.`;
+      }
+      if (kind === "r2") {
+        return prompt.replace("an Amazon SDE-2", "a Google Technical Interviewer") + "\n4. GOOGLE STYLE: challenge invariants, code modularity, readability and Big-O trade-offs. Never ask brain teasers or Leadership Principle questions.";
+      }
+      if (kind === "r3") {
+        return prompt.replace("an Amazon Bar Raiser", "a Google Technical Interviewer") + "\n4. GOOGLE STYLE: probe asymptotic scaling, partitioning, consistency trade-offs and failure domains. No brain teasers.";
+      }
+      return prompt
+        .replace(/Amazon Leadership Principles \([^)]*\)/g, "Google's Googleyness pillars (thriving in ambiguity, intellectual humility, bias to action, doing the right thing)")
+        .replace(/Principal Amazon Bar Raiser|Amazon Principal Bar Raiser/g, "Google hiring committee reviewer")
+        .replace(/Amazon SDE bar/g, "Google SWE bar")
+        .replace(/Amazon architectural standards/g, "Google engineering standards")
+        .replace(/Amazon Round 3 bar/g, "Google Round 3 bar")
+        .replace(/assigned 2 algorithmic problems/g, "assigned 1 algorithmic problem")
+        .replace(/across both questions/g, "across the scenario")
+        .replace(/Bar Raiser/g, "interviewer");
+    };
+
     const groqKey = process.env.GROQ_API_KEY;
     const geminiKey = process.env.GEMINI_API_KEY;
 
@@ -139,7 +176,7 @@ RULES:
             body: JSON.stringify({
               model: "openai/gpt-oss-120b",
               messages: [
-                { role: "system", content: archSystemPrompt },
+                { role: "system", content: gp(archSystemPrompt, "r3") },
                 ...normalizedMessages,
                 { role: "user", content: candidateMessage || "Ready." }
               ],
@@ -206,7 +243,7 @@ RULES:
           });
         } else {
           return NextResponse.json({
-            reply: "Thank you. You have successfully completed both scenarios of this Bar Raiser session! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive evaluation.",
+            reply: isGoogle ? "Thank you. You have completed this Googleyness & Leadership scenario! Please click 'Conclude & Score' at the top right to finalize your round and review your evaluation." : "Thank you. You have successfully completed both scenarios of this Bar Raiser session! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive evaluation.",
             questionCompleted: true,
             isSetFinished: true,
             nextQuestionIndex: qIdx
@@ -239,7 +276,7 @@ INTERVIEWER GUIDELINES:
             body: JSON.stringify({
               model: "openai/gpt-oss-120b",
               messages: [
-                { role: "system", content: behavioralPrompt },
+                { role: "system", content: gp(behavioralPrompt, "r4") },
                 { role: "user", content: candidateMessage || "Ready." }
               ],
               max_tokens: 180,
@@ -264,7 +301,7 @@ INTERVIEWER GUIDELINES:
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: `${behavioralPrompt}\n\nCandidate: "${candidateMessage}"` }] }]
+              contents: [{ parts: [{ text: `${gp(behavioralPrompt, "r4")}\n\nCandidate: "${candidateMessage}"` }] }]
             })
           });
           if (res.ok) {
@@ -350,7 +387,7 @@ BEHAVIOR DIRECTIVES:
             body: JSON.stringify({
               model: "openai/gpt-oss-120b",
               messages: [
-                { role: "system", content: dsaVivaPrompt },
+                { role: "system", content: gp(dsaVivaPrompt, "r2") },
                 ...normalizedMessages,
                 { role: "user", content: candidateMessage || "Ready." }
               ],
@@ -376,7 +413,7 @@ BEHAVIOR DIRECTIVES:
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              contents: [{ parts: [{ text: `${dsaVivaPrompt}\n\nCandidate: "${candidateMessage}"` }] }]
+              contents: [{ parts: [{ text: `${gp(dsaVivaPrompt, "r2")}\n\nCandidate: "${candidateMessage}"` }] }]
             })
           });
           if (res.ok) {
@@ -541,7 +578,7 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
             ? `\nUNANSWERED QUESTIONS: ${JSON.stringify(unansweredQuestions)}`
             : "")
         : "";
-      const evaluationPrompt = baseEvaluationPrompt + gateNote;
+      const evaluationPrompt = gp(baseEvaluationPrompt + gateNote, "eval");
 
       // 1. Try Groq
       if (groqKey) {
@@ -713,7 +750,7 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
             areasForImprovement: [
               "Provide concrete SLA memory bounds for extreme peak loads."
             ],
-            barRaiserDebriefNote: "The candidate demonstrated solid LLD architectural design and clear technical defense, clearing the Amazon Round 3 bar."
+            barRaiserDebriefNote: isGoogle ? "The candidate demonstrated solid architectural reasoning and a clear technical defense, clearing the Google Round 3 bar." : "The candidate demonstrated solid LLD architectural design and clear technical defense, clearing the Amazon Round 3 bar."
           }
         });
       }
@@ -815,8 +852,8 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
             "Quantify trade-offs and long-term guardrails rather than describing outcomes qualitatively."
           ],
           barRaiserDebriefNote: fallbackScore >= 66
-            ? "Candidate demonstrated sufficient individual ownership and structured reasoning to clear the Amazon Bar Raiser, with measurable outcomes strengthening the recommendation."
-            : "Candidate fell short of the Bar Raiser standard: responses lacked concrete metrics and first-person ownership, weakening the case for hire."
+            ? (isGoogle ? "Candidate showed intellectual humility, bias to action and sound judgment under ambiguity, clearing the Googleyness bar." : "Candidate demonstrated sufficient individual ownership and structured reasoning to clear the Amazon Bar Raiser, with measurable outcomes strengthening the recommendation.")
+            : (isGoogle ? "Candidate fell short of the Googleyness bar: responses lacked clear reasoning under ambiguity, concrete personal actions and ethical judgment." : "Candidate fell short of the Bar Raiser standard: responses lacked concrete metrics and first-person ownership, weakening the case for hire.")
         }
       });
     }
