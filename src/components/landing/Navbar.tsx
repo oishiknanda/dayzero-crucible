@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { EXTRA_COMPANIES } from "@/data/indianCompanies";
 import { Terminal, ChevronDown, Search } from "lucide-react";
 
 export const Navbar = () => {
@@ -21,7 +22,7 @@ export const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const companiesList = [
+  const baseCompanies = [
     { name: "Google", color: "#4285F4" },
     { name: "Microsoft", color: "#00A4EF" },
     { name: "Amazon", color: "#FF9900" },
@@ -123,6 +124,7 @@ export const Navbar = () => {
     { name: "OpenAI", color: "#10A37F" },
     { name: "Anthropic", color: "#D97706" }
   ];
+  const companiesList = [...baseCompanies, ...EXTRA_COMPANIES];
 
   const getSlug = (name: string) =>
     name

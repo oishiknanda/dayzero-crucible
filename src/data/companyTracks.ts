@@ -531,9 +531,12 @@ export const COMPANY_PROFILES: Record<string, Partial<CompanyTrackData>> = {
   }
 };
 
+import { EXTRA_COMPANY_PROFILES } from "./indianCompanies";
+
 // Generic Fallback generator for remaining 90+ companies
 export function getCompanyTrackData(companySlug: string): CompanyTrackData {
-  const profile = COMPANY_PROFILES[companySlug.toLowerCase()];
+  const slug = companySlug.toLowerCase();
+  const profile = COMPANY_PROFILES[slug] || EXTRA_COMPANY_PROFILES[slug];
   const formattedName = companySlug
     .split("-")
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
