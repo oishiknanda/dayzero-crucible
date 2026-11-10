@@ -53,12 +53,12 @@ export const HeroSection = () => {
 
         {/* CTAs */}
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/hub">
+          <Link href="/login?next=/hub">
             <Button size="lg" className="w-full sm:w-auto px-9 py-6 gap-2 shadow-md text-base sm:text-lg font-bold bg-primary hover:bg-primary-hover text-white">
               Start Placement Simulation <ArrowRight className="h-5 w-5" />
             </Button>
           </Link>
-          <a href="#tracks">
+          <a href="/login?next=/tracks">
             <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base sm:text-lg font-bold border-2 border-slate-900 bg-white hover:bg-slate-50 text-slate-950 shadow-sm">
               Explore 50+ Company Tracks
             </Button>

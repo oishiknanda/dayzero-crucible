@@ -310,7 +310,7 @@ export const CompanyMarquee = () => {
         {row1.map((item, i) => (
           <Link
             key={i}
-            href={`/tracks/${getSlug(item.name)}`}
+            href={"/login?next=/tracks/" + getSlug(item.name)}
             className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-900 font-sans font-bold text-sm tracking-tight shadow-sm hover:border-slate-800 transition-colors shrink-0 cursor-pointer"
           >
             {item.svg}
@@ -328,7 +328,7 @@ export const CompanyMarquee = () => {
         {row2.map((item, i) => (
           <Link
             key={i}
-            href={`/tracks/${getSlug(item.name)}`}
+            href={"/login?next=/tracks/" + getSlug(item.name)}
             className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl border-2 border-slate-300 bg-white text-slate-900 font-sans font-bold text-sm tracking-tight shadow-sm hover:border-slate-800 transition-colors shrink-0 cursor-pointer"
           >
             {item.svg}

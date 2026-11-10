@@ -26,9 +26,16 @@ export interface HistoryEntry {
   at: string;
 }
 
+export interface VoteEntry {
+  company: string;
+  userId: string;
+  at: string;
+}
+
 interface Db {
   users: StoredUser[];
   history: HistoryEntry[];
+  votes: VoteEntry[];
 }
 
 const FILE = path.join(process.cwd(), ".data", "store.json");
@@ -37,9 +44,9 @@ let queue: Promise<unknown> = Promise.resolve();
 async function load(): Promise<Db> {
   try {
     const parsed = JSON.parse(await fs.readFile(FILE, "utf8")) as Partial<Db>;
-    return { users: parsed.users ?? [], history: parsed.history ?? [] };
+    return { users: parsed.users ?? [], history: parsed.history ?? [], votes: parsed.votes ?? [] };
   } catch {
-    return { users: [], history: [] };
+    return { users: [], history: [], votes: [] };
   }
 }
 
@@ -129,4 +136,39 @@ export function getHistory(userId: string): Promise<HistoryEntry[]> {
     (db) => db.history.filter((h) => h.userId === userId).sort((a, b) => b.at.localeCompare(a.at)),
     false
   );
+}
+
+// ---------- Company waitlist votes (one vote per account per company) ----------
+
+export function addVote(company: string, userId: string): Promise<void> {
+  return withDb((db) => {
+    if (!db.votes.some((v) => v.company === company && v.userId === userId)) {
+      db.votes.push({ company, userId, at: new Date().toISOString() });
+    }
+  }, true);
+}
+
+export function removeVote(company: string, userId: string): Promise<void> {
+  return withDb((db) => {
+    db.votes = db.votes.filter((v) => !(v.company === company && v.userId === userId));
+  }, true);
+}
+
+export function getVoteState(company: string, userId?: string): Promise<{ count: number; voted: boolean }> {
+  return withDb((db) => {
+    const forCompany = db.votes.filter((v) => v.company === company);
+    return { count: forCompany.length, voted: userId ? forCompany.some((v) => v.userId === userId) : false };
+  }, false);
+}
+
+export function getAllVoteCounts(): Promise<Record<string, number>> {
+  return withDb((db) => {
+    const counts: Record<string, number> = {};
+    for (const v of db.votes) counts[v.company] = (counts[v.company] ?? 0) + 1;
+    return counts;
+  }, false);
+}
+
+export function getOverview(): Promise<{ users: number; interviews: number }> {
+  return withDb((db) => ({ users: db.users.length, interviews: db.history.length }), false);
 }
