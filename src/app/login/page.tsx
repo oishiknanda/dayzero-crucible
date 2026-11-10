@@ -106,6 +106,8 @@ function LoginForm() {
 
   const handleOAuthClick = async (providerId: string) => {
     setError("");
+    // Tells the server whether this is "Create account" or "Sign in" (new social accounts are only created from signup).
+    document.cookie = "dz_intent=" + mode + "; path=/; max-age=600; SameSite=Lax";
     await signIn(providerId, { callbackUrl: nextUrl });
   };
 
