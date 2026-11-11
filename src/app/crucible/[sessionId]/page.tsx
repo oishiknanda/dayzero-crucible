@@ -10,6 +10,9 @@ import { getProblemById, getProblemForRound, ProblemDefinition } from "@/data/pr
 import { PROBLEMS_DATABASE } from "@/data/problemsRegistry";
 import { getCompanyTrackData } from "@/data/companyTracks";
 import ScorecardShareModal from "@/components/scorecard/ScorecardShareModal";
+import ProctoringCameraTile, { type ProctoringWarning } from "@/components/crucible/ProctoringCameraTile";
+import { clearProctoringSession, getProctoringStream, readProctoringGrant } from "@/lib/crucible/proctoringSession";
+import { getRoundDurationSeconds } from "@/lib/crucible/roundTiming";
 import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTracks";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
@@ -29,7 +32,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Clock,
-  Code2,
   ChevronDown,
   ChevronUp,
   Lock,
@@ -43,7 +45,9 @@ import {
   MicOff,
   SendHorizonal,
   Loader2,
-  Award
+  Award,
+  Maximize2,
+  Minimize2
 } from "lucide-react";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
@@ -175,7 +179,104 @@ export default function CrucibleCockpitPage({
   };
   const isRound4 = getIsRound4();
 
-  const isStrict = searchParams.get("strict") === "true";
+  const [proctorMode, setProctorMode] = useState<"strict" | "practice" | null>(null);
+  const isStrict = proctorMode === "strict";
+  const [proctorGateReady, setProctorGateReady] = useState(false);
+  const [proctorStream, setProctorStream] = useState<MediaStream | null>(null);
+  const [proctorWarnings, setProctorWarnings] = useState<ProctoringWarning[]>([]);
+  const [proctorWarningCount, setProctorWarningCount] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const warningCooldownRef = useRef<Record<string, number>>({});
+  const cleanupTimerRef = useRef<number | null>(null);
+  const recordProctorWarning = useCallback((code: string, message: string) => {
+    const now = Date.now();
+    if (now - (warningCooldownRef.current[code] || 0) < 2000) return;
+    warningCooldownRef.current[code] = now;
+    setProctorWarningCount((count) => count + 1);
+    setProctorWarnings((previous) => [
+      ...previous,
+      { id: `${code}-${now}`, code, message, at: new Date(now).toLocaleTimeString() },
+    ].slice(-10));
+  }, []);
+
+  useEffect(() => {
+    const grant = readProctoringGrant(params.sessionId);
+    const stream = getProctoringStream(params.sessionId);
+    const videoReady = stream?.getVideoTracks().some((track) => track.readyState === "live") ?? false;
+    const audioReady = stream?.getAudioTracks().some((track) => track.readyState === "live") ?? false;
+
+    if (!grant || (grant.mode === "strict" && (!videoReady || !audioReady))) {
+      const setupParams = new URLSearchParams();
+      const role = searchParams.get("role");
+      const set = searchParams.get("set");
+      if (role) setupParams.set("role", role);
+      if (set) setupParams.set("set", set);
+      const setupQuery = setupParams.toString();
+      router.replace(`/tracks/${companySlug}/${roundSlug}/setup${setupQuery ? `?${setupQuery}` : ""}`);
+      return;
+    }
+
+    setProctorMode(grant.mode);
+    setProctorStream(grant.mode === "strict" ? stream : null);
+    setIsFullscreen(Boolean(document.fullscreenElement));
+    setProctorGateReady(true);
+  }, [params.sessionId, companySlug, roundSlug, router, searchParams]);
+
+  useEffect(() => {
+    if (!proctorGateReady || !isStrict) return;
+
+    let hadFullscreen = Boolean(document.fullscreenElement);
+    let lastAwayWarningAt = 0;
+    const onVisibilityChange = () => {
+      if (document.visibilityState !== "visible") {
+        const now = Date.now();
+        if (now - lastAwayWarningAt > 1500) {
+          recordProctorWarning("tab-switch", "The assessment tab became hidden. Return to the interview window and keep it in focus.");
+        }
+        lastAwayWarningAt = now;
+      }
+    };
+    const onBlur = () => {
+      const now = Date.now();
+      if (document.visibilityState === "visible" && now - lastAwayWarningAt > 1500) {
+        lastAwayWarningAt = now;
+        recordProctorWarning("window-blur", "The assessment window lost focus. Return to the interview window.");
+      }
+    };
+    const onFullscreenChange = () => {
+      const isNowFullscreen = Boolean(document.fullscreenElement);
+      setIsFullscreen(isNowFullscreen);
+      if (hadFullscreen && !isNowFullscreen) {
+        recordProctorWarning("fullscreen-exit", "Fullscreen was exited during strict monitoring. Re-enter fullscreen to continue.");
+      }
+      hadFullscreen = isNowFullscreen;
+    };
+    const onPaste = (event: ClipboardEvent) => {
+      event.preventDefault();
+      recordProctorWarning("paste-blocked", "Pasting is disabled during strict monitoring. Enter your work directly in the assessment.");
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    document.addEventListener("paste", onPaste, true);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+      document.removeEventListener("paste", onPaste, true);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, [proctorGateReady, isStrict, recordProctorWarning]);
+
+  useEffect(() => {
+    if (cleanupTimerRef.current !== null) window.clearTimeout(cleanupTimerRef.current);
+    const onPageHide = () => clearProctoringSession(params.sessionId);
+    window.addEventListener("pagehide", onPageHide);
+    return () => {
+      window.removeEventListener("pagehide", onPageHide);
+      cleanupTimerRef.current = window.setTimeout(() => clearProctoringSession(params.sessionId), 500);
+    };
+  }, [params.sessionId]);
   const problemParam = searchParams.get("problem");
 
   const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
@@ -349,7 +450,10 @@ export default function CrucibleCockpitPage({
   const scorecardVerdict = behavioralScorecard?.verdict
     || (scorecardScore >= 75 ? "Hire" : scorecardScore >= 50 ? "Leaning Hire" : "No Hire");
   const roundOneVerdict = scorecardScore >= 70 ? "Verified" : scorecardScore >= 40 ? "Borderline" : "Failed";
-  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(90 * 60);
+  const roundDurationSeconds = getRoundDurationSeconds(companySlug, selectedRole, roundSlug);
+  const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(roundDurationSeconds);
+  const [timeExpired, setTimeExpired] = useState(false);
+  const timerDeadlineRef = useRef<number | null>(null);
   const formatTimer = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
@@ -364,6 +468,28 @@ export default function CrucibleCockpitPage({
       dialogueContainerRef.current.scrollTop = dialogueContainerRef.current.scrollHeight;
     }
   }, [dialogue]);
+
+  useEffect(() => {
+    if (!proctorGateReady) return;
+    if (timerDeadlineRef.current === null) {
+      timerDeadlineRef.current = Date.now() + roundDurationSeconds * 1000;
+    }
+    const updateRemaining = () => {
+      if (timerDeadlineRef.current === null) return;
+      setTimeLeftSeconds(Math.max(0, Math.ceil((timerDeadlineRef.current - Date.now()) / 1000)));
+    };
+    updateRemaining();
+    const timer = window.setInterval(updateRemaining, 250);
+    document.addEventListener("visibilitychange", updateRemaining);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", updateRemaining);
+    };
+  }, [proctorGateReady, roundDurationSeconds]);
+
+  useEffect(() => {
+    if (proctorGateReady && timeLeftSeconds === 0) setTimeExpired(true);
+  }, [proctorGateReady, timeLeftSeconds]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval> | null = null;
@@ -689,6 +815,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleCandidateSubmit = async (textToSend?: string) => {
+    if (timeExpired) return;
     const text = (textToSend !== undefined ? textToSend : candidateInputText).trim();
     if (!text || aiRequestInFlightRef.current || isAiThinking) return;
     aiRequestInFlightRef.current = true;
@@ -825,6 +952,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleRunCode = () => {
+    if (timeExpired) return;
     setIsRunning(true);
     setIsConsoleCollapsed(false);
     setActiveConsoleTab("results");
@@ -843,6 +971,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleSubmitCode = () => {
+    if (timeExpired) return;
     if (isRound3) {
       const trimmedCode = code.trim();
       const architectureWords = trimmedCode.match(/[a-zA-Z]{3,}/g) || [];
@@ -1016,6 +1145,10 @@ export default function CrucibleCockpitPage({
   };
 
   const handleReturnToPipeline = () => {
+    clearProctoringSession(params.sessionId);
+    if (typeof document !== "undefined" && document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => undefined);
+    }
     const flag = isRound1
       ? "round1Completed=true"
       : isRound2
@@ -1068,6 +1201,29 @@ export default function CrucibleCockpitPage({
       ? "text-white border-b-2 " + activeColor
       : "text-slate-400 hover:text-slate-200");
 
+  const toggleFullscreen = () => {
+    if (typeof document === "undefined") return;
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => recordProctorWarning("fullscreen-error", "The browser could not exit fullscreen."));
+    } else if (document.documentElement.requestFullscreen) {
+      void document.documentElement.requestFullscreen().catch(() => recordProctorWarning("fullscreen-error", "Fullscreen could not start. Check browser permissions and try again."));
+    } else {
+      recordProctorWarning("fullscreen-unavailable", "Fullscreen is not supported by this browser.");
+    }
+  };
+
+  if (!proctorGateReady) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#1A1A1A] px-6 text-center text-slate-100">
+        <div className="max-w-md space-y-3">
+          <ShieldCheck className="mx-auto h-10 w-10 text-amber-400" />
+          <h1 className="text-xl font-black">Preparing your assessment</h1>
+          <p className="text-sm text-slate-400">We’re checking your pre-flight selection and camera access before opening the round.</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <div className="h-screen w-screen bg-[#1A1A1A] text-slate-200 flex flex-col overflow-hidden font-sans select-none">
 
@@ -1099,23 +1255,39 @@ export default function CrucibleCockpitPage({
             <span>{isVoiceActive ? "AI Voice On" : "AI Voice Muted"}</span>
           </button>
 
-          {isStrict && (
+            {isStrict && (
             <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-rose-400 bg-rose-950/40 border border-rose-500/30">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              <span>LOCKDOWN ACTIVE</span>
+                <span>STRICT MONITORING</span>
             </span>
           )}
 
+            {isStrict && proctorWarnings.length > 0 && (
+              <span className="rounded-lg border border-amber-500/40 bg-amber-950/40 px-2.5 py-1.5 text-[10px] font-bold text-amber-300" aria-live="polite">
+                {proctorWarningCount} WARNING{proctorWarningCount === 1 ? "" : "S"}
+              </span>
+            )}
+
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#333333] px-2.5 py-1.5 text-xs font-semibold text-slate-200 hover:bg-slate-700"
+              title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            >
+              {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+              <span className="hidden sm:inline">{isFullscreen ? "Fullscreen" : "Go fullscreen"}</span>
+            </button>
+
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold bg-[#333333] border border-white/10 text-amber-400">
             <Clock className="h-3.5 w-3.5" />
-            <span>{formatTimer(timeLeftSeconds)}</span>
+              <span className={timeLeftSeconds <= 300 ? "text-rose-300" : undefined} aria-live="off">{formatTimer(timeLeftSeconds)}</span>
           </div>
 
           <div className="flex items-center gap-2">
             {!isRound3 && (
               <button
                 onClick={handleRunCode}
-                disabled={isRunning}
+                disabled={isRunning || timeExpired}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-100 bg-[#3D3D3D] hover:bg-[#4A4A4A] border border-white/10 cursor-pointer disabled:opacity-50"
               >
                 <Play className="h-3.5 w-3.5 text-emerald-400" />
@@ -1124,7 +1296,7 @@ export default function CrucibleCockpitPage({
             )}
             <button
               onClick={handleSubmitCode}
-              disabled={isRunning}
+              disabled={isRunning || timeExpired}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-md cursor-pointer disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />
@@ -1133,7 +1305,7 @@ export default function CrucibleCockpitPage({
             {isRound3 && (
               <button
                 onClick={handleFinishBarRaiserRound}
-                disabled={isRunning || isGeneratingScorecard}
+                disabled={isRunning || isGeneratingScorecard || timeExpired}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 border border-amber-400/30 shadow-md cursor-pointer disabled:opacity-50 transition-all"
                 title="Conclude assessment and review evaluation scorecard"
               >
@@ -1166,7 +1338,7 @@ export default function CrucibleCockpitPage({
                         setShowCompletionScorecard(true);
                       }
                     }}
-                  disabled={isRunning}
+                  disabled={isRunning || timeExpired}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-white/10 shadow-sm cursor-pointer disabled:opacity-50 transition-all"
                   title="Advance to next task or finish with current test case results"
                 >
@@ -1188,6 +1360,23 @@ export default function CrucibleCockpitPage({
         </div>
       </header>
 
+      {isStrict && proctorWarnings.length > 0 && (
+        <div role="alert" aria-live="assertive" className="fixed left-1/2 top-14 z-40 w-[min(92vw,38rem)] -translate-x-1/2 rounded-xl border border-amber-500/50 bg-amber-950/95 px-4 py-3 shadow-2xl">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Proctoring warning · {proctorWarningCount} recorded</p>
+              <p className="mt-1 text-xs font-semibold text-amber-100">{proctorWarnings[proctorWarnings.length - 1]?.message}</p>
+              <p className="mt-1 text-[10px] text-amber-200/70">{proctorWarnings[proctorWarnings.length - 1]?.at}</p>
+            </div>
+            {!isFullscreen && (
+              <button type="button" onClick={toggleFullscreen} className="shrink-0 rounded-lg bg-amber-500 px-2.5 py-2 text-[10px] font-black text-slate-950 hover:bg-amber-400">
+                Re-enter fullscreen
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ───────── Main Content Split Panes ───────── */}
       <div className="flex-1 flex min-h-0 relative">
         {/* Left Pane: Problem Description */}
@@ -1202,6 +1391,9 @@ export default function CrucibleCockpitPage({
               </span>
             </div>
             <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
+            {isStrict && proctorStream && (
+              <ProctoringCameraTile stream={proctorStream} onWarning={recordProctorWarning} />
+            )}
           </div>
 
           <div className="space-y-4 text-sm leading-relaxed text-slate-300">
@@ -1266,7 +1458,8 @@ export default function CrucibleCockpitPage({
                 fontSize: 14,
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
-                automaticLayout: true
+                automaticLayout: true,
+                readOnly: timeExpired
               }}
             />
           </div>
@@ -1419,7 +1612,7 @@ export default function CrucibleCockpitPage({
 
                       <button
                         onClick={isRecording ? stopAndSubmitRecording : startRecording}
-                        disabled={isTranscribing}
+                        disabled={isTranscribing || timeExpired}
                         className={"flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md cursor-pointer disabled:opacity-50 " + (
                           isRecording
                             ? "bg-rose-600 hover:bg-rose-500 text-white animate-pulse shadow-rose-600/50"
@@ -1454,6 +1647,7 @@ export default function CrucibleCockpitPage({
                       <input
                         type="text"
                         value={candidateInputText}
+                        disabled={timeExpired}
                         onChange={(e) => setCandidateInputText(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
@@ -1466,7 +1660,7 @@ export default function CrucibleCockpitPage({
                       />
                       <button
                         onClick={() => handleCandidateSubmit()}
-                        disabled={!candidateInputText.trim() || isAiThinking}
+                        disabled={!candidateInputText.trim() || isAiThinking || timeExpired}
                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                       >
                         <SendHorizonal className="h-3.5 w-3.5" />
@@ -1582,6 +1776,27 @@ export default function CrucibleCockpitPage({
           </div>
         </section>
       </div>
+
+      {timeExpired && !showCompletionScorecard && (
+        <div role="dialog" aria-modal="true" aria-labelledby="time-expired-title" className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-5 backdrop-blur-sm">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border border-amber-500/50 bg-[#1E293B] p-6 text-center shadow-2xl">
+            <Clock className="mx-auto h-10 w-10 text-amber-400" />
+            <h2 id="time-expired-title" className="text-xl font-black text-white">Round time has ended</h2>
+            <p className="text-sm text-slate-300">Your work is saved in this session. Generate the scorecard to finish this round.</p>
+            <button
+              type="button"
+              onClick={() => {
+                if (isRound1) setShowCompletionScorecard(true);
+                else void handleFinishBarRaiserRound();
+              }}
+              disabled={isGeneratingScorecard}
+              className="w-full rounded-xl bg-amber-500 px-4 py-3 text-sm font-black text-slate-950 hover:bg-amber-400 disabled:opacity-50"
+            >
+              {isGeneratingScorecard ? "Generating scorecard…" : "Generate scorecard"}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ───────── Modal: Next problem ───────── */}
       {showNextModal && (
@@ -1877,7 +2092,7 @@ export default function CrucibleCockpitPage({
             )}
 
             <div className="pt-2 flex flex-col sm:flex-row items-stretch gap-3">
-              {(isRound1 || ((isRound2 || isRound4) && !singleTask)) && currentQuestionIndex === 0 ? (
+              {(isRound1 || ((isRound2 || isRound4) && !singleTask)) && currentQuestionIndex === 0 && !timeExpired ? (
                 <button
                   onClick={() => {
                     setAllSetHistory(prev => [...prev, ...dialogue]);

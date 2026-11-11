@@ -3,12 +3,10 @@
 import { useRouter, useSearchParams } from "next/navigation";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import { Navbar } from "@/components/landing/Navbar";
-import { Button } from "@/components/ui/Button";
 import { getCompanyTrackData } from "@/data/companyTracks";
-import { getAmazonRoleTrack, AmazonRole } from "@/data/amazonTracks";
 import { getTrackCompany } from "@/data/companyTrackRegistry";
+import { authorizeProctoringSession } from "@/lib/crucible/proctoringSession";
 import { 
   Camera, 
   Mic, 
@@ -17,7 +15,6 @@ import {
   ShieldAlert, 
   ShieldCheck, 
   Terminal, 
-  ArrowRight, 
   AlertTriangle,
   Sliders,
   CheckCircle2
@@ -41,12 +38,16 @@ export default function PreFlightSetupPage({
   const [hasCamera, setHasCamera] = useState<boolean | null>(null);
   const [hasMic, setHasMic] = useState<boolean | null>(null);
   const [micVolume, setMicVolume] = useState<number>(0);
+  const [micCheckMessage, setMicCheckMessage] = useState("");
   const [latencyMs, setLatencyMs] = useState<number>(24);
   const [screenResolution, setScreenResolution] = useState<string>("Detecting...");
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [launchError, setLaunchError] = useState("");
+  const [hardwareCheckAttempt, setHardwareCheckAttempt] = useState(0);
 
-  // Proctor Mode Toggle (Default ON, with developer override)
+  // Strict monitoring is selected per assessment and can be disabled for practice.
   const [proctorStrictMode, setProctorStrictMode] = useState<boolean>(true);
+  const handedOffStreamRef = useRef(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -80,7 +81,7 @@ export default function PreFlightSetupPage({
     if (existingRole && existingRole !== selectedRole) {
       setSelectedRole(existingRole);
     }
-  }, [params.companyId]);
+  }, [params.companyId, selectedRole]);
 
 
   // Sync state changes back into URL so navigating back remembers the selection
@@ -143,16 +144,36 @@ export default function PreFlightSetupPage({
     }
 
     async function initHardware() {
+      if (!proctorStrictMode) {
+        stopAllMediaStreams();
+        setHasCamera(null);
+        setHasMic(null);
+        setMicVolume(0);
+        setMicCheckMessage("");
+        setIsInitializing(false);
+        return;
+      }
+
       setIsInitializing(true);
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 1280, height: 720 },
-          audio: true,
-        });
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error("This browser does not support camera and microphone access.");
+        }
+        const [videoResult, audioResult] = await Promise.allSettled([
+          navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 }, audio: false }),
+          navigator.mediaDevices.getUserMedia({ video: false, audio: true }),
+        ]);
+        const videoStream = videoResult.status === "fulfilled" ? videoResult.value : null;
+        const audioStream = audioResult.status === "fulfilled" ? audioResult.value : null;
+        const tracks = [
+          ...(videoStream?.getVideoTracks() || []),
+          ...(audioStream?.getAudioTracks() || []),
+        ];
+        const stream = new MediaStream(tracks);
 
         // If user already clicked back/left while permission prompt was resolving
         if (isCancelled) {
-          stream.getTracks().forEach((t) => t.stop());
+          stream.getTracks().forEach((track) => track.stop());
           return;
         }
 
@@ -161,43 +182,45 @@ export default function PreFlightSetupPage({
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
         }
-        setHasCamera(true);
-        setHasMic(true);
+        const cameraAvailable = Boolean(videoStream?.getVideoTracks().some((track) => track.readyState === "live"));
+        const microphoneAvailable = Boolean(audioStream?.getAudioTracks().some((track) => track.readyState === "live"));
+        setHasCamera(cameraAvailable);
+        setHasMic(microphoneAvailable);
+        setLaunchError(cameraAvailable && microphoneAvailable ? "" : "Allow both camera and microphone access to enter strict monitoring, or switch to practice mode.");
 
-        // Mic Volume Listener via Web Audio API
-        const AudioContextClass =
-          window.AudioContext ||
-          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        const audioCtx = new AudioContextClass();
-        const analyser = audioCtx.createAnalyser();
-        const microphone = audioCtx.createMediaStreamSource(stream);
-
-        analyser.fftSize = 256;
-        microphone.connect(analyser);
-
-        audioContextRef.current = audioCtx;
-        analyserRef.current = analyser;
-
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        const checkVolume = () => {
-          if (isCancelled || !analyserRef.current) return;
-          analyserRef.current.getByteFrequencyData(dataArray);
-          let sum = 0;
-          for (let i = 0; i < dataArray.length; i++) {
-            sum += dataArray[i];
+        if (audioStream && microphoneAvailable) {
+          try {
+            const AudioContextClass = window.AudioContext
+              || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+            if (AudioContextClass) {
+              const audioCtx = new AudioContextClass();
+              const analyser = audioCtx.createAnalyser();
+              const microphone = audioCtx.createMediaStreamSource(audioStream);
+              analyser.fftSize = 256;
+              microphone.connect(analyser);
+              audioContextRef.current = audioCtx;
+              analyserRef.current = analyser;
+              const dataArray = new Uint8Array(analyser.frequencyBinCount);
+              const checkVolume = () => {
+                if (isCancelled || !analyserRef.current) return;
+                analyserRef.current.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                setMicVolume(Math.min(100, Math.round((sum / dataArray.length) * 1.8)));
+                animationFrameRef.current = requestAnimationFrame(checkVolume);
+              };
+              checkVolume();
+            }
+          } catch (audioError) {
+            console.info("Microphone level meter unavailable; permission check succeeded.", audioError);
           }
-          const avg = sum / dataArray.length;
-          setMicVolume(Math.min(100, Math.round(avg * 1.8)));
-          animationFrameRef.current = requestAnimationFrame(checkVolume);
-        };
-
-        checkVolume();
+        }
       } catch (err) {
         console.warn("Hardware initialization error:", err);
         if (!isCancelled) {
           setHasCamera(false);
           setHasMic(false);
+          setLaunchError(err instanceof Error ? err.message : "Camera and microphone access was not granted.");
         }
       } finally {
         if (!isCancelled) {
@@ -224,35 +247,42 @@ export default function PreFlightSetupPage({
     return () => {
       isCancelled = true;
       window.removeEventListener("beforeunload", stopAllMediaStreams);
-      stopAllMediaStreams();
+      if (!handedOffStreamRef.current) stopAllMediaStreams();
     };
-  }, [stopAllMediaStreams]);
-
-  
-  const handleStartAssessment = (e: React.MouseEvent) => {
-    e.preventDefault();
-    stopAllMediaStreams();
-    const isAmz = params.companyId.toLowerCase() === "amazon" || !!getTrackCompany(params.companyId);
-    const targetUrl = `/crucible/${sessionId}?strict=${proctorStrictMode}&company=${params.companyId}&round=${params.roundId}${
-      isAmz ? `&role=${selectedRole}&set=${selectedSet}` : ""
-    }`;
-    router.push(targetUrl);
-  };
+  }, [stopAllMediaStreams, proctorStrictMode, hardwareCheckAttempt]);
 
   
   const handleStartNow = (e: React.MouseEvent) => {
     e.preventDefault();
-    stopAllMediaStreams();
+    setLaunchError("");
+    const cameraTrack = streamRef.current?.getVideoTracks()[0];
+    const microphoneTrack = streamRef.current?.getAudioTracks()[0];
+    if (proctorStrictMode && (isInitializing || hasCamera !== true || hasMic !== true || !cameraTrack || cameraTrack.readyState !== "live" || !microphoneTrack || microphoneTrack.readyState !== "live")) {
+      setLaunchError("Strict proctoring needs working camera and microphone access. Retry the device check or switch to practice mode.");
+      return;
+    }
+
+    if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
+    animationFrameRef.current = null;
+    analyserRef.current = null;
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+      void audioContextRef.current.close().catch(() => undefined);
+    }
+    audioContextRef.current = null;
+
     const isAmz = params.companyId.toLowerCase() === "amazon" || !!getTrackCompany(params.companyId);
+    const mode = proctorStrictMode ? "strict" : "practice";
+    authorizeProctoringSession(sessionId, mode, proctorStrictMode ? streamRef.current : null);
+    if (proctorStrictMode && typeof document !== "undefined" && document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => undefined);
+    }
+    handedOffStreamRef.current = true;
     const target = "/crucible/" + sessionId + "?strict=" + proctorStrictMode + "&company=" + params.companyId + "&round=" + params.roundId + (isAmz ? ("&role=" + selectedRole + "&set=" + selectedSet) : "");
-    window.location.assign(target);
+    router.push(target);
   };
 
   const sessionId = `${params.companyId}-${params.roundId}-${Date.now().toString(36)}`;
-  const isAmazon = params.companyId.toLowerCase() === "amazon" || !!getTrackCompany(params.companyId);
-  const cockpitLaunchUrl = `/crucible/${sessionId}?strict=${proctorStrictMode}&company=${params.companyId}&round=${params.roundId}${
-    isAmazon ? `&role=${selectedRole}&set=${selectedSet}` : ""
-  }`;
+  const canEnterAssessment = !proctorStrictMode || (!isInitializing && hasCamera === true && hasMic === true && !!streamRef.current);
 
   return (
     <main className="min-h-screen bg-[#F1F4F9] text-slate-950 font-sans selection:bg-primary selection:text-white pb-24">
@@ -421,7 +451,7 @@ export default function PreFlightSetupPage({
                   ) : (
                     <span className="text-[11px] font-mono font-black text-amber-400 bg-amber-950/70 px-2 py-0.5 rounded border border-amber-800 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      SIMULATED FEED
+                      {isInitializing ? "CHECKING" : proctorStrictMode ? "NO FEED" : "PROCTORING OFF"}
                     </span>
                   )}
                 </div>
@@ -446,7 +476,7 @@ export default function PreFlightSetupPage({
                       {isInitializing ? "Initializing Optical Sensor..." : "Optical Stream Idle or Blocked"}
                     </p>
                     <p className="text-xs font-mono text-slate-500 max-w-sm mt-1">
-                      Grant browser camera permissions to enable AI face tracking and dual-screen deflection alerts.
+                      {proctorStrictMode ? "Grant camera permission to enable the live preview and local camera-image monitoring." : "Camera preview is off in practice mode."}
                     </p>
                   </div>
                 )}
@@ -458,7 +488,7 @@ export default function PreFlightSetupPage({
                   <div className="w-16 h-16 border-b-2 border-l-2 border-emerald-500/60 absolute bottom-0 left-0" />
                   <div className="w-16 h-16 border-b-2 border-r-2 border-emerald-500/60 absolute bottom-0 right-0" />
                   <span className="text-[10px] font-mono font-bold text-emerald-400/80 bg-slate-950/70 px-2 py-0.5 rounded tracking-widest uppercase">
-                    Face Calibration: Locked
+                    {hasCamera ? "Camera preview active" : proctorStrictMode ? "Camera check pending" : "Practice mode · Camera off"}
                   </span>
                 </div>
               </div>
@@ -479,7 +509,7 @@ export default function PreFlightSetupPage({
                   </span>
                 </div>
                 <span className="text-xs font-mono font-bold text-slate-600">
-                  {micVolume}% Intensity
+                  {proctorStrictMode ? (hasMic === true ? `${micVolume}% Intensity` : isInitializing ? "Checking…" : "Not connected") : "Optional in practice mode"}
                 </span>
               </div>
 
@@ -497,8 +527,26 @@ export default function PreFlightSetupPage({
               </div>
 
               <p className="mt-2 text-[11px] font-sans text-slate-500 font-medium">
-                Speak normally to calibrate oral defense response levels. Live AI voice evaluators require clean audio for AST Big-O cross-examination.
+                Speak to check the microphone level. Audio is sent for transcription only when you submit a spoken answer.
               </p>
+              {proctorStrictMode && (
+                <button
+                  type="button"
+                  disabled={!hasMic}
+                  onClick={async () => {
+                    try {
+                      if (audioContextRef.current?.state === "suspended") await audioContextRef.current.resume();
+                      setMicCheckMessage(audioContextRef.current ? "Speak now and confirm the meter responds." : "Microphone permission is ready; live level testing is unavailable in this browser.");
+                    } catch {
+                      setMicCheckMessage("Microphone permission is ready, but the live level meter could not start.");
+                    }
+                  }}
+                  className="mt-3 rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-50"
+                >
+                  Test microphone
+                </button>
+              )}
+              {micCheckMessage && <p className="mt-2 text-xs font-semibold text-slate-600" role="status">{micCheckMessage}</p>}
             </div>
           </div>
 
@@ -583,16 +631,22 @@ export default function PreFlightSetupPage({
                       : "bg-amber-100 text-amber-900 border border-amber-300"
                   }`}
                 >
-                  {proctorStrictMode ? "ENTERPRISE ACTIVE" : "DEV BYPASS"}
+                  {proctorStrictMode ? "STRICT MONITORING" : "PRACTICE MODE"}
                 </span>
               </div>
 
               <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
-                When enabled, leaving fullscreen, clipboard pasting, or switching tabs logs real-time assessment violations. Disable this toggle during development to prevent local browser lockouts.
+                Strict monitoring checks your camera and microphone before entry, keeps a small camera preview visible, and warns about camera interruptions, major movement, tab changes, and fullscreen exits. Camera analysis stays in this browser; audio is only sent when you choose to submit a spoken answer. Browser monitoring is best-effort and cannot prevent every way to leave a page.
               </p>
 
-              <div
-                onClick={() => setProctorStrictMode(!proctorStrictMode)}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={proctorStrictMode}
+                onClick={() => {
+                  setLaunchError("");
+                  setProctorStrictMode(!proctorStrictMode);
+                }}
                 className="flex items-center justify-between p-3.5 rounded-xl border-2 border-slate-300 hover:border-slate-800 bg-slate-50 cursor-pointer transition-all"
               >
                 <div className="flex items-center gap-2.5">
@@ -603,8 +657,8 @@ export default function PreFlightSetupPage({
                   />
                   <span className="text-xs font-bold text-slate-950 font-sans">
                     {proctorStrictMode
-                      ? "Lockdown Enabled (Enforce Fullscreen & Tab Guard)"
-                      : "Developer Bypass (Allow Tab Switching & DevTools)"}
+                      ? "Strict monitoring enabled (camera, focus and fullscreen warnings)"
+                      : "Practice mode (camera and focus monitoring off)"}
                   </span>
                 </div>
                 <div
@@ -618,16 +672,29 @@ export default function PreFlightSetupPage({
                     }`}
                   />
                 </div>
-              </div>
+              </button>
+              {proctorStrictMode && !isInitializing && (hasCamera !== true || hasMic !== true) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLaunchError("");
+                    setHardwareCheckAttempt((attempt) => attempt + 1);
+                  }}
+                  className="mt-3 rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-100"
+                >
+                  Retry camera and microphone check
+                </button>
+              )}
             </div>
 
             {/* Launch Cockpit CTA */}
             <div className="p-6 rounded-2xl border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-              <button type="button" onClick={handleStartNow} className="w-full py-5 rounded-xl font-black text-base bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer">
-      Enter Assessment Sandbox &rarr;
+              {launchError && <p role="alert" className="mb-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-left text-sm font-semibold text-rose-800">{launchError}</p>}
+              <button type="button" onClick={handleStartNow} disabled={!canEnterAssessment} className="w-full py-5 rounded-xl font-black text-base bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+      {isInitializing && proctorStrictMode ? "Checking camera and microphone…" : "Enter Assessment Sandbox →"}
    </button>
               <p className="mt-3 text-center text-[11px] font-mono text-slate-500 font-semibold">
-                By entering, candidate acknowledges session recording and automated AST code telemetry.
+                Strict mode analyzes camera frames locally. Audio is sent for transcription only when you submit a spoken answer.
               </p>
             </div>
 
