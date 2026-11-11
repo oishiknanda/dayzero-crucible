@@ -130,7 +130,7 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 10,
-      "title": "Set 10: Convert Number to Binary + Pair Summing to a Target",
+      "title": "Set 10: Convert Number to Binary + Count Pairs With a Fixed Difference",
       "focus": "Math",
       "problemIds": [
        "acc-ase-s10-r1-q1",
@@ -147,80 +147,80 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Kth Largest Latency",
-      "focus": "Heap",
+      "title": "Set 1: Reverse a Customer Number",
+      "focus": "Math",
       "problemIds": [
        "acc-ase-s1-r2-q1"
       ]
      },
      {
       "setId": 2,
-      "title": "Set 2: Top K Search Terms",
-      "focus": "Heap / Hashing",
+      "title": "Set 2: Palindromic Account Number",
+      "focus": "Math",
       "problemIds": [
        "acc-ase-s2-r2-q1"
       ]
      },
      {
       "setId": 3,
-      "title": "Set 3: Build Dependency Order",
-      "focus": "Graph / Topological Sort",
+      "title": "Set 3: Power of Two Capacity Check",
+      "focus": "Bit Manipulation",
       "problemIds": [
        "acc-ase-s3-r2-q1"
       ]
      },
      {
       "setId": 4,
-      "title": "Set 4: Longest Palindromic Token",
-      "focus": "Expand Around Center",
+      "title": "Set 4: Length of the Last Word",
+      "focus": "String",
       "problemIds": [
        "acc-ase-s4-r2-q1"
       ]
      },
      {
       "setId": 5,
-      "title": "Set 5: Generate Balanced Templates",
-      "focus": "Backtracking",
+      "title": "Set 5: Add Two Binary Strings",
+      "focus": "String",
       "problemIds": [
        "acc-ase-s5-r2-q1"
       ]
      },
      {
       "setId": 6,
-      "title": "Set 6: Search a Rotated Log Index",
-      "focus": "Binary Search",
+      "title": "Set 6: Pangram Check for a Sentence",
+      "focus": "String",
       "problemIds": [
        "acc-ase-s6-r2-q1"
       ]
      },
      {
       "setId": 7,
-      "title": "Set 7: Days Until Warmer",
-      "focus": "Monotonic Stack",
+      "title": "Set 7: FizzBuzz Report",
+      "focus": "Math",
       "problemIds": [
        "acc-ase-s7-r2-q1"
       ]
      },
      {
       "setId": 8,
-      "title": "Set 8: Reach the Last Shard",
-      "focus": "Greedy",
+      "title": "Set 8: Reverse the Vowels",
+      "focus": "String",
       "problemIds": [
        "acc-ase-s8-r2-q1"
       ]
      },
      {
       "setId": 9,
-      "title": "Set 9: Keypad Suggestion Expansion",
-      "focus": "Backtracking",
+      "title": "Set 9: Count Leap Years in a Range",
+      "focus": "Math",
       "problemIds": [
        "acc-ase-s9-r2-q1"
       ]
      },
      {
       "setId": 10,
-      "title": "Set 10: Capacity Between Peaks",
-      "focus": "Two Pointers",
+      "title": "Set 10: Perfect Square Check",
+      "focus": "Math",
       "problemIds": [
        "acc-ase-s10-r2-q1"
       ]
@@ -419,8 +419,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Validate Config Brackets + Longest Unique Query Fragment",
-      "focus": "Stack",
+      "title": "Set 1: Spreadsheet Column Title + Spreadsheet Column Number",
+      "focus": "Math",
       "problemIds": [
        "acc-adv-s1-r1-q1",
        "acc-adv-s1-r1-q2"
@@ -428,8 +428,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 2,
-      "title": "Set 2: Sorted Latency Pair + Peak Traffic Window",
-      "focus": "Two Pointers",
+      "title": "Set 2: Look-and-Say Sequence Term + Multiply Two Large Numbers",
+      "focus": "String",
       "problemIds": [
        "acc-adv-s2-r1-q1",
        "acc-adv-s2-r1-q2"
@@ -437,8 +437,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 3,
-      "title": "Set 3: Insert Position in Sorted Index + Merge Maintenance Windows",
-      "focus": "Binary Search",
+      "title": "Set 3: Zigzag Display Reading + Parse a Numeric Field",
+      "focus": "String",
       "problemIds": [
        "acc-adv-s3-r1-q1",
        "acc-adv-s3-r1-q2"
@@ -446,8 +446,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 4,
-      "title": "Set 4: Reverse Command Tokens + Longest Repeated Run After Edits",
-      "focus": "String",
+      "title": "Set 4: Integer to Roman Numeral + Longest Shared Substring",
+      "focus": "Math",
       "problemIds": [
        "acc-adv-s4-r1-q1",
        "acc-adv-s4-r1-q2"
@@ -455,8 +455,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 5,
-      "title": "Set 5: Count Data Center Clusters + Corrupted Replica Spread",
-      "focus": "Graph / DFS",
+      "title": "Set 5: Integer Square Root + Nth Ugly Number",
+      "focus": "Binary Search",
       "problemIds": [
        "acc-adv-s5-r1-q1",
        "acc-adv-s5-r1-q2"
@@ -464,8 +464,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 6,
-      "title": "Set 6: Best Single Trade + Product Without Self",
-      "focus": "Array",
+      "title": "Set 6: Guess Score for a Code + Smallest Rotation of a Code",
+      "focus": "Hash Table",
       "problemIds": [
        "acc-adv-s6-r1-q1",
        "acc-adv-s6-r1-q2"
@@ -473,8 +473,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 7,
-      "title": "Set 7: Climbing Release Stairs + Fewest Quota Units",
-      "focus": "Dynamic Programming",
+      "title": "Set 7: Validate an IPv4 Address + Longest Run After Skipping Failures",
+      "focus": "String",
       "problemIds": [
        "acc-adv-s7-r1-q1",
        "acc-adv-s7-r1-q2"
@@ -482,8 +482,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 8,
-      "title": "Set 8: Flood Fill Canvas + Shortest Clear Route",
-      "focus": "DFS",
+      "title": "Set 8: Balanced Load Pivot + Even Numbers First",
+      "focus": "Prefix Sum",
       "problemIds": [
        "acc-adv-s8-r1-q1",
        "acc-adv-s8-r1-q2"
@@ -491,8 +491,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 9,
-      "title": "Set 9: Compact Active Slots + Matching Usage Totals",
-      "focus": "Two Pointers",
+      "title": "Set 9: Was the Log Sorted Then Rotated + Alternate Credits and Debits",
+      "focus": "Array",
       "problemIds": [
        "acc-adv-s9-r1-q1",
        "acc-adv-s9-r1-q2"
@@ -500,7 +500,7 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 10,
-      "title": "Set 10: Anagram Tag Check + Segment a Search Query",
+      "title": "Set 10: Find the Duplicate and Missing Id + Total Alert Active Time",
       "focus": "Hash Table",
       "problemIds": [
        "acc-adv-s10-r1-q1",
@@ -517,80 +517,80 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Maximum Path Sum in a Service Tree",
-      "focus": "Tree / DFS",
+      "title": "Set 1: Reverse the Bits of a Flag Word",
+      "focus": "Bit Manipulation",
       "problemIds": [
        "acc-adv-s1-r2-q1"
       ]
      },
      {
       "setId": 2,
-      "title": "Set 2: Multi-Word Grid Search With Trie Pruning",
-      "focus": "Trie / Backtracking",
+      "title": "Set 2: Is One String a Rotation of Another",
+      "focus": "String",
       "problemIds": [
        "acc-adv-s2-r2-q1"
       ]
      },
      {
       "setId": 3,
-      "title": "Set 3: Kth Smallest in Sorted Matrix",
-      "focus": "Heap / Binary Search",
+      "title": "Set 3: Count Lit Bulbs After Rounds",
+      "focus": "Math",
       "problemIds": [
        "acc-adv-s3-r2-q1"
       ]
      },
      {
       "setId": 4,
-      "title": "Set 4: Best Root Nodes for Latency",
-      "focus": "Graph / Topological Peel",
+      "title": "Set 4: Total Bit Differences Across Pairs",
+      "focus": "Bit Manipulation",
       "problemIds": [
        "acc-adv-s4-r2-q1"
       ]
      },
      {
       "setId": 5,
-      "title": "Set 5: Longest Increasing Path in Grid",
-      "focus": "DFS + Memoization",
+      "title": "Set 5: Items Ordered More Than a Third",
+      "focus": "Voting Algorithm",
       "problemIds": [
        "acc-adv-s5-r2-q1"
       ]
      },
      {
       "setId": 6,
-      "title": "Set 6: Decode Telemetry Codes",
-      "focus": "DP",
+      "title": "Set 6: Find All Repeated Ids",
+      "focus": "Array",
       "problemIds": [
        "acc-adv-s6-r2-q1"
       ]
      },
      {
       "setId": 7,
-      "title": "Set 7: Fewest Palindromic Splits",
-      "focus": "DP",
+      "title": "Set 7: Smallest Missing Positive Ticket",
+      "focus": "Array",
       "problemIds": [
        "acc-adv-s7-r2-q1"
       ]
      },
      {
       "setId": 8,
-      "title": "Set 8: Largest Dashboard Rectangle",
-      "focus": "Monotonic Stack",
+      "title": "Set 8: Largest Gap in Sorted Timestamps",
+      "focus": "Bucket Sort",
       "problemIds": [
        "acc-adv-s8-r2-q1"
       ]
      },
      {
       "setId": 9,
-      "title": "Set 9: Count Smaller Events After",
-      "focus": "BIT / Merge Sort",
+      "title": "Set 9: H-Index of Engineer Impact",
+      "focus": "Sorting",
       "problemIds": [
        "acc-adv-s9-r2-q1"
       ]
      },
      {
       "setId": 10,
-      "title": "Set 10: Most Collinear Probe Points",
-      "focus": "Hashing / Geometry",
+      "title": "Set 10: Minimum Platforms for a Schedule",
+      "focus": "Sorting / Sweep",
       "problemIds": [
        "acc-adv-s10-r2-q1"
       ]
@@ -789,8 +789,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Alternating Colour Shortest Paths + Longest Fragment With K Distinct Tokens",
-      "focus": "Graph / BFS",
+      "title": "Set 1: Strip Invalid Brackets From a Query + Evaluate a Billing Expression",
+      "focus": "Stack",
       "problemIds": [
        "acc-sse-s1-r1-q1",
        "acc-sse-s1-r1-q2"
@@ -798,8 +798,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 2,
-      "title": "Set 2: Distance to Nearest Cache Node + Maximum Batch Jobs by Deadline",
-      "focus": "Multi-source BFS",
+      "title": "Set 2: Expand a Compressed Template + Normalize a File Path",
+      "focus": "Stack",
       "problemIds": [
        "acc-sse-s2-r1-q1",
        "acc-sse-s2-r1-q2"
@@ -807,8 +807,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 3,
-      "title": "Set 3: Rooms to Nearest Gateway + Rolling Maximum Over Metrics",
-      "focus": "Multi-source BFS",
+      "title": "Set 3: Earliest Common Meeting Slot + Shared Availability Windows",
+      "focus": "Two Pointers",
       "problemIds": [
        "acc-sse-s3-r1-q1",
        "acc-sse-s3-r1-q2"
@@ -816,8 +816,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 4,
-      "title": "Set 4: Shortest Route With Removable Blocks + Smallest Covering Log Window",
-      "focus": "BFS with State",
+      "title": "Set 4: Batches Divisible by K + Continuous Multiple Window",
+      "focus": "Prefix Sum",
       "problemIds": [
        "acc-sse-s4-r1-q1",
        "acc-sse-s4-r1-q2"
@@ -825,8 +825,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 5,
-      "title": "Set 5: Word Ladder Transformation Length + Longest Rising Trend",
-      "focus": "Graph / BFS",
+      "title": "Set 5: Longest Window Hitting a Target Sum + Windows With K Odd Events",
+      "focus": "Prefix Sum",
       "problemIds": [
        "acc-sse-s5-r1-q1",
        "acc-sse-s5-r1-q2"
@@ -834,8 +834,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 6,
-      "title": "Set 6: Farthest Zone From Any Node + Minimum Edits Between Configs",
-      "focus": "Multi-source BFS",
+      "title": "Set 6: Best Pair of Landmarks + Minimum Card Flips for Uniform Face",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "acc-sse-s6-r1-q1",
        "acc-sse-s6-r1-q2"
@@ -843,8 +843,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 7,
-      "title": "Set 7: Circular Server Rack Harvest + Largest Healthy Square",
-      "focus": "DP",
+      "title": "Set 7: Fewest Shuttles for Passengers + Minimum Brackets to Insert",
+      "focus": "Greedy",
       "problemIds": [
        "acc-sse-s7-r1-q1",
        "acc-sse-s7-r1-q2"
@@ -852,8 +852,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 8,
-      "title": "Set 8: Signal Propagation Time + Balanced Shard Split",
-      "focus": "Dijkstra",
+      "title": "Set 8: Longest Zigzag Metric Run + Longest Shared Event Sequence",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "acc-sse-s8-r1-q1",
        "acc-sse-s8-r1-q2"
@@ -861,8 +861,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 9,
-      "title": "Set 9: Cooldown Task Slots + Concurrent Booking Rooms",
-      "focus": "Greedy",
+      "title": "Set 9: Fewest Square-Sized Batches + Count Longest Rising Trends",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "acc-sse-s9-r1-q1",
        "acc-sse-s9-r1-q2"
@@ -870,8 +870,8 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 10,
-      "title": "Set 10: Cheapest Route With Hop Limit + Longest Consecutive Id Run",
-      "focus": "Bellman-Ford",
+      "title": "Set 10: Cheapest Top-to-Bottom Path in a Triangle + Windows Using At Most K Services",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "acc-sse-s10-r1-q1",
        "acc-sse-s10-r1-q2"
@@ -887,15 +887,15 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: LRU Cache Internals",
-      "focus": "Design / Linked List",
+      "title": "Set 1: Circular Task Queue",
+      "focus": "Design",
       "problemIds": [
        "acc-sse-s1-r2-q1"
       ]
      },
      {
       "setId": 2,
-      "title": "Set 2: LFU Cache Frequency Lists",
+      "title": "Set 2: Stack With Bulk Increment",
       "focus": "Design",
       "problemIds": [
        "acc-sse-s2-r2-q1"
@@ -903,64 +903,64 @@ export const ACCENTURE_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 3,
-      "title": "Set 3: Insert Delete Constant-Time Set",
-      "focus": "Design / Hashing",
+      "title": "Set 3: Build a HashMap From Scratch",
+      "focus": "Design",
       "problemIds": [
        "acc-sse-s3-r2-q1"
       ]
      },
      {
       "setId": 4,
-      "title": "Set 4: Autocomplete Trie With Top-K Ranking",
-      "focus": "Trie / Design",
+      "title": "Set 4: Number Pool Allocator",
+      "focus": "Design",
       "problemIds": [
        "acc-sse-s4-r2-q1"
       ]
      },
      {
       "setId": 5,
-      "title": "Set 5: Median From a Data Stream",
-      "focus": "Two Heaps",
+      "title": "Set 5: Session Token Expiry Manager",
+      "focus": "Design",
       "problemIds": [
        "acc-sse-s5-r2-q1"
       ]
      },
      {
       "setId": 6,
-      "title": "Set 6: Maximum Frequency Stack",
-      "focus": "Design / Stack",
+      "title": "Set 6: Parking Slot Reservation System",
+      "focus": "Design",
       "problemIds": [
        "acc-sse-s6-r2-q1"
       ]
      },
      {
       "setId": 7,
-      "title": "Set 7: Time-Versioned Key-Value Store",
-      "focus": "Binary Search / Design",
+      "title": "Set 7: Product of the Last K Readings",
+      "focus": "Design / Prefix Product",
       "problemIds": [
        "acc-sse-s7-r2-q1"
       ]
      },
      {
       "setId": 8,
-      "title": "Set 8: Snapshot Array With Versioned Cells",
-      "focus": "Binary Search / Design",
+      "title": "Set 8: Ordered Event Stream Release",
+      "focus": "Design",
       "problemIds": [
        "acc-sse-s8-r2-q1"
       ]
      },
      {
       "setId": 9,
-      "title": "Set 9: Mutable Range Sums With Fenwick Tree",
-      "focus": "Binary Indexed Tree",
+      "title": "Set 9: Slot Number Lookup",
+      "focus": "Design / Heap",
       "problemIds": [
        "acc-sse-s9-r2-q1"
       ]
      },
      {
       "setId": 10,
-      "title": "Set 10: Min Stack With Constant-Time Minimum",
-      "focus": "Design / Stack",
+      "title": "Set 10: Room Booking Calendar",
+      "focus": "Design / Intervals",
       "problemIds": [
        "acc-sse-s10-r2-q1"
       ]
