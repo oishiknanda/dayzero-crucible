@@ -28,6 +28,7 @@ export function parseDurationSeconds(duration: string | undefined): number | nul
 }
 
 export function getRoundDurationSeconds(companySlug: string, role: string, roundSlug: string): number {
+  if (roundSlug.toLowerCase() === "round-debug" && ["google", "amazon"].includes(companySlug.toLowerCase())) return 60 * 60;
   const roundNumber = getRoundNumber(roundSlug);
 
   if (companySlug.toLowerCase() === "amazon") {

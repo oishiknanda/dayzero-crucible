@@ -4,6 +4,7 @@ import { ZOMATO_ALL_PROBLEMS } from './problems/zomato/zomatoProblems';
 import { AMAZON_ROUND3_PROBLEMS } from "./amazonRound3Registry";
 import { AMAZON_ROUND2_PROBLEMS } from "./amazonRound2Registry";
 import { AMAZON_OA_ALL_PROBLEMS } from "./problems/amazon/oaSets";
+import { DEBUGGING_SCENARIOS } from "./problems/debuggingProblems";
 import { ProblemDefinition } from "./types";
 export type { ProblemDefinition };
 
@@ -126,6 +127,30 @@ export const PROBLEMS_DATABASE: Record<string, ProblemDefinition> = {
   ...AMAZON_ROUND2_PROBLEMS,
   ...AMAZON_OA_ALL_PROBLEMS,
   ...BASE_REGISTRY,
+  ...Object.fromEntries(Object.values(DEBUGGING_SCENARIOS).map((scenario) => [scenario.id, {
+    id: scenario.id,
+    title: scenario.title,
+    difficulty: scenario.difficulty,
+    company: scenario.company,
+    category: scenario.category,
+    tags: ["Debugging", "Code Comprehension", "Regression Testing"],
+    paragraphs: scenario.paragraphs,
+    examples: scenario.testCases.slice(0, 2).map((testCase) => ({
+      input: testCase.input,
+      output: testCase.expectedOutput,
+      explanation: testCase.explanation,
+    })),
+    constraints: [scenario.bugReport, "Explain the root cause before applying a change."],
+    visibleTestCases: scenario.testCases.filter((testCase) => !testCase.isHidden).map((testCase) => ({
+      id: testCase.id, input: testCase.input, expectedOutput: testCase.expectedOutput, explanation: testCase.explanation,
+    })),
+    hiddenTestCases: scenario.testCases.filter((testCase) => testCase.isHidden).map((testCase) => ({
+      id: testCase.id, input: testCase.input, expectedOutput: testCase.expectedOutput, explanation: testCase.explanation, isHidden: true,
+    })),
+    starterTemplates: { javascript: scenario.starterCode },
+    solutionReference: scenario.solutionCode,
+    optimalComplexity: { time: "Scenario dependent", space: "Scenario dependent" },
+  } satisfies ProblemDefinition])),
 
   // ==========================================
   // AMAZON ROUND 02: EXCLUSIVE PROBLEM SUITE

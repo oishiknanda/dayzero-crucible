@@ -206,6 +206,24 @@ export default function CompanyTrackPage({ params }: { params: { companyId: stri
               </div>
             );
           })}
+          {["google", "amazon"].includes(params.companyId.toLowerCase()) && (
+            <div className="relative flex flex-col justify-between rounded-2xl border-2 border-indigo-900 bg-slate-950 p-7 text-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
+              <div>
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-mono font-black text-amber-300">SPECIALIZED REHEARSAL</span>
+                  <span className="rounded border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-mono font-bold text-slate-300">⏱ 60 min</span>
+                </div>
+                <h3 className="mb-2.5 flex items-center gap-2 text-xl font-black tracking-tight"><Sparkles className="h-5 w-5 shrink-0 text-indigo-300" /> AI-Assisted Debugging</h3>
+                <p className="text-sm font-medium leading-relaxed text-slate-300">Investigate a realistic service defect, use an AI pair programmer thoughtfully, and validate your patch against visible and hidden regression checks.</p>
+                <div className="mt-4 rounded-md border border-indigo-400/20 bg-indigo-950/40 px-3 py-2 text-xs font-mono font-bold text-indigo-200">FOCUS: Root cause · AI verification · Zero regressions</div>
+              </div>
+              <div className="mt-8 border-t border-slate-800 pt-4">
+                <Link href={`/tracks/${params.companyId}/round-debug/setup?role=${encodeURIComponent(getTrackCompany(params.companyId)?.normalizeRole(activeCanonicalRole) || activeCanonicalRole)}`} className="block w-full">
+                  <Button className="flex w-full items-center justify-center gap-2 bg-indigo-600 py-6 text-sm font-black text-white hover:bg-indigo-500"><PlayCircle className="h-4 w-4" /> Initialize Debugging Rehearsal</Button>
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </main>

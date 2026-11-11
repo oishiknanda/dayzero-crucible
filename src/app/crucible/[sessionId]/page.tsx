@@ -8,6 +8,8 @@ import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getProblemById, getProblemForRound, ProblemDefinition } from "@/data/problemsRegistry";
 import { PROBLEMS_DATABASE } from "@/data/problemsRegistry";
+import { getDebuggingScenario } from "@/data/problems/debuggingProblems";
+import DebuggingRoundCockpit from "@/components/workspace/DebuggingRoundCockpit";
 import { getCompanyTrackData } from "@/data/companyTracks";
 import ScorecardShareModal from "@/components/scorecard/ScorecardShareModal";
 import ProctoringCameraTile, { type ProctoringWarning } from "@/components/crucible/ProctoringCameraTile";
@@ -139,6 +141,7 @@ export default function CrucibleCockpitPage({
   // Generated-track companies (Google, Accenture, Zomato): roles, sets and rounds come from the registry.
   const trackCo = getTrackCompany(companySlug);
   const roundSlug = searchParams.get("round") || "round-1";
+  const isDebuggingRound = roundSlug.toLowerCase() === "round-debug" || roundSlug.toLowerCase() === "debugging";
 
   // Check current round stages
   const getIsRound1 = (): boolean => {
@@ -1247,6 +1250,28 @@ export default function CrucibleCockpitPage({
         </div>
       </main>
     );
+  }
+
+  if (isDebuggingRound && (companySlug.toLowerCase() === "google" || companySlug.toLowerCase() === "amazon")) {
+    const requestedDebugId = searchParams.get("problem") || `${companySlug.toLowerCase()}-debug-01`;
+    const debugScenario = getDebuggingScenario(requestedDebugId)
+      || getDebuggingScenario(`${companySlug.toLowerCase()}-debug-01`);
+    if (debugScenario) {
+      return <DebuggingRoundCockpit
+        scenario={debugScenario}
+        companyName={companyData.companyName || debugScenario.company}
+        roleTitle={companyData.roles[selectedRole]?.roleTitle || selectedRole}
+        strict={isStrict}
+        stream={proctorStream}
+        warnings={proctorWarnings}
+        warningCount={proctorWarningCount}
+        warningLimit={MAX_PROCTOR_WARNINGS}
+        failed={proctorFailed}
+        locked={roundLocked}
+        timeLeftSeconds={timeLeftSeconds}
+        onWarning={recordProctorWarning}
+      />;
+    }
   }
 
   return (

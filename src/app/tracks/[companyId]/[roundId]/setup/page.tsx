@@ -277,7 +277,8 @@ export default function PreFlightSetupPage({
       document.documentElement.requestFullscreen().catch(() => undefined);
     }
     handedOffStreamRef.current = true;
-    const target = "/crucible/" + sessionId + "?strict=" + proctorStrictMode + "&company=" + params.companyId + "&round=" + params.roundId + (isAmz ? ("&role=" + selectedRole + "&set=" + selectedSet) : "");
+    const includeRole = isAmz || (params.companyId.toLowerCase() === "google" && params.roundId.toLowerCase() === "round-debug");
+    const target = "/crucible/" + sessionId + "?strict=" + proctorStrictMode + "&company=" + params.companyId + "&round=" + params.roundId + (includeRole ? ("&role=" + encodeURIComponent(selectedRole) + "&set=" + selectedSet) : "");
     router.push(target);
   };
 
