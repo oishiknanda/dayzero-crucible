@@ -6,8 +6,12 @@ import { cookies } from "next/headers";
 export const FOUNDER_COOKIE = "dz_founder";
 const DAYS = 7;
 
-const secret = () => process.env.NEXTAUTH_SECRET || "dev-only-secret";
-const sign = (value: string) => createHmac("sha256", secret()).update(value).digest("hex");
+const secret = () => process.env.NEXTAUTH_SECRET || "";
+const sign = (value: string) => {
+  const key = secret();
+  if (!key) throw new Error("NEXTAUTH_SECRET must be configured for founder access.");
+  return createHmac("sha256", key).update(value).digest("hex");
+};
 
 export function makeFounderToken(): string {
   const value = "founder." + (Date.now() + DAYS * 86_400_000);
@@ -15,7 +19,7 @@ export function makeFounderToken(): string {
 }
 
 export function verifyFounderToken(token: string | undefined): boolean {
-  if (!token) return false;
+  if (!token || !secret()) return false;
   const parts = token.split(".");
   if (parts.length !== 3 || parts[0] !== "founder") return false;
   const expires = Number(parts[1]);

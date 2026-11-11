@@ -31,6 +31,7 @@ export default function Home() {
             <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
             <span className="hover:text-primary cursor-pointer transition-colors">Proctoring Terms</span>
             <span className="hover:text-primary cursor-pointer transition-colors">Institutional Access</span>
+            <a href="/founder" className="text-slate-500 hover:text-slate-900 transition-colors">Founder access</a>
           </div>
 
           <p className="text-slate-500 font-medium">

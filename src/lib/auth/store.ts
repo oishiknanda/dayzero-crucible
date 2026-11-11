@@ -30,12 +30,40 @@ export interface VoteEntry {
   company: string;
   userId: string;
   at: string;
+  notificationEmail?: string;
+}
+
+export interface SiteActivityEntry {
+  id: string;
+  userId: string;
+  activeSeconds: number;
+  at: string;
+}
+
+export interface FounderUserSummary {
+  id: string;
+  name: string;
+  email: string;
+  provider: string;
+  createdAt: string;
+  activeSeconds: number;
+  lastActiveAt: string | null;
+}
+
+export interface FounderWaitlistContact {
+  company: string;
+  userId: string;
+  userName: string;
+  accountEmail: string;
+  notificationEmail: string;
+  votedAt: string;
 }
 
 interface Db {
   users: StoredUser[];
   history: HistoryEntry[];
   votes: VoteEntry[];
+  activity: SiteActivityEntry[];
 }
 
 const FILE = path.join(process.cwd(), ".data", "store.json");
@@ -44,9 +72,9 @@ let queue: Promise<unknown> = Promise.resolve();
 async function load(): Promise<Db> {
   try {
     const parsed = JSON.parse(await fs.readFile(FILE, "utf8")) as Partial<Db>;
-    return { users: parsed.users ?? [], history: parsed.history ?? [], votes: parsed.votes ?? [] };
+    return { users: parsed.users ?? [], history: parsed.history ?? [], votes: parsed.votes ?? [], activity: parsed.activity ?? [] };
   } catch {
-    return { users: [], history: [], votes: [] };
+    return { users: [], history: [], votes: [], activity: [] };
   }
 }
 
@@ -140,11 +168,32 @@ export function getHistory(userId: string): Promise<HistoryEntry[]> {
 
 // ---------- Company waitlist votes (one vote per account per company) ----------
 
-export function addVote(company: string, userId: string): Promise<void> {
+export function addVote(company: string, userId: string, notificationEmail?: string): Promise<void> {
   return withDb((db) => {
-    if (!db.votes.some((v) => v.company === company && v.userId === userId)) {
-      db.votes.push({ company, userId, at: new Date().toISOString() });
+    const existing = db.votes.find((v) => v.company === company && v.userId === userId);
+    if (existing) {
+      if (notificationEmail !== undefined) {
+        if (notificationEmail) existing.notificationEmail = normalizeEmail(notificationEmail);
+        else delete existing.notificationEmail;
+      }
+    } else {
+      db.votes.push({
+        company,
+        userId,
+        at: new Date().toISOString(),
+        ...(notificationEmail ? { notificationEmail: normalizeEmail(notificationEmail) } : {}),
+      });
     }
+  }, true);
+}
+
+export function updateVoteEmail(company: string, userId: string, notificationEmail: string): Promise<boolean> {
+  return withDb((db) => {
+    const existing = db.votes.find((v) => v.company === company && v.userId === userId);
+    if (!existing) return false;
+    if (notificationEmail) existing.notificationEmail = normalizeEmail(notificationEmail);
+    else delete existing.notificationEmail;
+    return true;
   }, true);
 }
 
@@ -154,10 +203,15 @@ export function removeVote(company: string, userId: string): Promise<void> {
   }, true);
 }
 
-export function getVoteState(company: string, userId?: string): Promise<{ count: number; voted: boolean }> {
+export function getVoteState(company: string, userId?: string): Promise<{ count: number; voted: boolean; hasNotificationEmail: boolean }> {
   return withDb((db) => {
     const forCompany = db.votes.filter((v) => v.company === company);
-    return { count: forCompany.length, voted: userId ? forCompany.some((v) => v.userId === userId) : false };
+    const userVote = userId ? forCompany.find((v) => v.userId === userId) : undefined;
+    return {
+      count: forCompany.length,
+      voted: Boolean(userVote),
+      hasNotificationEmail: Boolean(userVote?.notificationEmail),
+    };
   }, false);
 }
 
@@ -169,6 +223,68 @@ export function getAllVoteCounts(): Promise<Record<string, number>> {
   }, false);
 }
 
-export function getOverview(): Promise<{ users: number; interviews: number }> {
-  return withDb((db) => ({ users: db.users.length, interviews: db.history.length }), false);
+export function recordActiveTime(userId: string, eventId: string, activeSeconds: number): Promise<void> {
+  return withDb((db) => {
+    if (db.activity.some((entry) => entry.id === eventId)) return;
+    db.activity.push({ id: eventId, userId, activeSeconds, at: new Date().toISOString() });
+  }, true);
+}
+
+export function getFounderWaitlistContacts(): Promise<FounderWaitlistContact[]> {
+  return withDb((db) => {
+    const usersById = new Map(db.users.map((user) => [user.id, user]));
+    return db.votes
+      .filter((vote) => Boolean(vote.notificationEmail))
+      .map((vote) => {
+        const user = usersById.get(vote.userId);
+        return {
+          company: vote.company,
+          userId: vote.userId,
+          userName: user?.name || "Account holder",
+          accountEmail: user?.email || "",
+          notificationEmail: vote.notificationEmail || "",
+          votedAt: vote.at,
+        };
+      })
+      .sort((a, b) => b.votedAt.localeCompare(a.votedAt));
+  }, false);
+}
+
+export function getOverview(): Promise<{
+  users: number;
+  interviews: number;
+  activeSeconds: number;
+  userDetails: FounderUserSummary[];
+}> {
+  return withDb((db) => {
+    const activityByUser = new Map<string, { activeSeconds: number; lastActiveAt: string | null }>();
+    for (const entry of db.activity) {
+      const summary = activityByUser.get(entry.userId) || { activeSeconds: 0, lastActiveAt: null };
+      summary.activeSeconds += entry.activeSeconds;
+      if (!summary.lastActiveAt || entry.at > summary.lastActiveAt) summary.lastActiveAt = entry.at;
+      activityByUser.set(entry.userId, summary);
+    }
+
+    const userDetails = db.users
+      .map((user) => {
+        const activity = activityByUser.get(user.id);
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          provider: user.provider,
+          createdAt: user.createdAt,
+          activeSeconds: activity?.activeSeconds || 0,
+          lastActiveAt: activity?.lastActiveAt || null,
+        };
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    return {
+      users: db.users.length,
+      interviews: db.history.length,
+      activeSeconds: userDetails.reduce((sum, user) => sum + user.activeSeconds, 0),
+      userDetails,
+    };
+  }, false);
 }

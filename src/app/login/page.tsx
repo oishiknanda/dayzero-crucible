@@ -170,6 +170,12 @@ function LoginForm() {
         </Button>
       </form>
 
+      {mode === "signup" && (
+        <p className="mt-3 text-center text-xs leading-relaxed text-slate-500">
+          We store your account details and approximate active time while you are signed in. A launch-notification email for a company waitlist is optional.
+        </p>
+      )}
+
       <p className="mt-5 text-center text-sm text-slate-600">
         {mode === "signin" ? "New here? " : "Already have an account? "}
         <button
