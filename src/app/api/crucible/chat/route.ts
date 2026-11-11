@@ -12,21 +12,55 @@ function stripGateOnly(history: unknown): any[] {
 
 // Server-side backstop for the answer gate. The page already blocks non-answers before calling us;
 // this only catches a stale or modified client. Fails open: any problem returns null (normal flow).
-function gateBackstop(round: 2 | 3, phase: string, message: string, history: any[], questionTitle: string): NextResponse | null {
+function gateBackstop(round: 2 | 3 | 4, phase: string, message: string, history: any[], questionTitle: string): NextResponse | null {
   try {
-    const gatePhase = round === 3 && phase === "INITIAL" ? "DRAFTING" : phase;
+    const gatePhase = round === 4 ? "BEHAVIORAL" : round === 3 && phase === "INITIAL" ? "DRAFTING" : phase;
     if (gatePhase === "VERDICT") return null;
     const lastAi = [...history].reverse().find((m: any) => {
       const s = String(m?.sender || m?.speaker || m?.role || "").toLowerCase();
-      return s !== "candidate" && s !== "user" && (m?.text || m?.content);
+      return s !== "candidate" && s !== "user" && !GATE_ONLY_KINDS.includes(String(m?.kind || "")) && (m?.text || m?.content);
     });
     const question = lastAi ? String(lastAi.text || lastAi.content) : "Walk me through your approach for " + questionTitle + ".";
+    let consecutiveNonAnswers = 0;
+    let clarificationsUsed = 0;
+    for (let i = history.length - 1; i >= 0; i--) {
+      const item = history[i];
+      const sender = String(item?.sender || item?.speaker || item?.role || "").toLowerCase();
+      if (sender !== "candidate" && sender !== "user") continue;
+      if (item?.kind === "non_answer" || item?.kind === "nudge" || item?.kind === "reask") {
+        consecutiveNonAnswers++;
+        continue;
+      }
+      if (item?.kind === "clarification") {
+        clarificationsUsed++;
+        continue;
+      }
+      break;
+    }
     const decision = decideGate(
       message,
-      { round, phase: gatePhase as "INITIAL" | "FOLLOW_UPS" | "CODING" | "DRAFTING", questionText: question, problemTitle: questionTitle },
-      { consecutiveNonAnswers: 0, clarificationsUsed: 0 }
+      { round, phase: gatePhase as "INITIAL" | "FOLLOW_UPS" | "CODING" | "DRAFTING" | "BEHAVIORAL", questionText: question, problemTitle: questionTitle },
+      { consecutiveNonAnswers, clarificationsUsed }
     );
-    if (decision.action === "proceed" || decision.action === "force_advance") return null;
+    if (decision.action === "proceed") return null;
+    if (decision.action === "force_advance") {
+      if (round === 4) {
+        return NextResponse.json({
+          reply: "I’m recording this scenario as unanswered. Please move to the next scenario, or conclude the assessment to generate your scorecard.",
+          accepted: false,
+          questionCompleted: true,
+          isCompleted: true,
+          gate: "force_advance"
+        });
+      }
+      return NextResponse.json({
+        reply: gatePhase === "CODING"
+          ? "I still need a submitted solution before I can assess the technical defense. Revise your code and submit it, or conclude to receive your scorecard."
+          : "I still need an architecture in the editor before I can assess the design defense. Add and submit your design, or conclude to receive your scorecard.",
+        accepted: false,
+        gate: "force_advance"
+      });
+    }
     console.info("[answerGate:server]", { class: decision.classification, round, phase: gatePhase });
     if (decision.action === "nudge") {
       return NextResponse.json({ reply: gatePhase === "CODING" ? NUDGE_REPLIES.CODING : NUDGE_REPLIES.DRAFTING, accepted: false, gate: "reask" });
@@ -49,6 +83,8 @@ export async function POST(req: NextRequest) {
       isRound2 = false,
       isRound4 = false,
       roundSlug = "round-1",
+      company = "",
+      roleTitle = "",
       problemId = "amz-general",
       problemTitle = "Leadership Scenario",
       problemDescription = "",
@@ -58,6 +94,7 @@ export async function POST(req: NextRequest) {
       nonAnswerCount = 0,
       unansweredQuestions = [],
       vivaPhase = "INITIAL",
+      followUpCount = 0,
       questionIndex = 0,
       totalQuestions = 2,
       candidateTestScore = 0,
@@ -67,7 +104,8 @@ export async function POST(req: NextRequest) {
     const dialogueHistory = stripGateOnly(rawDialogueHistory);
 
     // Google track: Google personas and rubrics (no Amazon Bar Raiser, STAR or Leadership Principles).
-    const isGoogle = String(problemId || "").startsWith("goog-");
+    const companyContext = String(company || "").toLowerCase();
+    const isGoogle = String(problemId || "").startsWith("goog-") || companyContext.includes("google");
     // Accenture and Zomato personas (same architecture as Google, own rubric and tone).
     const OTHER: Record<string, { name: string; r2: string; r3: string; r2x: string; r3x: string; crit: string; r4: string }> = {
       "acc-": {
@@ -85,7 +123,8 @@ export async function POST(req: NextRequest) {
         r4: "You are a Zomato hiring manager interviewing a candidate. Assess ownership, customer obsession, speed with good judgment, honesty about mistakes and teamwork. This is NOT an Amazon Leadership Principles interview."
       }
     };
-    const otherKey = Object.keys(OTHER).find((k) => String(problemId || "").startsWith(k));
+    const companyPrefix = companyContext.includes("accenture") ? "acc-" : companyContext.includes("zomato") ? "zom-" : "";
+    const otherKey = Object.keys(OTHER).find((k) => String(problemId || "").startsWith(k)) || companyPrefix;
     const other = otherKey ? OTHER[otherKey] : null;
     const isOther = !!other;
     const coName = isGoogle ? "Google" : other ? other.name : "";
@@ -95,6 +134,7 @@ export async function POST(req: NextRequest) {
           return `${other.r4}
 Scenario: ${problemTitle}
 Description: ${problemDescription}
+Candidate role: ${roleTitle || "Software Engineering"}
 
 Candidate Just Said: "${candidateMessage}"
 Recent Conversation History:
@@ -123,6 +163,7 @@ GUIDELINES:
         return `You are a Googleyness & Leadership Evaluator conducting a behavioral interview.
 Scenario: ${problemTitle}
 Description: ${problemDescription}
+Candidate role: ${roleTitle || "Software Engineering"}
 
 Candidate Just Said: "${candidateMessage}"
 Recent Conversation History:
@@ -168,16 +209,13 @@ GUIDELINES:
     // ─────────────────────────────────────────────────────────────
     if (isSystemDesignRound && !evaluateScorecard) {
       if (!gateForced && process.env.ANSWER_GATE_ENABLED !== "false") {
-        const blocked = gateBackstop(3, String(vivaPhase), String(candidateMessage), dialogueHistory, String(problemTitle));
+        const blocked = gateBackstop(3, String(vivaPhase), String(candidateMessage), rawDialogueHistory, String(problemTitle));
         if (blocked) return blocked;
       }
       // Calculate turns based on history plus current message if present
-      const previousTurns = (dialogueHistory || []).filter((m: any) => {
-        const s = String(m?.sender || m?.speaker || m?.role || "").toLowerCase();
-        return s === "candidate" || s === "user";
-      }).length;
-
-      const currentTurnCount = previousTurns + (candidateMessage ? 1 : 0);
+      const currentTurnCount = String(vivaPhase) === "FOLLOW_UPS"
+        ? Math.max(0, Number(followUpCount) || 0) + (candidateMessage ? 1 : 0)
+        : 0;
 
       // Conclude immediately if candidate has answered 3 follow-ups
       if (currentTurnCount >= 3) {
@@ -198,6 +236,7 @@ GUIDELINES:
 
       const archSystemPrompt = `You are an Amazon Bar Raiser conducting Round 3 (System Design / LLD).
 TOPIC: ${problemTitle}
+CANDIDATE ROLE: ${roleTitle || "Software Engineering"}
 SYSTEM CONSTRAINTS: ${problemDescription}
 
 CODE IN EDITOR:
@@ -217,6 +256,7 @@ RULES:
       if (groqKey) {
         try {
           const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            signal: AbortSignal.timeout(25_000),
             method: "POST",
             headers: {
               "Authorization": `Bearer ${groqKey}`,
@@ -272,6 +312,10 @@ RULES:
     // 2. ROUND 4: BEHAVIORAL HARD STOP (4-TURN LIMIT)
     // ─────────────────────────────────────────────────────────────
     if (isBehavioral && !evaluateScorecard) {
+      if (!gateForced && process.env.ANSWER_GATE_ENABLED !== "false") {
+        const blocked = gateBackstop(4, String(vivaPhase), String(candidateMessage), rawDialogueHistory, String(problemTitle));
+        if (blocked) return blocked;
+      }
       const historyList = Array.isArray(dialogueHistory) ? dialogueHistory : [];
       const candidateTurns = historyList.filter((m) => {
         const s = String(m?.sender || m?.speaker || m?.role || "").toLowerCase();
@@ -302,6 +346,7 @@ RULES:
 
       const behavioralPrompt = `You are an Amazon Executive Bar Raiser (Director / PE level) conducting an interview.
 Problem: ${problemTitle}
+Candidate role: ${roleTitle || "Software Engineering"}
 Description: ${problemDescription}
 
 Candidate Just Said: "${candidateMessage}"
@@ -320,6 +365,7 @@ INTERVIEWER GUIDELINES:
       if (groqKey) {
         try {
           const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            signal: AbortSignal.timeout(25_000),
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
             body: JSON.stringify({
@@ -347,6 +393,7 @@ INTERVIEWER GUIDELINES:
       if (geminiKey) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
+            signal: AbortSignal.timeout(25_000),
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -365,8 +412,31 @@ INTERVIEWER GUIDELINES:
         }
       }
 
+      const behavioralFallbacks = isGoogle
+        ? [
+            "When the situation was ambiguous, what evidence or input helped you choose your first step?",
+            "What alternative did you consider, and what would have changed your decision?",
+            "How did you check that your decision was fair to the people affected by it?"
+          ]
+        : other?.name === "Accenture"
+          ? [
+              "How did you clarify the client's most important need before choosing what to do?",
+              "How did you keep the people involved aligned as the situation changed?",
+              "What would you do differently to improve the outcome for the client or team?"
+            ]
+          : other?.name === "Zomato"
+            ? [
+                "How did you decide what mattered most to the customer in that situation?",
+                "What trade-off did you make to act quickly while protecting service quality?",
+                "What signal would tell you that your decision had the intended impact?"
+              ]
+            : [
+                "What was the most important action you personally took, and why?",
+                "What measurable result followed, and how did you verify it?",
+                "What did you learn, and what would you change if you faced it again?"
+              ];
       return NextResponse.json({
-        reply: "Those are solid technical decisions. Now, walk me through the specific Result: what were the measurable business metrics and the long-term mechanisms you established?",
+        reply: behavioralFallbacks[Math.max(0, candidateTurns - 1) % behavioralFallbacks.length],
         nextQuestionIndex: questionIndex
       });
     }
@@ -376,12 +446,12 @@ INTERVIEWER GUIDELINES:
     // ─────────────────────────────────────────────────────────────
     if (isDsaVivaRound && !evaluateScorecard) {
       if (!gateForced && process.env.ANSWER_GATE_ENABLED !== "false") {
-        const blocked = gateBackstop(2, String(vivaPhase), String(candidateMessage), dialogueHistory, String(problemTitle));
+        const blocked = gateBackstop(2, String(vivaPhase), String(candidateMessage), rawDialogueHistory, String(problemTitle));
         if (blocked) return blocked;
       }
-      const candidateTurnCount = (dialogueHistory || []).filter(
-        (m: any) => m.speaker === "CANDIDATE" || m.sender === "candidate" || m.role === "user"
-      ).length + (candidateMessage ? 1 : 0);
+      const candidateTurnCount = vivaPhase === "FOLLOW_UPS"
+        ? Math.max(0, Number(followUpCount) || 0) + (candidateMessage ? 1 : 0)
+        : 0;
 
       // Conclude defense when 3 follow-ups have been answered
       if (vivaPhase === "FOLLOW_UPS" && candidateTurnCount >= 3) {
@@ -407,6 +477,7 @@ INTERVIEWER GUIDELINES:
 
       const dsaVivaPrompt = `You are an Amazon SDE-2 conducting Round 2 (Technical DSA Viva).
 TOPIC: ${problemTitle}
+CANDIDATE ROLE: ${roleTitle || "Software Engineering"}
 PROBLEM DESCRIPTION: ${problemDescription}
 
 CURRENT CODE IMPLEMENTED:
@@ -431,6 +502,7 @@ BEHAVIOR DIRECTIVES:
       if (groqKey) {
         try {
           const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            signal: AbortSignal.timeout(25_000),
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
             body: JSON.stringify({
@@ -459,6 +531,7 @@ BEHAVIOR DIRECTIVES:
       if (geminiKey) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
+            signal: AbortSignal.timeout(25_000),
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -633,6 +706,7 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
       if (groqKey) {
         try {
           const gRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            signal: AbortSignal.timeout(25_000),
             method: "POST",
             headers: { "Content-Type": "application/json", Authorization: `Bearer ${groqKey}` },
             body: JSON.stringify({
@@ -692,6 +766,7 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
       if (geminiKey) {
         try {
           const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`, {
+            signal: AbortSignal.timeout(25_000),
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

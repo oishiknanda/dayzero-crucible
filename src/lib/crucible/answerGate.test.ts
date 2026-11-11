@@ -1,4 +1,4 @@
-// ANSWER GATE TESTS (Rounds 2 and 3). Runner: vitest.
+// ANSWER GATE TESTS (Rounds 2, 3 and 4). Runner: vitest.
 // Pure classifier tests plus the strike / free-clarification / safety-valve decisions.
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
@@ -117,16 +117,19 @@ describe("overlap with the problem or question keeps short text an answer", () =
   });
 });
 
-describe("Round 4 and Round 1 are never gated", () => {
+describe("Round 4 behavioral gate and Round 1 bypass", () => {
   const junk = ["hello", "what", "ok", "asdf", "thank you", ""];
-  for (const round of [1, 4]) {
-    it("round " + round + " always passes through", () => {
-      for (const m of junk) {
-        expect(classifyCandidateMessage(m, { round, phase: "INITIAL" })).toEqual({ classification: "answer", gate: "none" });
-        expect(classifyCandidateMessage(m, { round, phase: "FOLLOW_UPS" })).toEqual({ classification: "answer", gate: "none" });
-      }
-    });
-  }
+  it("Round 1 always passes through", () => {
+    for (const m of junk) expect(classifyCandidateMessage(m, { round: 1, phase: "INITIAL" })).toEqual({ classification: "answer", gate: "none" });
+  });
+  it("Round 4 gates junk and clarification but accepts concise behavioral answers", () => {
+    expect(classifyCandidateMessage("asdf", { round: 4, phase: "BEHAVIORAL" })).toEqual({ classification: "non_answer", gate: "reask" });
+    expect(classifyCandidateMessage("what?", { round: 4, phase: "BEHAVIORAL" })).toEqual({ classification: "clarification", gate: "clarification" });
+    expect(classifyCandidateMessage("I would ask the team for evidence", { round: 4, phase: "BEHAVIORAL" }).classification).toBe("answer");
+  });
+  it("Round 4 force-advances after the warning limit", () => {
+    expect(decideGate("asdf", { round: 4, phase: "BEHAVIORAL" }, { consecutiveNonAnswers: 3, clarificationsUsed: 0 }).action).toBe("force_advance");
+  });
 });
 
 describe("feature flag and fail-open", () => {
@@ -198,11 +201,11 @@ describe("decideGate: strikes, free clarifications, safety valve", () => {
     expect(MAX_FREE_CLARIFICATIONS).toBe(2);
   });
 
-  it("CODING and DRAFTING only nudge: no strikes, no force", () => {
+  it("CODING and DRAFTING nudge finitely, then reach the safety valve", () => {
     const c = { consecutiveNonAnswers: 3, clarificationsUsed: 2 };
-    expect(decideGate("hello", { round: 2, phase: "CODING" }, c).action).toBe("nudge");
-    expect(decideGate("hello", R3_DRAFT, c).action).toBe("nudge");
-    expect(decideGate("hello", R3_DRAFT, c).strike).toBe(3);
+    expect(decideGate("hello", { round: 2, phase: "CODING" }, c).action).toBe("force_advance");
+    expect(decideGate("hello", R3_DRAFT, c).action).toBe("force_advance");
+    expect(decideGate("hello", R3_DRAFT, { consecutiveNonAnswers: 2, clarificationsUsed: 0 }).action).toBe("nudge");
   });
 
   it("a real answer after non-answers continues normally", () => {
@@ -216,8 +219,8 @@ describe("decideGate: strikes, free clarifications, safety valve", () => {
     expect(d.strike).toBe(1);
   });
 
-  it("Round 4 is bypassed by decideGate too", () => {
-    expect(decideGate("hello", { round: 4, phase: "FOLLOW_UPS" }, { consecutiveNonAnswers: 9, clarificationsUsed: 9 }).action).toBe("proceed");
+  it("Round 4 is gated by decideGate too", () => {
+    expect(decideGate("hello", { round: 4, phase: "BEHAVIORAL" }, { consecutiveNonAnswers: 0, clarificationsUsed: 0 }).action).toBe("reask");
   });
 });
 

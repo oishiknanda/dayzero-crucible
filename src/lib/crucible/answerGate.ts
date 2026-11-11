@@ -1,7 +1,7 @@
-// ANSWER GATE FOR THE CRUCIBLE AI INTERVIEWER (ROUND 2 AND ROUND 3 ONLY)
+// ANSWER GATE FOR THE CRUCIBLE AI INTERVIEWER (ROUNDS 2, 3 AND 4)
 //
 // Pure functions: no AI calls, no network, no side effects, no state.
-// Round 4 and Round 1 are bypassed: the gate always answers "answer / none" for them.
+// Round 1 is bypassed. Round 4 uses its own behavioral-answer phase, never an editor phase.
 //
 // Classification rules, applied in this order. The stored or sent text is never changed;
 // only a normalized copy is used for matching.
@@ -21,7 +21,7 @@
 
 export type AnswerClass = "answer" | "clarification" | "non_answer";
 export type GateSignal = "reask" | "clarification" | "none";
-export type GatePhase = "INITIAL" | "FOLLOW_UPS" | "CODING" | "DRAFTING" | "VERDICT";
+export type GatePhase = "INITIAL" | "FOLLOW_UPS" | "CODING" | "DRAFTING" | "BEHAVIORAL" | "VERDICT";
 
 export interface AnswerGateResult {
   classification: AnswerClass;
@@ -29,7 +29,7 @@ export interface AnswerGateResult {
 }
 
 export interface AnswerGateContext {
-  /** 1 to 4. Only rounds 2 and 3 are ever gated. */
+  /** 1 to 4. Rounds 2, 3 and 4 are gated. */
   round: number;
   phase: GatePhase;
   /** The interviewer question waiting for an answer (used for word overlap). */
@@ -45,8 +45,8 @@ export function isAnswerGateEnabled(): boolean {
   return process.env.ANSWER_GATE_ENABLED !== "false";
 }
 
-/** Only these rounds are gated. Round 4 and Round 1 must never be touched. */
-export const GATED_ROUNDS: readonly number[] = [2, 3];
+/** Round 1 has no interviewer answer gate. */
+export const GATED_ROUNDS: readonly number[] = [2, 3, 4];
 
 /** After this many consecutive re-asks, the next non-answer moves on by the normal path. */
 export const MAX_CONSECUTIVE_NON_ANSWERS = 3;
@@ -179,7 +179,19 @@ function isKeyboardMash(text: string): boolean {
   const compact = text.replace(/\s/g, "");
   if (compact.length < 3) return false;
   if (/^(.)\1+$/.test(compact)) return true;
-  return new RegExp("\\p{L}", "u").test(compact) && !/[aeiouy]/.test(compact);
+  if (new RegExp("\\p{L}", "u").test(compact) && !/[aeiouy]/.test(compact)) return true;
+
+  const words = text.split(" ").filter(Boolean);
+  if (words.length >= 5 && new Set(words).size <= Math.ceil(words.length * 0.35)) return true;
+  const letters = compact.replace(/[^a-z]/g, "");
+  if (letters.length >= 14 && (letters.match(/[aeiouy]/g) || []).length / letters.length < 0.12) return true;
+  return false;
+}
+
+function isPlausibleShortBehavioralAnswer(text: string, context: AnswerGateContext): boolean {
+  if (context.round !== 4) return false;
+  return /\b(i|we|my|our)\b/.test(text)
+    && /\b(would|will|did|made|asked|decided|owned|led|built|changed|handled|worked|learned|chose|explained|proposed|raised|shared|told|helped|listened|aligned|escalated)\b/.test(text);
 }
 
 function significantWords(text: string): Set<string> {
@@ -216,6 +228,7 @@ function classify(message: string, context: AnswerGateContext): AnswerClass {
   if (WEAK_ANSWER_PHRASES.has(text)) return "answer";
   if (NON_ANSWER_PHRASES.has(text)) return "non_answer";
   if (isKeyboardMash(text)) return "non_answer";
+  if (isPlausibleShortBehavioralAnswer(text, context)) return "answer";
 
   const wordCount = text.split(" ").length;
   if (wordCount <= OFF_TOPIC_MAX_WORDS && !hasWordOverlap(text, context)) return "non_answer";
@@ -227,7 +240,7 @@ function classify(message: string, context: AnswerGateContext): AnswerClass {
 
 /**
  * Classifies a candidate message. FAILS OPEN: if anything goes wrong, or the gate is
- * disabled, or the round is not 2 or 3, the message is treated as a normal answer.
+ * disabled, or the round is not gated, the message is treated as a normal answer.
  */
 export function classifyCandidateMessage(message: string, context: AnswerGateContext): AnswerGateResult {
   try {
@@ -255,7 +268,7 @@ export type GateAction =
   | "reask"
   /** Reply with the free clarification wording. No strike. */
   | "clarify"
-  /** CODING or DRAFTING: reply with the fixed editor nudge. No strike, no state change. */
+  /** CODING or DRAFTING: reply with the fixed editor nudge and increment the strike. */
   | "nudge"
   /** Safety valve: take the EXISTING progression path and mark the question unanswered. */
   | "force_advance";
@@ -279,7 +292,7 @@ export interface GateCounters {
 /**
  * Turns a classification plus the running counters into one action.
  * - answer: proceed, strikes reset.
- * - CODING and DRAFTING: nudge only, no strikes (there is no question to repeat).
+ * - CODING and DRAFTING: nudge until the same bounded safety valve is reached.
  * - clarification: free up to MAX_FREE_CLARIFICATIONS, then it counts as a strike.
  * - non-answer: re-ask; after MAX_CONSECUTIVE_NON_ANSWERS re-asks, force the normal move-on.
  */
@@ -297,7 +310,10 @@ export function decideGate(
   }
 
   if (context.phase === "CODING" || context.phase === "DRAFTING") {
-    return { action: "nudge", classification, strike: prior, clarificationsUsed: used };
+    if (prior >= MAX_CONSECUTIVE_NON_ANSWERS) {
+      return { action: "force_advance", classification, strike: prior + 1, clarificationsUsed: used };
+    }
+    return { action: "nudge", classification, strike: prior + 1, clarificationsUsed: used };
   }
 
   if (classification === "clarification" && used < MAX_FREE_CLARIFICATIONS) {
