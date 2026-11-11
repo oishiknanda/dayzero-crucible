@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Camera } from "lucide-react";
+import { isCameraFrameObscured } from "@/lib/crucible/proctoringPolicy";
 
 export interface ProctoringWarning {
   id: string;
@@ -54,23 +55,32 @@ export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCa
       warn("camera-muted", "Camera feed was interrupted. Check that your camera is enabled.");
     };
     const onVideoUnmute = () => {
+      delete lastWarningRef.current["camera-muted"];
+      delete lastWarningRef.current["camera-ended"];
+      delete lastWarningRef.current["camera-blank"];
       setCameraIssue("");
       setCameraReady(true);
     };
     const onAudioEnded = () => warn("microphone-ended", "Microphone access was interrupted. Voice answers may not work until it is restored.");
     const onAudioMute = () => warn("microphone-muted", "Microphone access was muted. Check your device and browser permissions.");
+    const onAudioUnmute = () => {
+      delete lastWarningRef.current["microphone-muted"];
+      delete lastWarningRef.current["microphone-ended"];
+    };
 
     videoTrack?.addEventListener("ended", onVideoEnded);
     videoTrack?.addEventListener("mute", onVideoMute);
     videoTrack?.addEventListener("unmute", onVideoUnmute);
     audioTrack?.addEventListener("ended", onAudioEnded);
     audioTrack?.addEventListener("mute", onAudioMute);
+    audioTrack?.addEventListener("unmute", onAudioUnmute);
 
     const canvas = document.createElement("canvas");
     canvas.width = 32;
     canvas.height = 18;
     const context = canvas.getContext("2d", { willReadFrequently: true });
     let blankSamples = 0;
+    let obscuredSamples = 0;
     let movementSamples = 0;
     let previousPixels: Uint8ClampedArray | null = null;
     let wasReady = false;
@@ -99,12 +109,14 @@ export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCa
         context.drawImage(currentVideo, 0, 0, canvas.width, canvas.height);
         const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
         let brightnessSum = 0;
+        let brightnessSquareSum = 0;
         let changedPixels = 0;
         const pixelCount = pixels.length / 4;
 
         for (let index = 0; index < pixels.length; index += 4) {
           const brightness = (pixels[index] * 0.299) + (pixels[index + 1] * 0.587) + (pixels[index + 2] * 0.114);
           brightnessSum += brightness;
+          brightnessSquareSum += brightness * brightness;
           if (previousPixels) {
             const change = Math.abs(pixels[index] - previousPixels[index])
               + Math.abs(pixels[index + 1] - previousPixels[index + 1])
@@ -114,18 +126,29 @@ export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCa
         }
 
         const averageBrightness = brightnessSum / pixelCount;
-        blankSamples = averageBrightness < 3 ? blankSamples + 1 : 0;
-        if (blankSamples >= 8) {
+        const brightnessVariance = Math.max(0, (brightnessSquareSum / pixelCount) - (averageBrightness * averageBrightness));
+        const changedRatio = previousPixels ? changedPixels / pixelCount : 0;
+        const frameObscured = isCameraFrameObscured({
+          averageBrightness,
+          brightnessVariance,
+          changedPixelRatio: changedRatio,
+          hasPreviousFrame: previousPixels !== null,
+          previousFrameWasObscured: obscuredSamples > 0,
+        });
+        blankSamples = averageBrightness < 20 && brightnessVariance < 220 ? blankSamples + 1 : 0;
+        obscuredSamples = frameObscured ? obscuredSamples + 1 : 0;
+
+        if (blankSamples >= 3 || obscuredSamples >= 3) {
           setCameraReady(false);
-          setCameraIssue("Camera image appears blank or fully covered.");
-          warn("camera-blank", "Camera image appears blank. Check the camera cover, lighting, or device.");
+          setCameraIssue("Camera image appears blank or covered.");
+          warn("camera-blank", "Camera image went dark or became obscured. Remove anything covering the lens and check the camera preview.");
         } else {
           setCameraReady(true);
           setCameraIssue("");
+          if (blankSamples === 0 && obscuredSamples === 0) delete lastWarningRef.current["camera-blank"];
         }
 
-        if (previousPixels) {
-          const changedRatio = changedPixels / pixelCount;
+        if (previousPixels && obscuredSamples === 0) {
           movementSamples = changedRatio > 0.16 ? movementSamples + 1 : Math.max(0, movementSamples - 1);
           if (movementSamples >= 5) {
             warn("camera-movement", "Large movement in the camera image was detected. Please steady the device and return to your interview position.");
@@ -148,6 +171,7 @@ export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCa
       videoTrack?.removeEventListener("unmute", onVideoUnmute);
       audioTrack?.removeEventListener("ended", onAudioEnded);
       audioTrack?.removeEventListener("mute", onAudioMute);
+      audioTrack?.removeEventListener("unmute", onAudioUnmute);
       if (video.srcObject === stream) video.srcObject = null;
     };
   }, [stream, onWarning]);

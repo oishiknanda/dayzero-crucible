@@ -13,6 +13,7 @@ import ScorecardShareModal from "@/components/scorecard/ScorecardShareModal";
 import ProctoringCameraTile, { type ProctoringWarning } from "@/components/crucible/ProctoringCameraTile";
 import { clearProctoringSession, getProctoringStream, readProctoringGrant } from "@/lib/crucible/proctoringSession";
 import { getRoundDurationSeconds } from "@/lib/crucible/roundTiming";
+import { MAX_PROCTOR_WARNINGS, shouldFailForWarningCount } from "@/lib/crucible/proctoringPolicy";
 import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTracks";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
@@ -185,19 +186,32 @@ export default function CrucibleCockpitPage({
   const [proctorStream, setProctorStream] = useState<MediaStream | null>(null);
   const [proctorWarnings, setProctorWarnings] = useState<ProctoringWarning[]>([]);
   const [proctorWarningCount, setProctorWarningCount] = useState(0);
+  const [proctorFailed, setProctorFailed] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const warningCooldownRef = useRef<Record<string, number>>({});
+  const warningCountRef = useRef(0);
+  const proctorFailedRef = useRef(false);
   const cleanupTimerRef = useRef<number | null>(null);
   const recordProctorWarning = useCallback((code: string, message: string) => {
+    if (!isStrict || proctorFailedRef.current) return;
     const now = Date.now();
     if (now - (warningCooldownRef.current[code] || 0) < 2000) return;
     warningCooldownRef.current[code] = now;
-    setProctorWarningCount((count) => count + 1);
+    const nextCount = warningCountRef.current + 1;
+    warningCountRef.current = nextCount;
+    setProctorWarningCount(nextCount);
     setProctorWarnings((previous) => [
       ...previous,
       { id: `${code}-${now}`, code, message, at: new Date(now).toLocaleTimeString() },
     ].slice(-10));
-  }, []);
+    if (shouldFailForWarningCount(nextCount)) {
+      proctorFailedRef.current = true;
+      setProctorFailed(true);
+      setProctorStream(null);
+      clearProctoringSession(params.sessionId);
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+    }
+  }, [isStrict, params.sessionId]);
 
   useEffect(() => {
     const grant = readProctoringGrant(params.sessionId);
@@ -453,6 +467,7 @@ export default function CrucibleCockpitPage({
   const roundDurationSeconds = getRoundDurationSeconds(companySlug, selectedRole, roundSlug);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(roundDurationSeconds);
   const [timeExpired, setTimeExpired] = useState(false);
+  const roundLocked = timeExpired || proctorFailed;
   const timerDeadlineRef = useRef<number | null>(null);
   const formatTimer = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
@@ -470,7 +485,7 @@ export default function CrucibleCockpitPage({
   }, [dialogue]);
 
   useEffect(() => {
-    if (!proctorGateReady) return;
+    if (!proctorGateReady || roundLocked) return;
     if (timerDeadlineRef.current === null) {
       timerDeadlineRef.current = Date.now() + roundDurationSeconds * 1000;
     }
@@ -485,7 +500,7 @@ export default function CrucibleCockpitPage({
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", updateRemaining);
     };
-  }, [proctorGateReady, roundDurationSeconds]);
+  }, [proctorGateReady, roundDurationSeconds, roundLocked]);
 
   useEffect(() => {
     if (proctorGateReady && timeLeftSeconds === 0) setTimeExpired(true);
@@ -815,7 +830,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleCandidateSubmit = async (textToSend?: string) => {
-    if (timeExpired) return;
+    if (roundLocked || proctorFailedRef.current) return;
     const text = (textToSend !== undefined ? textToSend : candidateInputText).trim();
     if (!text || aiRequestInFlightRef.current || isAiThinking) return;
     aiRequestInFlightRef.current = true;
@@ -874,6 +889,7 @@ export default function CrucibleCockpitPage({
   };
 
   const startRecording = async () => {
+    if (roundLocked || proctorFailedRef.current) return;
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
       setIsAiSpeaking(false);
@@ -952,7 +968,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleRunCode = () => {
-    if (timeExpired) return;
+    if (roundLocked || proctorFailedRef.current) return;
     setIsRunning(true);
     setIsConsoleCollapsed(false);
     setActiveConsoleTab("results");
@@ -971,7 +987,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleSubmitCode = () => {
-    if (timeExpired) return;
+    if (roundLocked || proctorFailedRef.current) return;
     if (isRound3) {
       const trimmedCode = code.trim();
       const architectureWords = trimmedCode.match(/[a-zA-Z]{3,}/g) || [];
@@ -1110,6 +1126,7 @@ export default function CrucibleCockpitPage({
   };
 
   const handleFinishBarRaiserRound = async () => {
+    if (proctorFailedRef.current) return;
     setIsGeneratingScorecard(true);
     setShowCompletionScorecard(true);
     try {
@@ -1157,6 +1174,14 @@ export default function CrucibleCockpitPage({
       ? "round3Completed=true"
       : "round4Completed=true";
     router.push(`/tracks/${companySlug}?${flag}`);
+  };
+
+  const handleProctorFailureReturn = () => {
+    clearProctoringSession(params.sessionId);
+    if (typeof document !== "undefined" && document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => undefined);
+    }
+    router.replace(`/tracks/${companySlug}`);
   };
 
   const handleMouseDownH = () => setIsDraggingH(true);
@@ -1287,7 +1312,7 @@ export default function CrucibleCockpitPage({
             {!isRound3 && (
               <button
                 onClick={handleRunCode}
-                disabled={isRunning || timeExpired}
+                disabled={isRunning || roundLocked}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-100 bg-[#3D3D3D] hover:bg-[#4A4A4A] border border-white/10 cursor-pointer disabled:opacity-50"
               >
                 <Play className="h-3.5 w-3.5 text-emerald-400" />
@@ -1296,7 +1321,7 @@ export default function CrucibleCockpitPage({
             )}
             <button
               onClick={handleSubmitCode}
-              disabled={isRunning || timeExpired}
+              disabled={isRunning || roundLocked}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-md cursor-pointer disabled:opacity-50"
             >
               <Send className="h-3.5 w-3.5" />
@@ -1305,7 +1330,7 @@ export default function CrucibleCockpitPage({
             {isRound3 && (
               <button
                 onClick={handleFinishBarRaiserRound}
-                disabled={isRunning || isGeneratingScorecard || timeExpired}
+                disabled={isRunning || isGeneratingScorecard || roundLocked}
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 border border-amber-400/30 shadow-md cursor-pointer disabled:opacity-50 transition-all"
                 title="Conclude assessment and review evaluation scorecard"
               >
@@ -1338,7 +1363,7 @@ export default function CrucibleCockpitPage({
                         setShowCompletionScorecard(true);
                       }
                     }}
-                  disabled={isRunning || timeExpired}
+                  disabled={isRunning || roundLocked}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-white/10 shadow-sm cursor-pointer disabled:opacity-50 transition-all"
                   title="Advance to next task or finish with current test case results"
                 >
@@ -1459,7 +1484,7 @@ export default function CrucibleCockpitPage({
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 automaticLayout: true,
-                readOnly: timeExpired
+                readOnly: roundLocked
               }}
             />
           </div>
@@ -1612,7 +1637,7 @@ export default function CrucibleCockpitPage({
 
                       <button
                         onClick={isRecording ? stopAndSubmitRecording : startRecording}
-                        disabled={isTranscribing || timeExpired}
+                        disabled={isTranscribing || roundLocked}
                         className={"flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs transition-all shadow-md cursor-pointer disabled:opacity-50 " + (
                           isRecording
                             ? "bg-rose-600 hover:bg-rose-500 text-white animate-pulse shadow-rose-600/50"
@@ -1647,7 +1672,7 @@ export default function CrucibleCockpitPage({
                       <input
                         type="text"
                         value={candidateInputText}
-                        disabled={timeExpired}
+                        disabled={roundLocked}
                         onChange={(e) => setCandidateInputText(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
@@ -1660,7 +1685,7 @@ export default function CrucibleCockpitPage({
                       />
                       <button
                         onClick={() => handleCandidateSubmit()}
-                        disabled={!candidateInputText.trim() || isAiThinking || timeExpired}
+                        disabled={!candidateInputText.trim() || isAiThinking || roundLocked}
                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                       >
                         <SendHorizonal className="h-3.5 w-3.5" />
@@ -1777,7 +1802,24 @@ export default function CrucibleCockpitPage({
         </section>
       </div>
 
-      {timeExpired && !showCompletionScorecard && (
+      {proctorFailed && (
+        <div role="alertdialog" aria-modal="true" aria-labelledby="proctor-failed-title" className="fixed inset-0 z-[80] flex items-center justify-center bg-black/90 p-5 backdrop-blur-md">
+          <div className="w-full max-w-md space-y-4 rounded-2xl border-2 border-rose-500/70 bg-[#1E293B] p-6 text-center shadow-2xl">
+            <ShieldCheck className="mx-auto h-11 w-11 text-rose-400" />
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-rose-300">Strict monitoring limit reached</p>
+            <h2 id="proctor-failed-title" className="text-xl font-black text-white">Assessment ended</h2>
+            <p className="text-sm leading-relaxed text-slate-300">
+              You have failed this assessment because you did not follow the proctoring guidelines. Six warnings are allowed; warning {MAX_PROCTOR_WARNINGS + 1} ends the attempt.
+            </p>
+            <p className="text-xs font-bold text-rose-300">Warnings recorded: {proctorWarningCount}</p>
+            <button type="button" onClick={handleProctorFailureReturn} className="w-full rounded-xl bg-rose-600 px-4 py-3 text-sm font-black text-white hover:bg-rose-500">
+              Return to pipeline
+            </button>
+          </div>
+        </div>
+      )}
+
+      {timeExpired && !showCompletionScorecard && !proctorFailed && (
         <div role="dialog" aria-modal="true" aria-labelledby="time-expired-title" className="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-5 backdrop-blur-sm">
           <div className="w-full max-w-md space-y-4 rounded-2xl border border-amber-500/50 bg-[#1E293B] p-6 text-center shadow-2xl">
             <Clock className="mx-auto h-10 w-10 text-amber-400" />
@@ -2092,7 +2134,7 @@ export default function CrucibleCockpitPage({
             )}
 
             <div className="pt-2 flex flex-col sm:flex-row items-stretch gap-3">
-              {(isRound1 || ((isRound2 || isRound4) && !singleTask)) && currentQuestionIndex === 0 && !timeExpired ? (
+              {(isRound1 || ((isRound2 || isRound4) && !singleTask)) && currentQuestionIndex === 0 && !roundLocked ? (
                 <button
                   onClick={() => {
                     setAllSetHistory(prev => [...prev, ...dialogue]);

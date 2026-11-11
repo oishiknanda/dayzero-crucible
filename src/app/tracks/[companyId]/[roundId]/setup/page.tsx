@@ -636,7 +636,7 @@ export default function PreFlightSetupPage({
               </div>
 
               <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
-                Strict monitoring checks your camera and microphone before entry, keeps a small camera preview visible, and warns about camera interruptions, major movement, tab changes, and fullscreen exits. Camera analysis stays in this browser; audio is only sent when you choose to submit a spoken answer. Browser monitoring is best-effort and cannot prevent every way to leave a page.
+                Strict monitoring checks your camera and microphone before entry, keeps a small camera preview visible, and warns about camera interruptions, major movement, tab changes, and fullscreen exits. Six warnings are allowed; the seventh ends the attempt. Camera analysis stays in this browser; audio is only sent when you submit a spoken answer. Browser monitoring is best-effort and cannot prevent every way to leave a page.
               </p>
 
               <button
