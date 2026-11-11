@@ -9,6 +9,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { getProblemById, getProblemForRound, ProblemDefinition } from "@/data/problemsRegistry";
 import { PROBLEMS_DATABASE } from "@/data/problemsRegistry";
 import { getCompanyTrackData } from "@/data/companyTracks";
+import ScorecardShareModal from "@/components/scorecard/ScorecardShareModal";
 import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTracks";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
@@ -304,6 +305,17 @@ export default function CrucibleCockpitPage({
   const [showCompletionScorecard, setShowCompletionScorecard] = useState<boolean>(false);
   const [behavioralScorecard, setBehavioralScorecard] = useState<any>(null);
   const [isGeneratingScorecard, setIsGeneratingScorecard] = useState<boolean>(false);
+  const scorecardRoundNumber = isRound4 ? 4 : isRound3 ? 3 : isRound2 ? 2 : 1;
+  const scorecardRoundTitle = companyData?.roles[selectedRole]?.rounds?.[scorecardRoundNumber - 1]?.title
+    || ["Online Assessment", "Technical Screen & Viva", "System Design / LLD", "Bar Raiser"][scorecardRoundNumber - 1];
+  const scorecardRoleTitle = companyData?.roles[selectedRole]?.roleTitle
+    || selectedRole.replace(/[_-]/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const scorecardTaskPoints = currentQuestionIndex === 0 ? taskScores[0] : taskScores[0] + taskScores[1];
+  const scorecardTaskMaximum = currentQuestionIndex === 0 ? 50 : 100;
+  const scorecardScore = Number(behavioralScorecard?.score ?? Math.round((scorecardTaskPoints / scorecardTaskMaximum) * 100));
+  const scorecardVerdict = behavioralScorecard?.verdict
+    || (scorecardScore >= 75 ? "Hire" : scorecardScore >= 50 ? "Leaning Hire" : "No Hire");
+  const roundOneVerdict = scorecardScore >= 70 ? "Verified" : scorecardScore >= 40 ? "Borderline" : "Failed";
   const [timeLeftSeconds, setTimeLeftSeconds] = useState<number>(90 * 60);
   const formatTimer = (totalSeconds: number) => {
     const mins = Math.floor(totalSeconds / 60);
@@ -1495,6 +1507,14 @@ export default function CrucibleCockpitPage({
       {showCompletionScorecard && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-6">
           <div className="bg-[#1E293B] border-2 border-primary rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl text-center space-y-5 my-auto">
+            <div className="rounded-xl border border-slate-700/80 bg-slate-900/70 px-4 py-3 text-left">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-400">{companyData?.companyName || "DayZero"} Interview Scorecard</span>
+                <span className="rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-300">Round {String(scorecardRoundNumber).padStart(2, "0")}</span>
+              </div>
+              <h2 className="mt-1 text-lg font-black leading-tight text-white">{scorecardRoundTitle}</h2>
+              <p className="mt-1 text-xs text-slate-400">{scorecardRoleTitle}</p>
+            </div>
             {isRound4 && currentQuestionIndex === 0 && !singleTask && (
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase tracking-wider">
@@ -1585,7 +1605,7 @@ export default function CrucibleCockpitPage({
               <div className="space-y-4 text-left">
                 <div className="text-center pb-2 border-b border-white/10">
                   <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                    Amazon Executive Bar Raiser Debrief
+                    {companyData?.companyName || "Company"} {scorecardRoundTitle} Evaluation
                   </span>
                   <div className="mt-3 flex items-center justify-center gap-4">
                     <div className="text-5xl font-black font-mono text-white">
@@ -1634,7 +1654,7 @@ export default function CrucibleCockpitPage({
               <div className="space-y-4 text-left">
                 <div className="text-center pb-2 border-b border-white/10">
                   <span className="text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                    Amazon Executive Bar Raiser Debrief
+                    {companyData?.companyName || "Company"} {scorecardRoundTitle} Evaluation
                   </span>
                   <div className="mt-3 flex items-center justify-center gap-4">
                     <div className="text-5xl font-black font-mono text-white">
@@ -1738,7 +1758,7 @@ export default function CrucibleCockpitPage({
               </>
             )}
 
-            <div className="pt-2">
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch gap-3">
               {(isRound1 || ((isRound2 || isRound4) && !singleTask)) && currentQuestionIndex === 0 ? (
                 <button
                   onClick={() => {
@@ -1797,7 +1817,7 @@ export default function CrucibleCockpitPage({
                       time: "Just now"
                     }]);
                   }}
-                  className="w-full py-4 rounded-xl text-base font-black text-white bg-emerald-600 hover:bg-emerald-500 shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all sticky bottom-0 z-10"
+                  className="flex-1 min-w-0 py-4 rounded-xl text-base font-black text-white bg-emerald-600 hover:bg-emerald-500 shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all sticky bottom-0 z-10"
                 >
                   <span>Proceed to Question 2 of Set →</span>
                   <ArrowRight className="h-4 w-4" />
@@ -1805,12 +1825,20 @@ export default function CrucibleCockpitPage({
               ) : (
                 <button
                   onClick={handleReturnToPipeline}
-                  className="w-full py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  className="flex-1 min-w-0 py-4 rounded-xl text-sm font-black text-white bg-primary hover:bg-primary-hover shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
                   <span>{isRound1 ? "Return to Pipeline (Unlock Round 02 Viva)" : isRound2 ? "Return to Pipeline (Unlock Round 03 System Design)" : isRound3 ? "Return to Pipeline (Unlock Round 04 " + (isGoogle ? "Googleyness & Leadership" : "Bar Raiser") + ")" : isRound4 ? "Return to Pipeline (View Final Hiring Decision)" : "Return to Pipeline (View Final Decision)"}</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
               )}
+              <ScorecardShareModal
+                companyName={companyData?.companyName || companySlug}
+                role={scorecardRoleTitle}
+                roundTitle={scorecardRoundTitle}
+                score={scorecardScore}
+                verdict={isRound1 ? roundOneVerdict : scorecardVerdict}
+                sessionId={params.sessionId}
+              />
             </div>
           </div>
         </div>
