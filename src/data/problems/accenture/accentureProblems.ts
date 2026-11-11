@@ -1362,7 +1362,7 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s10-r1-q2": {
   "id": "acc-ase-s10-r1-q2",
-  "title": "Pair Summing to a Target",
+  "title": "Count Pairs With a Fixed Difference",
   "difficulty": "Easy",
   "company": "Accenture",
   "category": "Hash Table",
@@ -1373,16 +1373,16 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
    "Set 10"
   ],
   "paragraphs": [
-   "Return the indices of the two numbers that add up to target. Exactly one solution exists."
+   "Return the number of index pairs (i < j) whose values differ by exactly k."
   ],
   "examples": [
    {
-    "input": "nums = [2,7,11,15], target = 9",
-    "output": "[0,1]"
+    "input": "nums = [1,2,2,1], k = 1",
+    "output": "4"
    },
    {
-    "input": "nums = [3,2,4], target = 6",
-    "output": "[1,2]"
+    "input": "nums = [1,3], k = 3",
+    "output": "0"
    }
   ],
   "constraints": [
@@ -1393,36 +1393,36 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-ase-s10-r1-q2-v1",
-    "input": "[2,7,11,15]\n9",
-    "expectedOutput": "[0,1]"
+    "input": "[1,2,2,1]\n1",
+    "expectedOutput": "4"
    },
    {
     "id": "acc-ase-s10-r1-q2-v2",
-    "input": "[3,2,4]\n6",
-    "expectedOutput": "[1,2]"
+    "input": "[1,3]\n3",
+    "expectedOutput": "0"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s10-r1-q2-h1",
-    "input": "[3,3]\n6",
-    "expectedOutput": "[0,1]"
+    "input": "[3,2,1,5,4]\n2",
+    "expectedOutput": "3"
    },
    {
     "id": "acc-ase-s10-r1-q2-h2",
-    "input": "[1,5,3,8]\n11",
-    "expectedOutput": "[2,3]"
+    "input": "[1,1,1]\n0",
+    "expectedOutput": "3"
    },
    {
     "id": "acc-ase-s10-r1-q2-h3",
-    "input": "[-1,-2,-3,-4,-5]\n-8",
-    "expectedOutput": "[2,4]"
+    "input": "[5,5]\n1",
+    "expectedOutput": "0"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nfunction countPairsWithDiff(nums, k) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def countPairsWithDiff(self, nums: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int countPairsWithDiff(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -1434,71 +1434,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s1-r2-q1": {
   "id": "acc-ase-s1-r2-q1",
-  "title": "Kth Largest Latency",
-  "difficulty": "Medium",
+  "title": "Reverse a Customer Number",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Heap",
+  "category": "Math",
   "tags": [
    "Accenture Round 2",
-   "Heap",
-   "Quickselect",
+   "Math",
    "Set 1"
   ],
   "paragraphs": [
-   "Return the kth largest element of an unsorted array (kth in sorted order, not distinct). Defend a heap versus quickselect trade-off.",
+   "Reverse the digits of an integer, keeping its sign. Return 0 if the result leaves the 32-bit signed range.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "nums = [3,2,1,5,6,4], k = 2",
-    "output": "5"
+    "input": "x = 123",
+    "output": "321"
    },
    {
-    "input": "nums = [3,2,3,1,2,4,5,5,6], k = 4",
-    "output": "4"
+    "input": "x = -120",
+    "output": "-21"
    }
   ],
   "constraints": [
-   "Target O(N) avg time and O(1) space.",
+   "Target O(log N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-ase-s1-r2-q1-v1",
-    "input": "[3,2,1,5,6,4]\n2",
-    "expectedOutput": "5"
+    "input": "123",
+    "expectedOutput": "321"
    },
    {
     "id": "acc-ase-s1-r2-q1-v2",
-    "input": "[3,2,3,1,2,4,5,5,6]\n4",
-    "expectedOutput": "4"
+    "input": "-120",
+    "expectedOutput": "-21"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s1-r2-q1-h1",
-    "input": "[1]\n1",
-    "expectedOutput": "1"
+    "input": "0",
+    "expectedOutput": "0"
    },
    {
     "id": "acc-ase-s1-r2-q1-h2",
-    "input": "[7,7,7]\n2",
-    "expectedOutput": "7"
+    "input": "1534236469",
+    "expectedOutput": "0"
    },
    {
     "id": "acc-ase-s1-r2-q1-h3",
-    "input": "[-1,-5,3]\n3",
-    "expectedOutput": "-5"
+    "input": "907",
+    "expectedOutput": "709"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nfunction findKthLargest(nums, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def findKthLargest(self, nums: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int findKthLargest(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} x\n * @return {number}\n */\nfunction reverseInteger(x) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def reverseInteger(self, x: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int reverseInteger(int x) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N) avg",
+   "time": "O(log N)",
    "space": "O(1)"
   },
   "taskIndex": 1,
@@ -1507,73 +1506,71 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s2-r2-q1": {
   "id": "acc-ase-s2-r2-q1",
-  "title": "Top K Search Terms",
-  "difficulty": "Medium",
+  "title": "Palindromic Account Number",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Heap / Hashing",
+  "category": "Math",
   "tags": [
    "Accenture Round 2",
-   "Heap",
-   "Hash Table",
-   "Bucket Sort",
+   "Math",
    "Set 2"
   ],
   "paragraphs": [
-   "Return the k most frequent elements, sorted ascending (frequency ties are broken by smaller value). Defend your complexity versus sorting.",
+   "Return true if the integer reads the same forwards and backwards (negative numbers are not palindromes).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "nums = [1,1,1,2,2,3], k = 2",
-    "output": "[1,2]"
+    "input": "x = 121",
+    "output": "true"
    },
    {
-    "input": "nums = [1], k = 1",
-    "output": "[1]"
+    "input": "x = -121",
+    "output": "false"
    }
   ],
   "constraints": [
-   "Target O(N log K) time and O(N) space.",
+   "Target O(log N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-ase-s2-r2-q1-v1",
-    "input": "[1,1,1,2,2,3]\n2",
-    "expectedOutput": "[1,2]"
+    "input": "121",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s2-r2-q1-v2",
-    "input": "[1]\n1",
-    "expectedOutput": "[1]"
+    "input": "-121",
+    "expectedOutput": "false"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s2-r2-q1-h1",
-    "input": "[4,4,5,5,6]\n2",
-    "expectedOutput": "[4,5]"
+    "input": "10",
+    "expectedOutput": "false"
    },
    {
     "id": "acc-ase-s2-r2-q1-h2",
-    "input": "[3,0,1,0]\n1",
-    "expectedOutput": "[0]"
+    "input": "0",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s2-r2-q1-h3",
-    "input": "[9,8,8,9,7,7,7]\n2",
-    "expectedOutput": "[7,8]"
+    "input": "12321",
+    "expectedOutput": "true"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number[]}\n */\nfunction topKFrequent(nums, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def topKFrequent(self, nums: List[int], k: int) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> topKFrequent(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} x\n * @return {boolean}\n */\nfunction isPalindromeNumber(x) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def isPalindromeNumber(self, x: int) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isPalindromeNumber(int x) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N log K)",
-   "space": "O(N)"
+   "time": "O(log N)",
+   "space": "O(1)"
   },
   "taskIndex": 1,
   "totalTasks": 1,
@@ -1581,72 +1578,71 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s3-r2-q1": {
   "id": "acc-ase-s3-r2-q1",
-  "title": "Build Dependency Order",
-  "difficulty": "Medium",
+  "title": "Power of Two Capacity Check",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Graph / Topological Sort",
+  "category": "Bit Manipulation",
   "tags": [
    "Accenture Round 2",
-   "Graph",
-   "Topological Sort",
+   "Bit Manipulation",
    "Set 3"
   ],
   "paragraphs": [
-   "There are numCourses build targets 0..n-1 and prerequisites [a, b] meaning b must be built before a. Return true if all targets can be built.",
+   "Return true if n is a positive power of two. Explain why n & (n - 1) works.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "numCourses = 2, prerequisites = [[1,0]]",
+    "input": "n = 1",
     "output": "true"
    },
    {
-    "input": "numCourses = 2, prerequisites = [[1,0],[0,1]]",
-    "output": "false"
+    "input": "n = 16",
+    "output": "true"
    }
   ],
   "constraints": [
-   "Target O(V+E) time and O(V+E) space.",
+   "Target O(1) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-ase-s3-r2-q1-v1",
-    "input": "2\n[[1,0]]",
+    "input": "1",
     "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s3-r2-q1-v2",
-    "input": "2\n[[1,0],[0,1]]",
-    "expectedOutput": "false"
+    "input": "16",
+    "expectedOutput": "true"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s3-r2-q1-h1",
-    "input": "1\n[]",
-    "expectedOutput": "true"
+    "input": "3",
+    "expectedOutput": "false"
    },
    {
     "id": "acc-ase-s3-r2-q1-h2",
-    "input": "4\n[[1,0],[2,1],[3,2]]",
-    "expectedOutput": "true"
+    "input": "0",
+    "expectedOutput": "false"
    },
    {
     "id": "acc-ase-s3-r2-q1-h3",
-    "input": "3\n[[0,1],[1,2],[2,0]]",
-    "expectedOutput": "false"
+    "input": "1024",
+    "expectedOutput": "true"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number} numCourses\n * @param {number[][]} prerequisites\n * @return {boolean}\n */\nfunction canFinish(numCourses, prerequisites) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} n\n * @return {boolean}\n */\nfunction isPowerOfTwo(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def isPowerOfTwo(self, n: int) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isPowerOfTwo(int n) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(V+E)",
-   "space": "O(V+E)"
+   "time": "O(1)",
+   "space": "O(1)"
   },
   "taskIndex": 1,
   "totalTasks": 1,
@@ -1654,45 +1650,44 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s4-r2-q1": {
   "id": "acc-ase-s4-r2-q1",
-  "title": "Longest Palindromic Token",
-  "difficulty": "Medium",
+  "title": "Length of the Last Word",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Expand Around Center",
+  "category": "String",
   "tags": [
    "Accenture Round 2",
    "String",
-   "DP",
    "Set 4"
   ],
   "paragraphs": [
-   "Return the length of the longest palindromic substring of s. Defend why expanding around centers beats brute force.",
+   "Return the length of the last word in a string of letters and spaces.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "s = \"babad\"",
-    "output": "3"
+    "input": "s = \"Hello World\"",
+    "output": "5"
    },
    {
-    "input": "s = \"cbbd\"",
-    "output": "2"
+    "input": "s = \"   fly me   to   the moon  \"",
+    "output": "4"
    }
   ],
   "constraints": [
-   "Target O(N^2) time and O(1) space.",
+   "Target O(N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-ase-s4-r2-q1-v1",
-    "input": "\"babad\"",
-    "expectedOutput": "3"
+    "input": "\"Hello World\"",
+    "expectedOutput": "5"
    },
    {
     "id": "acc-ase-s4-r2-q1-v2",
-    "input": "\"cbbd\"",
-    "expectedOutput": "2"
+    "input": "\"   fly me   to   the moon  \"",
+    "expectedOutput": "4"
    }
   ],
   "hiddenTestCases": [
@@ -1703,22 +1698,22 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
    },
    {
     "id": "acc-ase-s4-r2-q1-h2",
-    "input": "\"forgeeksskeegfor\"",
-    "expectedOutput": "10"
+    "input": "\"\"",
+    "expectedOutput": "0"
    },
    {
     "id": "acc-ase-s4-r2-q1-h3",
-    "input": "\"abcde\"",
-    "expectedOutput": "1"
+    "input": "\"luffy is still joyboy\"",
+    "expectedOutput": "6"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction longestPalindromeLength(s) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def longestPalindromeLength(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int longestPalindromeLength(string s) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction lengthOfLastWord(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def lengthOfLastWord(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int lengthOfLastWord(string s) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N^2)",
+   "time": "O(N)",
    "space": "O(1)"
   },
   "taskIndex": 1,
@@ -1727,66 +1722,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s5-r2-q1": {
   "id": "acc-ase-s5-r2-q1",
-  "title": "Generate Balanced Templates",
-  "difficulty": "Medium",
+  "title": "Add Two Binary Strings",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Backtracking",
+  "category": "String",
   "tags": [
    "Accenture Round 2",
-   "Backtracking",
-   "Recursion",
+   "String",
    "Set 5"
   ],
   "paragraphs": [
-   "Given n pairs of brackets, return all well-formed combinations sorted in lexicographic order.",
+   "Return the sum of two binary strings as a binary string.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "n = 1",
-    "output": "[\"()\"]"
+    "input": "a = \"11\", b = \"1\"",
+    "output": "\"100\""
    },
    {
-    "input": "n = 2",
-    "output": "[\"(())\",\"()()\"]"
+    "input": "a = \"1010\", b = \"1011\"",
+    "output": "\"10101\""
    }
   ],
   "constraints": [
-   "Target O(4^N/sqrt(N)) time and O(N) space.",
+   "Target O(N) time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-ase-s5-r2-q1-v1",
-    "input": "1",
-    "expectedOutput": "[\"()\"]"
+    "input": "\"11\"\n\"1\"",
+    "expectedOutput": "\"100\""
    },
    {
     "id": "acc-ase-s5-r2-q1-v2",
-    "input": "2",
-    "expectedOutput": "[\"(())\",\"()()\"]"
+    "input": "\"1010\"\n\"1011\"",
+    "expectedOutput": "\"10101\""
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s5-r2-q1-h1",
-    "input": "3",
-    "expectedOutput": "[\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]"
+    "input": "\"0\"\n\"0\"",
+    "expectedOutput": "\"0\""
    },
    {
     "id": "acc-ase-s5-r2-q1-h2",
-    "input": "4",
-    "expectedOutput": "[\"(((())))\",\"((()()))\",\"((())())\",\"((()))()\",\"(()(()))\",\"(()()())\",\"(()())()\",\"(())(())\",\"(())()()\",\"()((()))\",\"()(()())\",\"()(())()\",\"()()(())\",\"()()()()\"]"
+    "input": "\"1111\"\n\"1111\"",
+    "expectedOutput": "\"11110\""
+   },
+   {
+    "id": "acc-ase-s5-r2-q1-h3",
+    "input": "\"100\"\n\"110010\"",
+    "expectedOutput": "\"110110\""
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number} n\n * @return {string[]}\n */\nfunction generateParenthesis(n) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def generateParenthesis(self, n: int) -> List[str]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<string> generateParenthesis(int n) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nfunction addBinary(a, b) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def addBinary(self, a: str, b: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string addBinary(string a, string b) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(4^N/sqrt(N))",
+   "time": "O(N)",
    "space": "O(N)"
   },
   "taskIndex": 1,
@@ -1795,71 +1794,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s6-r2-q1": {
   "id": "acc-ase-s6-r2-q1",
-  "title": "Search a Rotated Log Index",
-  "difficulty": "Medium",
+  "title": "Pangram Check for a Sentence",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Binary Search",
+  "category": "String",
   "tags": [
    "Accenture Round 2",
-   "Binary Search",
-   "Array",
+   "String",
    "Set 6"
   ],
   "paragraphs": [
-   "A sorted array of distinct values was rotated at an unknown pivot. Return the index of target or -1 in O(log N).",
+   "Return true if the sentence uses every letter of the English alphabet at least once (case-insensitive).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "nums = [4,5,6,7,0,1,2], target = 0",
-    "output": "4"
+    "input": "s = \"The quick brown fox jumps over the lazy dog\"",
+    "output": "true"
    },
    {
-    "input": "nums = [4,5,6,7,0,1,2], target = 3",
-    "output": "-1"
+    "input": "s = \"hello world\"",
+    "output": "false"
    }
   ],
   "constraints": [
-   "Target O(log N) time and O(1) space.",
+   "Target O(N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-ase-s6-r2-q1-v1",
-    "input": "[4,5,6,7,0,1,2]\n0",
-    "expectedOutput": "4"
+    "input": "\"The quick brown fox jumps over the lazy dog\"",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s6-r2-q1-v2",
-    "input": "[4,5,6,7,0,1,2]\n3",
-    "expectedOutput": "-1"
+    "input": "\"hello world\"",
+    "expectedOutput": "false"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s6-r2-q1-h1",
-    "input": "[1]\n0",
-    "expectedOutput": "-1"
+    "input": "\"\"",
+    "expectedOutput": "false"
    },
    {
     "id": "acc-ase-s6-r2-q1-h2",
-    "input": "[3,1]\n1",
-    "expectedOutput": "1"
+    "input": "\"abcdefghijklmnopqrstuvwxyz\"",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s6-r2-q1-h3",
-    "input": "[5,1,3]\n5",
-    "expectedOutput": "0"
+    "input": "\"Pack my box with five dozen liquor jugs\"",
+    "expectedOutput": "true"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nfunction search(nums, target) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def search(self, nums: List[int], target: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int search(vector<int>& nums, int target) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isPangram(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def isPangram(self, s: str) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isPangram(string s) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(log N)",
+   "time": "O(N)",
    "space": "O(1)"
   },
   "taskIndex": 1,
@@ -1868,28 +1866,27 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s7-r2-q1": {
   "id": "acc-ase-s7-r2-q1",
-  "title": "Days Until Warmer",
-  "difficulty": "Medium",
+  "title": "FizzBuzz Report",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Monotonic Stack",
+  "category": "Math",
   "tags": [
    "Accenture Round 2",
-   "Stack",
-   "Monotonic Stack",
+   "Math",
    "Set 7"
   ],
   "paragraphs": [
-   "For each day, return how many days until a warmer temperature, or 0 if none. Defend the amortised O(N) bound.",
+   "For 1..n return 'Fizz' for multiples of 3, 'Buzz' for multiples of 5, 'FizzBuzz' for both, otherwise the number as a string.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "temperatures = [73,74,75,71,69,72,76,73]",
-    "output": "[1,1,4,2,1,1,0,0]"
+    "input": "n = 3",
+    "output": "[\"1\",\"2\",\"Fizz\"]"
    },
    {
-    "input": "temperatures = [30,40,50,60]",
-    "output": "[1,1,1,0]"
+    "input": "n = 5",
+    "output": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
    }
   ],
   "constraints": [
@@ -1900,36 +1897,36 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-ase-s7-r2-q1-v1",
-    "input": "[73,74,75,71,69,72,76,73]",
-    "expectedOutput": "[1,1,4,2,1,1,0,0]"
+    "input": "3",
+    "expectedOutput": "[\"1\",\"2\",\"Fizz\"]"
    },
    {
     "id": "acc-ase-s7-r2-q1-v2",
-    "input": "[30,40,50,60]",
-    "expectedOutput": "[1,1,1,0]"
+    "input": "5",
+    "expectedOutput": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\"]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s7-r2-q1-h1",
-    "input": "[30,60,90]",
-    "expectedOutput": "[1,1,0]"
+    "input": "15",
+    "expectedOutput": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\",\"Fizz\",\"7\",\"8\",\"Fizz\",\"Buzz\",\"11\",\"Fizz\",\"13\",\"14\",\"FizzBuzz\"]"
    },
    {
     "id": "acc-ase-s7-r2-q1-h2",
-    "input": "[90,80,70]",
-    "expectedOutput": "[0,0,0]"
+    "input": "1",
+    "expectedOutput": "[\"1\"]"
    },
    {
     "id": "acc-ase-s7-r2-q1-h3",
-    "input": "[55]",
-    "expectedOutput": "[0]"
+    "input": "10",
+    "expectedOutput": "[\"1\",\"2\",\"Fizz\",\"4\",\"Buzz\",\"Fizz\",\"7\",\"8\",\"Fizz\",\"Buzz\"]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} temperatures\n * @return {number[]}\n */\nfunction dailyTemperatures(temperatures) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> dailyTemperatures(vector<int>& temperatures) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} n\n * @return {string[]}\n */\nfunction fizzBuzz(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def fizzBuzz(self, n: int) -> List[str]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<string> fizzBuzz(int n) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -1941,28 +1938,99 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-ase-s8-r2-q1": {
   "id": "acc-ase-s8-r2-q1",
-  "title": "Reach the Last Shard",
-  "difficulty": "Medium",
+  "title": "Reverse the Vowels",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Greedy",
+  "category": "String",
   "tags": [
    "Accenture Round 2",
-   "Greedy",
-   "Array",
+   "String",
    "Set 8"
   ],
   "paragraphs": [
-   "Each value is the maximum jump length from that index. Return true if you can reach the last index from index 0. Prove the greedy invariant.",
+   "Reverse only the vowels of the string (a, e, i, o, u in either case), leaving other characters in place.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "nums = [2,3,1,1,4]",
-    "output": "true"
+    "input": "s = \"hello\"",
+    "output": "\"holle\""
    },
    {
-    "input": "nums = [3,2,1,0,4]",
-    "output": "false"
+    "input": "s = \"leetcode\"",
+    "output": "\"leotcede\""
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-ase-s8-r2-q1-v1",
+    "input": "\"hello\"",
+    "expectedOutput": "\"holle\""
+   },
+   {
+    "id": "acc-ase-s8-r2-q1-v2",
+    "input": "\"leetcode\"",
+    "expectedOutput": "\"leotcede\""
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-ase-s8-r2-q1-h1",
+    "input": "\"xyz\"",
+    "expectedOutput": "\"xyz\""
+   },
+   {
+    "id": "acc-ase-s8-r2-q1-h2",
+    "input": "\"aA\"",
+    "expectedOutput": "\"Aa\""
+   },
+   {
+    "id": "acc-ase-s8-r2-q1-h3",
+    "input": "\"Accenture\"",
+    "expectedOutput": "\"eccunterA\""
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nfunction reverseVowels(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def reverseVowels(self, s: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string reverseVowels(string s) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-ase-s9-r2-q1": {
+  "id": "acc-ase-s9-r2-q1",
+  "title": "Count Leap Years in a Range",
+  "difficulty": "Easy",
+  "company": "Accenture",
+  "category": "Math",
+  "tags": [
+   "Accenture Round 2",
+   "Math",
+   "Set 9"
+  ],
+  "paragraphs": [
+   "Return how many leap years lie between two years, inclusive.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "start = 2000, end = 2020",
+    "output": "6"
+   },
+   {
+    "input": "start = 1900, end = 1900",
+    "output": "0"
    }
   ],
   "constraints": [
@@ -1972,37 +2040,37 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-ase-s8-r2-q1-v1",
-    "input": "[2,3,1,1,4]",
-    "expectedOutput": "true"
+    "id": "acc-ase-s9-r2-q1-v1",
+    "input": "2000\n2020",
+    "expectedOutput": "6"
    },
    {
-    "id": "acc-ase-s8-r2-q1-v2",
-    "input": "[3,2,1,0,4]",
-    "expectedOutput": "false"
+    "id": "acc-ase-s9-r2-q1-v2",
+    "input": "1900\n1900",
+    "expectedOutput": "0"
    }
   ],
   "hiddenTestCases": [
    {
-    "id": "acc-ase-s8-r2-q1-h1",
-    "input": "[0]",
-    "expectedOutput": "true"
+    "id": "acc-ase-s9-r2-q1-h1",
+    "input": "1996\n2004",
+    "expectedOutput": "3"
    },
    {
-    "id": "acc-ase-s8-r2-q1-h2",
-    "input": "[2,0,0]",
-    "expectedOutput": "true"
+    "id": "acc-ase-s9-r2-q1-h2",
+    "input": "2024\n2024",
+    "expectedOutput": "1"
    },
    {
-    "id": "acc-ase-s8-r2-q1-h3",
-    "input": "[1,1,0,1]",
-    "expectedOutput": "false"
+    "id": "acc-ase-s9-r2-q1-h3",
+    "input": "1\n100",
+    "expectedOutput": "24"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nfunction canJump(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def canJump(self, nums: List[int]) -> bool:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool canJump(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} start\n * @param {number} end\n * @return {number}\n */\nfunction countLeapYears(start, end) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def countLeapYears(self, start: int, end: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int countLeapYears(int start, int end) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -2012,146 +2080,72 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "totalTasks": 1,
   "nextProblemId": null
  },
- "acc-ase-s9-r2-q1": {
-  "id": "acc-ase-s9-r2-q1",
-  "title": "Keypad Suggestion Expansion",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Backtracking",
-  "tags": [
-   "Accenture Round 2",
-   "Backtracking",
-   "String",
-   "Set 9"
-  ],
-  "paragraphs": [
-   "Given a string of digits 2-9, return every letter combination a phone keypad could spell, sorted lexicographically. Return [] for empty input.",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "digits = \"23\"",
-    "output": "[\"ad\",\"ae\",\"af\",\"bd\",\"be\",\"bf\",\"cd\",\"ce\",\"cf\"]"
-   },
-   {
-    "input": "digits = \"\"",
-    "output": "[]"
-   }
-  ],
-  "constraints": [
-   "Target O(4^N * N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-ase-s9-r2-q1-v1",
-    "input": "\"23\"",
-    "expectedOutput": "[\"ad\",\"ae\",\"af\",\"bd\",\"be\",\"bf\",\"cd\",\"ce\",\"cf\"]"
-   },
-   {
-    "id": "acc-ase-s9-r2-q1-v2",
-    "input": "\"\"",
-    "expectedOutput": "[]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-ase-s9-r2-q1-h1",
-    "input": "\"2\"",
-    "expectedOutput": "[\"a\",\"b\",\"c\"]"
-   },
-   {
-    "id": "acc-ase-s9-r2-q1-h2",
-    "input": "\"79\"",
-    "expectedOutput": "[\"pw\",\"px\",\"py\",\"pz\",\"qw\",\"qx\",\"qy\",\"qz\",\"rw\",\"rx\",\"ry\",\"rz\",\"sw\",\"sx\",\"sy\",\"sz\"]"
-   },
-   {
-    "id": "acc-ase-s9-r2-q1-h3",
-    "input": "\"999\"",
-    "expectedOutput": "[\"www\",\"wwx\",\"wwy\",\"wwz\",\"wxw\",\"wxx\",\"wxy\",\"wxz\",\"wyw\",\"wyx\",\"wyy\",\"wyz\",\"wzw\",\"wzx\",\"wzy\",\"wzz\",\"xww\",\"xwx\",\"xwy\",\"xwz\",\"xxw\",\"xxx\",\"xxy\",\"xxz\",\"xyw\",\"xyx\",\"xyy\",\"xyz\",\"xzw\",\"xzx\",\"xzy\",\"xzz\",\"yww\",\"ywx\",\"ywy\",\"ywz\",\"yxw\",\"yxx\",\"yxy\",\"yxz\",\"yyw\",\"yyx\",\"yyy\",\"yyz\",\"yzw\",\"yzx\",\"yzy\",\"yzz\",\"zww\",\"zwx\",\"zwy\",\"zwz\",\"zxw\",\"zxx\",\"zxy\",\"zxz\",\"zyw\",\"zyx\",\"zyy\",\"zyz\",\"zzw\",\"zzx\",\"zzy\",\"zzz\"]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} digits\n * @return {string[]}\n */\nfunction letterCombinations(digits) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def letterCombinations(self, digits: str) -> List[str]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<string> letterCombinations(string digits) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(4^N * N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
  "acc-ase-s10-r2-q1": {
   "id": "acc-ase-s10-r2-q1",
-  "title": "Capacity Between Peaks",
-  "difficulty": "Hard",
+  "title": "Perfect Square Check",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Two Pointers",
+  "category": "Math",
   "tags": [
    "Accenture Round 2",
-   "Two Pointers",
-   "Stack",
+   "Math",
    "Set 10"
   ],
   "paragraphs": [
-   "Given elevation heights, compute how much water is trapped after raining. Defend the two-pointer invariant.",
+   "Return true if n is a perfect square without using a library square-root function.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "height = [0,1,0,2,1,0,1,3,2,1,2,1]",
-    "output": "6"
+    "input": "n = 16",
+    "output": "true"
    },
    {
-    "input": "height = [4,2,0,3,2,5]",
-    "output": "9"
+    "input": "n = 14",
+    "output": "false"
    }
   ],
   "constraints": [
-   "Target O(N) time and O(1) space.",
+   "Target O(log N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-ase-s10-r2-q1-v1",
-    "input": "[0,1,0,2,1,0,1,3,2,1,2,1]",
-    "expectedOutput": "6"
+    "input": "16",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s10-r2-q1-v2",
-    "input": "[4,2,0,3,2,5]",
-    "expectedOutput": "9"
+    "input": "14",
+    "expectedOutput": "false"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-ase-s10-r2-q1-h1",
-    "input": "[1,2,3]",
-    "expectedOutput": "0"
+    "input": "1",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s10-r2-q1-h2",
-    "input": "[3,0,3]",
-    "expectedOutput": "3"
+    "input": "0",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-ase-s10-r2-q1-h3",
-    "input": "[2,0,2,0,2]",
-    "expectedOutput": "4"
+    "input": "808201",
+    "expectedOutput": "true"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} height\n * @return {number}\n */\nfunction trap(height) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def trap(self, height: List[int]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int trap(vector<int>& height) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} n\n * @return {boolean}\n */\nfunction isPerfectSquare(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def isPerfectSquare(self, n: int) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isPerfectSquare(int n) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N)",
+   "time": "O(log N)",
    "space": "O(1)"
   },
   "taskIndex": 1,
@@ -3030,324 +3024,26 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s1-r1-q1": {
   "id": "acc-adv-s1-r1-q1",
-  "title": "Validate Config Brackets",
-  "difficulty": "Easy",
+  "title": "Spreadsheet Column Title",
+  "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Stack",
+  "category": "Math",
   "tags": [
    "Accenture Round 1",
-   "Stack",
-   "String",
+   "Math",
    "Set 1"
   ],
   "paragraphs": [
-   "A Google config file uses (), [] and {}. Return true if every bracket is closed by the same type in the correct order."
+   "Convert a positive column number to its spreadsheet title (1 -> A, 27 -> AA)."
   ],
   "examples": [
    {
-    "input": "s = \"()[]{}\"",
-    "output": "true"
+    "input": "n = 1",
+    "output": "\"A\""
    },
    {
-    "input": "s = \"(]\"",
-    "output": "false"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s1-r1-q1-v1",
-    "input": "\"()[]{}\"",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-adv-s1-r1-q1-v2",
-    "input": "\"(]\"",
-    "expectedOutput": "false"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s1-r1-q1-h1",
-    "input": "\"\"",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-adv-s1-r1-q1-h2",
-    "input": "\"([{}])\"",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-adv-s1-r1-q1-h3",
-    "input": "\"(((\"",
-    "expectedOutput": "false"
-   },
-   {
-    "id": "acc-adv-s1-r1-q1-h4",
-    "input": "\"{[}]\"",
-    "expectedOutput": "false"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isValid(s) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def isValid(self, s: str) -> bool:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isValid(string s) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-adv-s1-r1-q2"
- },
- "acc-adv-s1-r1-q2": {
-  "id": "acc-adv-s1-r1-q2",
-  "title": "Longest Unique Query Fragment",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Sliding Window",
-  "tags": [
-   "Accenture Round 1",
-   "Sliding Window",
-   "Hash Table",
-   "Set 1"
-  ],
-  "paragraphs": [
-   "Given a search query string s, return the length of the longest substring without repeating characters."
-  ],
-  "examples": [
-   {
-    "input": "s = \"abcabcbb\"",
-    "output": "3"
-   },
-   {
-    "input": "s = \"bbbbb\"",
-    "output": "1"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(min(N,A)) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s1-r1-q2-v1",
-    "input": "\"abcabcbb\"",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-adv-s1-r1-q2-v2",
-    "input": "\"bbbbb\"",
-    "expectedOutput": "1"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s1-r1-q2-h1",
-    "input": "\"\"",
-    "expectedOutput": "0"
-   },
-   {
-    "id": "acc-adv-s1-r1-q2-h2",
-    "input": "\"pwwkew\"",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-adv-s1-r1-q2-h3",
-    "input": "\"abba\"",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-adv-s1-r1-q2-h4",
-    "input": "\"dvdf\"",
-    "expectedOutput": "3"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction lengthOfLongestSubstring(s) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def lengthOfLongestSubstring(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(min(N,A))"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-adv-s2-r1-q1": {
-  "id": "acc-adv-s2-r1-q1",
-  "title": "Sorted Latency Pair",
-  "difficulty": "Easy",
-  "company": "Accenture",
-  "category": "Two Pointers",
-  "tags": [
-   "Accenture Round 1",
-   "Two Pointers",
-   "Array",
-   "Set 2"
-  ],
-  "paragraphs": [
-   "Given a sorted array of latencies and a target, return the 1-indexed positions of the two values that sum to target. Exactly one solution exists."
-  ],
-  "examples": [
-   {
-    "input": "numbers = [2,7,11,15], target = 9",
-    "output": "[1,2]"
-   },
-   {
-    "input": "numbers = [2,3,4], target = 6",
-    "output": "[1,3]"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(1) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s2-r1-q1-v1",
-    "input": "[2,7,11,15]\n9",
-    "expectedOutput": "[1,2]"
-   },
-   {
-    "id": "acc-adv-s2-r1-q1-v2",
-    "input": "[2,3,4]\n6",
-    "expectedOutput": "[1,3]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s2-r1-q1-h1",
-    "input": "[-1,0]\n-1",
-    "expectedOutput": "[1,2]"
-   },
-   {
-    "id": "acc-adv-s2-r1-q1-h2",
-    "input": "[1,2,3,4,4,9,56,90]\n8",
-    "expectedOutput": "[4,5]"
-   },
-   {
-    "id": "acc-adv-s2-r1-q1-h3",
-    "input": "[5,25,75]\n100",
-    "expectedOutput": "[2,3]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} numbers\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(numbers, target) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def twoSum(self, numbers: List[int], target: int) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> twoSum(vector<int>& numbers, int target) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(1)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-adv-s2-r1-q2"
- },
- "acc-adv-s2-r1-q2": {
-  "id": "acc-adv-s2-r1-q2",
-  "title": "Peak Traffic Window",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Sliding Window",
-  "tags": [
-   "Accenture Round 1",
-   "Sliding Window",
-   "Array",
-   "Set 2"
-  ],
-  "paragraphs": [
-   "Given an array of per-minute request counts and an integer k, return the maximum sum of any k consecutive minutes."
-  ],
-  "examples": [
-   {
-    "input": "counts = [1,12,-5,-6,50,3], k = 4",
-    "output": "51"
-   },
-   {
-    "input": "counts = [5], k = 1",
-    "output": "5"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(1) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s2-r1-q2-v1",
-    "input": "[1,12,-5,-6,50,3]\n4",
-    "expectedOutput": "51"
-   },
-   {
-    "id": "acc-adv-s2-r1-q2-v2",
-    "input": "[5]\n1",
-    "expectedOutput": "5"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s2-r1-q2-h1",
-    "input": "[4,2,1,7,8,1,2,8,1,0]\n3",
-    "expectedOutput": "16"
-   },
-   {
-    "id": "acc-adv-s2-r1-q2-h2",
-    "input": "[-3,-1,-2]\n2",
-    "expectedOutput": "-3"
-   },
-   {
-    "id": "acc-adv-s2-r1-q2-h3",
-    "input": "[9,9,9,9]\n4",
-    "expectedOutput": "36"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} counts\n * @param {number} k\n * @return {number}\n */\nfunction maxWindowSum(counts, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def maxWindowSum(self, counts: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxWindowSum(vector<int>& counts, int k) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(1)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-adv-s3-r1-q1": {
-  "id": "acc-adv-s3-r1-q1",
-  "title": "Insert Position in Sorted Index",
-  "difficulty": "Easy",
-  "company": "Accenture",
-  "category": "Binary Search",
-  "tags": [
-   "Accenture Round 1",
-   "Binary Search",
-   "Set 3"
-  ],
-  "paragraphs": [
-   "Return the index of target in a sorted array of distinct integers, or the index where it would be inserted to keep the array sorted. Use O(log N) time."
-  ],
-  "examples": [
-   {
-    "input": "nums = [1,3,5,6], target = 5",
-    "output": "2"
-   },
-   {
-    "input": "nums = [1,3,5,6], target = 2",
-    "output": "1"
+    "input": "n = 28",
+    "output": "\"AB\""
    }
   ],
   "constraints": [
@@ -3357,37 +3053,37 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-adv-s3-r1-q1-v1",
-    "input": "[1,3,5,6]\n5",
-    "expectedOutput": "2"
+    "id": "acc-adv-s1-r1-q1-v1",
+    "input": "1",
+    "expectedOutput": "\"A\""
    },
    {
-    "id": "acc-adv-s3-r1-q1-v2",
-    "input": "[1,3,5,6]\n2",
-    "expectedOutput": "1"
+    "id": "acc-adv-s1-r1-q1-v2",
+    "input": "28",
+    "expectedOutput": "\"AB\""
    }
   ],
   "hiddenTestCases": [
    {
-    "id": "acc-adv-s3-r1-q1-h1",
-    "input": "[1,3,5,6]\n7",
-    "expectedOutput": "4"
+    "id": "acc-adv-s1-r1-q1-h1",
+    "input": "701",
+    "expectedOutput": "\"ZY\""
    },
    {
-    "id": "acc-adv-s3-r1-q1-h2",
-    "input": "[1,3,5,6]\n0",
-    "expectedOutput": "0"
+    "id": "acc-adv-s1-r1-q1-h2",
+    "input": "52",
+    "expectedOutput": "\"AZ\""
    },
    {
-    "id": "acc-adv-s3-r1-q1-h3",
-    "input": "[10]\n10",
-    "expectedOutput": "0"
+    "id": "acc-adv-s1-r1-q1-h3",
+    "input": "2147483647",
+    "expectedOutput": "\"FXSHRXW\""
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nfunction searchInsert(nums, target) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def searchInsert(self, nums: List[int], target: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int searchInsert(vector<int>& nums, int target) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} n\n * @return {string}\n */\nfunction columnTitle(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def columnTitle(self, n: int) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string columnTitle(int n) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(log N)",
@@ -3395,175 +3091,30 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   },
   "taskIndex": 1,
   "totalTasks": 2,
-  "nextProblemId": "acc-adv-s3-r1-q2"
+  "nextProblemId": "acc-adv-s1-r1-q2"
  },
- "acc-adv-s3-r1-q2": {
-  "id": "acc-adv-s3-r1-q2",
-  "title": "Merge Maintenance Windows",
+ "acc-adv-s1-r1-q2": {
+  "id": "acc-adv-s1-r1-q2",
+  "title": "Spreadsheet Column Number",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Sorting",
+  "category": "Math",
   "tags": [
    "Accenture Round 1",
-   "Sorting",
-   "Intervals",
-   "Set 3"
+   "Math",
+   "Set 1"
   ],
   "paragraphs": [
-   "Given maintenance windows [start, end], merge all overlapping windows and return the result sorted by start."
+   "Convert a spreadsheet column title to its column number."
   ],
   "examples": [
    {
-    "input": "intervals = [[1,3],[2,6],[8,10],[15,18]]",
-    "output": "[[1,6],[8,10],[15,18]]"
+    "input": "title = \"A\"",
+    "output": "1"
    },
    {
-    "input": "intervals = [[1,4],[4,5]]",
-    "output": "[[1,5]]"
-   }
-  ],
-  "constraints": [
-   "Target O(N log N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s3-r1-q2-v1",
-    "input": "[[1,3],[2,6],[8,10],[15,18]]",
-    "expectedOutput": "[[1,6],[8,10],[15,18]]"
-   },
-   {
-    "id": "acc-adv-s3-r1-q2-v2",
-    "input": "[[1,4],[4,5]]",
-    "expectedOutput": "[[1,5]]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s3-r1-q2-h1",
-    "input": "[[1,4],[0,4]]",
-    "expectedOutput": "[[0,4]]"
-   },
-   {
-    "id": "acc-adv-s3-r1-q2-h2",
-    "input": "[[1,4],[2,3]]",
-    "expectedOutput": "[[1,4]]"
-   },
-   {
-    "id": "acc-adv-s3-r1-q2-h3",
-    "input": "[[5,6]]",
-    "expectedOutput": "[[5,6]]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} intervals\n * @return {number[][]}\n */\nfunction merge(intervals) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def merge(self, intervals: List[List[int]]) -> List[List[int]]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<vector<int>> merge(vector<vector<int>>& intervals) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N log N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-adv-s4-r1-q1": {
-  "id": "acc-adv-s4-r1-q1",
-  "title": "Reverse Command Tokens",
-  "difficulty": "Easy",
-  "company": "Accenture",
-  "category": "String",
-  "tags": [
-   "Accenture Round 1",
-   "String",
-   "Parsing",
-   "Set 4"
-  ],
-  "paragraphs": [
-   "Reverse the order of the words in s. Words are separated by one or more spaces. The result must have single spaces and no leading or trailing spaces."
-  ],
-  "examples": [
-   {
-    "input": "s = \"the sky is blue\"",
-    "output": "\"blue is sky the\""
-   },
-   {
-    "input": "s = \"  hello world  \"",
-    "output": "\"world hello\""
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s4-r1-q1-v1",
-    "input": "\"the sky is blue\"",
-    "expectedOutput": "\"blue is sky the\""
-   },
-   {
-    "id": "acc-adv-s4-r1-q1-v2",
-    "input": "\"  hello world  \"",
-    "expectedOutput": "\"world hello\""
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s4-r1-q1-h1",
-    "input": "\"a good   example\"",
-    "expectedOutput": "\"example good a\""
-   },
-   {
-    "id": "acc-adv-s4-r1-q1-h2",
-    "input": "\"x\"",
-    "expectedOutput": "\"x\""
-   },
-   {
-    "id": "acc-adv-s4-r1-q1-h3",
-    "input": "\"  one  two three \"",
-    "expectedOutput": "\"three two one\""
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nfunction reverseWords(s) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def reverseWords(self, s: str) -> str:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string reverseWords(string s) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-adv-s4-r1-q2"
- },
- "acc-adv-s4-r1-q2": {
-  "id": "acc-adv-s4-r1-q2",
-  "title": "Longest Repeated Run After Edits",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Sliding Window",
-  "tags": [
-   "Accenture Round 1",
-   "Sliding Window",
-   "Hash Table",
-   "Set 4"
-  ],
-  "paragraphs": [
-   "You may change at most k characters of s to any uppercase letter. Return the length of the longest substring containing the same letter after the changes."
-  ],
-  "examples": [
-   {
-    "input": "s = \"ABAB\", k = 2",
-    "output": "4"
-   },
-   {
-    "input": "s = \"AABABBA\", k = 1",
-    "output": "4"
+    "input": "title = \"AB\"",
+    "output": "28"
    }
   ],
   "constraints": [
@@ -3573,37 +3124,37 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-adv-s4-r1-q2-v1",
-    "input": "\"ABAB\"\n2",
-    "expectedOutput": "4"
+    "id": "acc-adv-s1-r1-q2-v1",
+    "input": "\"A\"",
+    "expectedOutput": "1"
    },
    {
-    "id": "acc-adv-s4-r1-q2-v2",
-    "input": "\"AABABBA\"\n1",
-    "expectedOutput": "4"
+    "id": "acc-adv-s1-r1-q2-v2",
+    "input": "\"AB\"",
+    "expectedOutput": "28"
    }
   ],
   "hiddenTestCases": [
    {
-    "id": "acc-adv-s4-r1-q2-h1",
-    "input": "\"AAAA\"\n0",
-    "expectedOutput": "4"
+    "id": "acc-adv-s1-r1-q2-h1",
+    "input": "\"ZY\"",
+    "expectedOutput": "701"
    },
    {
-    "id": "acc-adv-s4-r1-q2-h2",
-    "input": "\"ABCDE\"\n1",
-    "expectedOutput": "2"
+    "id": "acc-adv-s1-r1-q2-h2",
+    "input": "\"AAA\"",
+    "expectedOutput": "703"
    },
    {
-    "id": "acc-adv-s4-r1-q2-h3",
-    "input": "\"ABBB\"\n2",
-    "expectedOutput": "4"
+    "id": "acc-adv-s1-r1-q2-h3",
+    "input": "\"FXSHRXW\"",
+    "expectedOutput": "2147483647"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @param {number} k\n * @return {number}\n */\nfunction characterReplacement(s, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def characterReplacement(self, s: str, k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int characterReplacement(string s, int k) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} title\n * @return {number}\n */\nfunction columnNumber(title) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def columnNumber(self, title: str) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int columnNumber(string title) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -3613,74 +3164,498 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "totalTasks": 2,
   "nextProblemId": null
  },
- "acc-adv-s5-r1-q1": {
-  "id": "acc-adv-s5-r1-q1",
-  "title": "Count Data Center Clusters",
+ "acc-adv-s2-r1-q1": {
+  "id": "acc-adv-s2-r1-q1",
+  "title": "Look-and-Say Sequence Term",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Graph / DFS",
+  "category": "String",
   "tags": [
    "Accenture Round 1",
-   "DFS",
-   "Grid",
-   "Graph",
-   "Set 5"
+   "String",
+   "Set 2"
   ],
   "paragraphs": [
-   "Each row of grid is a string of '1' (server) and '0' (empty). Return the number of clusters, where a cluster is a group of servers connected horizontally or vertically."
+   "Term 1 is '1'; each next term describes the previous one by counting runs of digits. Return term n."
   ],
   "examples": [
    {
-    "input": "grid = [\"11000\",\"11000\",\"00100\",\"00011\"]",
-    "output": "3"
+    "input": "n = 1",
+    "output": "\"1\""
    },
    {
-    "input": "grid = [\"111\",\"010\",\"111\"]",
-    "output": "1"
+    "input": "n = 4",
+    "output": "\"1211\""
    }
   ],
   "constraints": [
-   "Target O(M*N) time and O(M*N) space.",
+   "Target O(N * L) time and O(L) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s2-r1-q1-v1",
+    "input": "1",
+    "expectedOutput": "\"1\""
+   },
+   {
+    "id": "acc-adv-s2-r1-q1-v2",
+    "input": "4",
+    "expectedOutput": "\"1211\""
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s2-r1-q1-h1",
+    "input": "5",
+    "expectedOutput": "\"111221\""
+   },
+   {
+    "id": "acc-adv-s2-r1-q1-h2",
+    "input": "6",
+    "expectedOutput": "\"312211\""
+   },
+   {
+    "id": "acc-adv-s2-r1-q1-h3",
+    "input": "8",
+    "expectedOutput": "\"1113213211\""
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number} n\n * @return {string}\n */\nfunction countAndSay(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def countAndSay(self, n: int) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string countAndSay(int n) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N * L)",
+   "space": "O(L)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-adv-s2-r1-q2"
+ },
+ "acc-adv-s2-r1-q2": {
+  "id": "acc-adv-s2-r1-q2",
+  "title": "Multiply Two Large Numbers",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Math",
+  "tags": [
+   "Accenture Round 1",
+   "Math",
+   "Set 2"
+  ],
+  "paragraphs": [
+   "Multiply two non-negative integers given as strings and return the product as a string, without converting them to integers."
+  ],
+  "examples": [
+   {
+    "input": "a = \"2\", b = \"3\"",
+    "output": "\"6\""
+   },
+   {
+    "input": "a = \"123\", b = \"456\"",
+    "output": "\"56088\""
+   }
+  ],
+  "constraints": [
+   "Target O(M*N) time and O(M+N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s2-r1-q2-v1",
+    "input": "\"2\"\n\"3\"",
+    "expectedOutput": "\"6\""
+   },
+   {
+    "id": "acc-adv-s2-r1-q2-v2",
+    "input": "\"123\"\n\"456\"",
+    "expectedOutput": "\"56088\""
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s2-r1-q2-h1",
+    "input": "\"0\"\n\"999\"",
+    "expectedOutput": "\"0\""
+   },
+   {
+    "id": "acc-adv-s2-r1-q2-h2",
+    "input": "\"99\"\n\"99\"",
+    "expectedOutput": "\"9801\""
+   },
+   {
+    "id": "acc-adv-s2-r1-q2-h3",
+    "input": "\"1000000007\"\n\"1000000009\"",
+    "expectedOutput": "\"1000000016000000063\""
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} a\n * @param {string} b\n * @return {string}\n */\nfunction multiplyStrings(a, b) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def multiplyStrings(self, a: str, b: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string multiplyStrings(string a, string b) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(M*N)",
+   "space": "O(M+N)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-adv-s3-r1-q1": {
+  "id": "acc-adv-s3-r1-q1",
+  "title": "Zigzag Display Reading",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "String",
+  "tags": [
+   "Accenture Round 1",
+   "String",
+   "Set 3"
+  ],
+  "paragraphs": [
+   "Write s in a zigzag over numRows rows, then read it row by row. Return the result."
+  ],
+  "examples": [
+   {
+    "input": "s = \"PAYPALISHIRING\", numRows = 3",
+    "output": "\"PAHNAPLSIIGYIR\""
+   },
+   {
+    "input": "s = \"PAYPALISHIRING\", numRows = 4",
+    "output": "\"PINALSIGYAHRPI\""
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s3-r1-q1-v1",
+    "input": "\"PAYPALISHIRING\"\n3",
+    "expectedOutput": "\"PAHNAPLSIIGYIR\""
+   },
+   {
+    "id": "acc-adv-s3-r1-q1-v2",
+    "input": "\"PAYPALISHIRING\"\n4",
+    "expectedOutput": "\"PINALSIGYAHRPI\""
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s3-r1-q1-h1",
+    "input": "\"A\"\n1",
+    "expectedOutput": "\"A\""
+   },
+   {
+    "id": "acc-adv-s3-r1-q1-h2",
+    "input": "\"AB\"\n1",
+    "expectedOutput": "\"AB\""
+   },
+   {
+    "id": "acc-adv-s3-r1-q1-h3",
+    "input": "\"ABCDE\"\n2",
+    "expectedOutput": "\"ACEBD\""
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} s\n * @param {number} numRows\n * @return {string}\n */\nfunction convertZigzag(s, numRows) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def convertZigzag(self, s: str, numRows: int) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string convertZigzag(string s, int numRows) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-adv-s3-r1-q2"
+ },
+ "acc-adv-s3-r1-q2": {
+  "id": "acc-adv-s3-r1-q2",
+  "title": "Parse a Numeric Field",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "String",
+  "tags": [
+   "Accenture Round 1",
+   "String",
+   "Set 3"
+  ],
+  "paragraphs": [
+   "Implement atoi: skip leading spaces, read an optional sign and digits until a non-digit, clamp to the 32-bit signed range."
+  ],
+  "examples": [
+   {
+    "input": "s = \"42\"",
+    "output": "42"
+   },
+   {
+    "input": "s = \"   -42\"",
+    "output": "-42"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s3-r1-q2-v1",
+    "input": "\"42\"",
+    "expectedOutput": "42"
+   },
+   {
+    "id": "acc-adv-s3-r1-q2-v2",
+    "input": "\"   -42\"",
+    "expectedOutput": "-42"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s3-r1-q2-h1",
+    "input": "\"4193 with words\"",
+    "expectedOutput": "4193"
+   },
+   {
+    "id": "acc-adv-s3-r1-q2-h2",
+    "input": "\"words and 987\"",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-adv-s3-r1-q2-h3",
+    "input": "\"-91283472332\"",
+    "expectedOutput": "-2147483648"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction myAtoi(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def myAtoi(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int myAtoi(string s) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-adv-s4-r1-q1": {
+  "id": "acc-adv-s4-r1-q1",
+  "title": "Integer to Roman Numeral",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Math",
+  "tags": [
+   "Accenture Round 1",
+   "Math",
+   "Set 4"
+  ],
+  "paragraphs": [
+   "Convert an integer from 1 to 3999 to a Roman numeral."
+  ],
+  "examples": [
+   {
+    "input": "num = 3",
+    "output": "\"III\""
+   },
+   {
+    "input": "num = 58",
+    "output": "\"LVIII\""
+   }
+  ],
+  "constraints": [
+   "Target O(1) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s4-r1-q1-v1",
+    "input": "3",
+    "expectedOutput": "\"III\""
+   },
+   {
+    "id": "acc-adv-s4-r1-q1-v2",
+    "input": "58",
+    "expectedOutput": "\"LVIII\""
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s4-r1-q1-h1",
+    "input": "1994",
+    "expectedOutput": "\"MCMXCIV\""
+   },
+   {
+    "id": "acc-adv-s4-r1-q1-h2",
+    "input": "4",
+    "expectedOutput": "\"IV\""
+   },
+   {
+    "id": "acc-adv-s4-r1-q1-h3",
+    "input": "3999",
+    "expectedOutput": "\"MMMCMXCIX\""
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number} num\n * @return {string}\n */\nfunction intToRoman(num) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def intToRoman(self, num: int) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string intToRoman(int num) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(1)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-adv-s4-r1-q2"
+ },
+ "acc-adv-s4-r1-q2": {
+  "id": "acc-adv-s4-r1-q2",
+  "title": "Longest Shared Substring",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Dynamic Programming",
+  "tags": [
+   "Accenture Round 1",
+   "Dynamic Programming",
+   "Set 4"
+  ],
+  "paragraphs": [
+   "Return the length of the longest contiguous substring common to both strings."
+  ],
+  "examples": [
+   {
+    "input": "a = \"abcdxyz\", b = \"xyzabcd\"",
+    "output": "4"
+   },
+   {
+    "input": "a = \"abc\", b = \"def\"",
+    "output": "0"
+   }
+  ],
+  "constraints": [
+   "Target O(M*N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s4-r1-q2-v1",
+    "input": "\"abcdxyz\"\n\"xyzabcd\"",
+    "expectedOutput": "4"
+   },
+   {
+    "id": "acc-adv-s4-r1-q2-v2",
+    "input": "\"abc\"\n\"def\"",
+    "expectedOutput": "0"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s4-r1-q2-h1",
+    "input": "\"zxabcdezy\"\n\"yzabcdezx\"",
+    "expectedOutput": "6"
+   },
+   {
+    "id": "acc-adv-s4-r1-q2-h2",
+    "input": "\"a\"\n\"a\"",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-adv-s4-r1-q2-h3",
+    "input": "\"hello\"\n\"yellow\"",
+    "expectedOutput": "4"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} a\n * @param {string} b\n * @return {number}\n */\nfunction longestCommonSubstring(a, b) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def longestCommonSubstring(self, a: str, b: str) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int longestCommonSubstring(string a, string b) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(M*N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-adv-s5-r1-q1": {
+  "id": "acc-adv-s5-r1-q1",
+  "title": "Integer Square Root",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Binary Search",
+  "tags": [
+   "Accenture Round 1",
+   "Binary Search",
+   "Set 5"
+  ],
+  "paragraphs": [
+   "Return floor(sqrt(n)) using binary search."
+  ],
+  "examples": [
+   {
+    "input": "x = 4",
+    "output": "2"
+   },
+   {
+    "input": "x = 8",
+    "output": "2"
+   }
+  ],
+  "constraints": [
+   "Target O(log N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-adv-s5-r1-q1-v1",
-    "input": "[\"11000\",\"11000\",\"00100\",\"00011\"]",
-    "expectedOutput": "3"
+    "input": "4",
+    "expectedOutput": "2"
    },
    {
     "id": "acc-adv-s5-r1-q1-v2",
-    "input": "[\"111\",\"010\",\"111\"]",
-    "expectedOutput": "1"
+    "input": "8",
+    "expectedOutput": "2"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s5-r1-q1-h1",
-    "input": "[\"000\"]",
+    "input": "0",
     "expectedOutput": "0"
    },
    {
     "id": "acc-adv-s5-r1-q1-h2",
-    "input": "[\"101\",\"010\",\"101\"]",
-    "expectedOutput": "5"
+    "input": "1",
+    "expectedOutput": "1"
    },
    {
     "id": "acc-adv-s5-r1-q1-h3",
-    "input": "[\"1\"]",
-    "expectedOutput": "1"
+    "input": "2147395599",
+    "expectedOutput": "46339"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} grid\n * @return {number}\n */\nfunction numClusters(grid) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def numClusters(self, grid: List[str]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int numClusters(vector<string>& grid) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} x\n * @return {number}\n */\nfunction mySqrt(x) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def mySqrt(self, x: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int mySqrt(int x) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(M*N)"
+   "time": "O(log N)",
+   "space": "O(1)"
   },
   "taskIndex": 1,
   "totalTasks": 2,
@@ -3688,72 +3663,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s5-r1-q2": {
   "id": "acc-adv-s5-r1-q2",
-  "title": "Corrupted Replica Spread",
+  "title": "Nth Ugly Number",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Graph / BFS",
+  "category": "Dynamic Programming",
   "tags": [
    "Accenture Round 1",
-   "BFS",
-   "Grid",
-   "Multi-source",
+   "Dynamic Programming",
    "Set 5"
   ],
   "paragraphs": [
-   "In grid, 0 is empty, 1 is a healthy replica and 2 is a corrupted replica. Each minute corruption spreads to the 4-neighbours that are healthy. Return the minutes until none are healthy, or -1 if impossible."
+   "An ugly number has only prime factors 2, 3 and 5 (1 counts). Return the nth ugly number."
   ],
   "examples": [
    {
-    "input": "grid = [[2,1,1],[1,1,0],[0,1,1]]",
-    "output": "4"
+    "input": "n = 10",
+    "output": "12"
    },
    {
-    "input": "grid = [[2,1,1],[0,1,1],[1,0,1]]",
-    "output": "-1"
+    "input": "n = 1",
+    "output": "1"
    }
   ],
   "constraints": [
-   "Target O(M*N) time and O(M*N) space.",
+   "Target O(N) time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-adv-s5-r1-q2-v1",
-    "input": "[[2,1,1],[1,1,0],[0,1,1]]",
-    "expectedOutput": "4"
+    "input": "10",
+    "expectedOutput": "12"
    },
    {
     "id": "acc-adv-s5-r1-q2-v2",
-    "input": "[[2,1,1],[0,1,1],[1,0,1]]",
-    "expectedOutput": "-1"
+    "input": "1",
+    "expectedOutput": "1"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s5-r1-q2-h1",
-    "input": "[[0,2]]",
-    "expectedOutput": "0"
+    "input": "15",
+    "expectedOutput": "24"
    },
    {
     "id": "acc-adv-s5-r1-q2-h2",
-    "input": "[[1]]",
-    "expectedOutput": "-1"
+    "input": "50",
+    "expectedOutput": "243"
    },
    {
     "id": "acc-adv-s5-r1-q2-h3",
-    "input": "[[2,2],[1,1]]",
-    "expectedOutput": "1"
+    "input": "1690",
+    "expectedOutput": "2123366400"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nfunction minutesToCorrupt(grid) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def minutesToCorrupt(self, grid: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minutesToCorrupt(vector<vector<int>>& grid) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction nthUglyNumber(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def nthUglyNumber(self, n: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int nthUglyNumber(int n) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(M*N)"
+   "time": "O(N)",
+   "space": "O(N)"
   },
   "taskIndex": 2,
   "totalTasks": 2,
@@ -3761,27 +3734,26 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s6-r1-q1": {
   "id": "acc-adv-s6-r1-q1",
-  "title": "Best Single Trade",
-  "difficulty": "Easy",
+  "title": "Guess Score for a Code",
+  "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Array",
+  "category": "Hash Table",
   "tags": [
    "Accenture Round 1",
-   "Array",
-   "Greedy",
+   "Hash Table",
    "Set 6"
   ],
   "paragraphs": [
-   "Given daily prices, return the maximum profit from one buy followed by one later sell, or 0 if no profit is possible."
+   "Return '<bulls>A<cows>B' where bulls are digits right in value and place, and cows are right digits in the wrong place."
   ],
   "examples": [
    {
-    "input": "prices = [7,1,5,3,6,4]",
-    "output": "5"
+    "input": "secret = \"1807\", guess = \"7810\"",
+    "output": "\"1A3B\""
    },
    {
-    "input": "prices = [7,6,4,3,1]",
-    "output": "0"
+    "input": "secret = \"1123\", guess = \"0111\"",
+    "output": "\"1A1B\""
    }
   ],
   "constraints": [
@@ -3792,36 +3764,36 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-adv-s6-r1-q1-v1",
-    "input": "[7,1,5,3,6,4]",
-    "expectedOutput": "5"
+    "input": "\"1807\"\n\"7810\"",
+    "expectedOutput": "\"1A3B\""
    },
    {
     "id": "acc-adv-s6-r1-q1-v2",
-    "input": "[7,6,4,3,1]",
-    "expectedOutput": "0"
+    "input": "\"1123\"\n\"0111\"",
+    "expectedOutput": "\"1A1B\""
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s6-r1-q1-h1",
-    "input": "[1]",
-    "expectedOutput": "0"
+    "input": "\"1\"\n\"1\"",
+    "expectedOutput": "\"1A0B\""
    },
    {
     "id": "acc-adv-s6-r1-q1-h2",
-    "input": "[2,4,1]",
-    "expectedOutput": "2"
+    "input": "\"1234\"\n\"4321\"",
+    "expectedOutput": "\"0A4B\""
    },
    {
     "id": "acc-adv-s6-r1-q1-h3",
-    "input": "[3,3,5,0,0,3,1,4]",
-    "expectedOutput": "4"
+    "input": "\"0000\"\n\"1111\"",
+    "expectedOutput": "\"0A0B\""
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} prices\n * @return {number}\n */\nfunction maxProfit(prices) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def maxProfit(self, prices: List[int]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxProfit(vector<int>& prices) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} secret\n * @param {string} guess\n * @return {string}\n */\nfunction getHint(secret, guess) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def getHint(self, secret: str, guess: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string getHint(string secret, string guess) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -3833,71 +3805,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s6-r1-q2": {
   "id": "acc-adv-s6-r1-q2",
-  "title": "Product Without Self",
+  "title": "Smallest Rotation of a Code",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Prefix Products",
+  "category": "String",
   "tags": [
    "Accenture Round 1",
-   "Array",
-   "Prefix Sum",
+   "String",
    "Set 6"
   ],
   "paragraphs": [
-   "Return an array where out[i] is the product of all elements except nums[i]. Do not use division and run in O(N)."
+   "Return the lexicographically smallest rotation of the string."
   ],
   "examples": [
    {
-    "input": "nums = [1,2,3,4]",
-    "output": "[24,12,8,6]"
+    "input": "s = \"cba\"",
+    "output": "\"acb\""
    },
    {
-    "input": "nums = [-1,1,0,-3,3]",
-    "output": "[0,0,9,0,0]"
+    "input": "s = \"abab\"",
+    "output": "\"abab\""
    }
   ],
   "constraints": [
-   "Target O(N) time and O(1) extra space.",
+   "Target O(N^2) time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-adv-s6-r1-q2-v1",
-    "input": "[1,2,3,4]",
-    "expectedOutput": "[24,12,8,6]"
+    "input": "\"cba\"",
+    "expectedOutput": "\"acb\""
    },
    {
     "id": "acc-adv-s6-r1-q2-v2",
-    "input": "[-1,1,0,-3,3]",
-    "expectedOutput": "[0,0,9,0,0]"
+    "input": "\"abab\"",
+    "expectedOutput": "\"abab\""
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s6-r1-q2-h1",
-    "input": "[2,3]",
-    "expectedOutput": "[3,2]"
+    "input": "\"a\"",
+    "expectedOutput": "\"a\""
    },
    {
     "id": "acc-adv-s6-r1-q2-h2",
-    "input": "[0,0]",
-    "expectedOutput": "[0,0]"
+    "input": "\"dcab\"",
+    "expectedOutput": "\"abdc\""
    },
    {
     "id": "acc-adv-s6-r1-q2-h3",
-    "input": "[5,1,1,2]",
-    "expectedOutput": "[2,10,10,5]"
+    "input": "\"bbaa\"",
+    "expectedOutput": "\"aabb\""
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction productExceptSelf(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> productExceptSelf(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nfunction smallestRotation(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def smallestRotation(self, s: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string smallestRotation(string s) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(1) extra"
+   "time": "O(N^2)",
+   "space": "O(N)"
   },
   "taskIndex": 2,
   "totalTasks": 2,
@@ -3905,26 +3876,26 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s7-r1-q1": {
   "id": "acc-adv-s7-r1-q1",
-  "title": "Climbing Release Stairs",
-  "difficulty": "Easy",
+  "title": "Validate an IPv4 Address",
+  "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Dynamic Programming",
+  "category": "String",
   "tags": [
    "Accenture Round 1",
-   "DP",
+   "String",
    "Set 7"
   ],
   "paragraphs": [
-   "You can climb 1 or 2 steps at a time. Return the number of distinct ways to reach step n."
+   "Return true if s is a valid IPv4 address: four numbers 0-255 separated by dots, without leading zeros."
   ],
   "examples": [
    {
-    "input": "n = 2",
-    "output": "2"
+    "input": "s = \"192.168.1.1\"",
+    "output": "true"
    },
    {
-    "input": "n = 3",
-    "output": "3"
+    "input": "s = \"256.1.1.1\"",
+    "output": "false"
    }
   ],
   "constraints": [
@@ -3935,36 +3906,36 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-adv-s7-r1-q1-v1",
-    "input": "2",
-    "expectedOutput": "2"
+    "input": "\"192.168.1.1\"",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-adv-s7-r1-q1-v2",
-    "input": "3",
-    "expectedOutput": "3"
+    "input": "\"256.1.1.1\"",
+    "expectedOutput": "false"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s7-r1-q1-h1",
-    "input": "1",
-    "expectedOutput": "1"
+    "input": "\"01.2.3.4\"",
+    "expectedOutput": "false"
    },
    {
     "id": "acc-adv-s7-r1-q1-h2",
-    "input": "10",
-    "expectedOutput": "89"
+    "input": "\"1.2.3\"",
+    "expectedOutput": "false"
    },
    {
     "id": "acc-adv-s7-r1-q1-h3",
-    "input": "30",
-    "expectedOutput": "1346269"
+    "input": "\"0.0.0.0\"",
+    "expectedOutput": "true"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction climbStairs(n) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def climbStairs(self, n: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int climbStairs(int n) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} s\n * @return {boolean}\n */\nfunction validIPv4(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def validIPv4(self, s: str) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool validIPv4(string s) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -3976,71 +3947,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s7-r1-q2": {
   "id": "acc-adv-s7-r1-q2",
-  "title": "Fewest Quota Units",
+  "title": "Longest Run After Skipping Failures",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Dynamic Programming",
+  "category": "Sliding Window",
   "tags": [
    "Accenture Round 1",
-   "DP",
-   "Unbounded Knapsack",
+   "Sliding Window",
    "Set 7"
   ],
   "paragraphs": [
-   "Given unit sizes coins and a total amount, return the fewest units that sum to amount, or -1 if impossible. Units can be reused."
+   "Return the longest run of 1s if you may flip at most k zeros to 1."
   ],
   "examples": [
    {
-    "input": "coins = [1,2,5], amount = 11",
-    "output": "3"
+    "input": "nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2",
+    "output": "6"
    },
    {
-    "input": "coins = [2], amount = 3",
-    "output": "-1"
+    "input": "nums = [0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1], k = 3",
+    "output": "10"
    }
   ],
   "constraints": [
-   "Target O(N*A) time and O(A) space.",
+   "Target O(N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-adv-s7-r1-q2-v1",
-    "input": "[1,2,5]\n11",
-    "expectedOutput": "3"
+    "input": "[1,1,1,0,0,0,1,1,1,1,0]\n2",
+    "expectedOutput": "6"
    },
    {
     "id": "acc-adv-s7-r1-q2-v2",
-    "input": "[2]\n3",
-    "expectedOutput": "-1"
+    "input": "[0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1]\n3",
+    "expectedOutput": "10"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s7-r1-q2-h1",
-    "input": "[1]\n0",
+    "input": "[0,0]\n0",
     "expectedOutput": "0"
    },
    {
     "id": "acc-adv-s7-r1-q2-h2",
-    "input": "[186,419,83,408]\n6249",
-    "expectedOutput": "20"
+    "input": "[1,1]\n0",
+    "expectedOutput": "2"
    },
    {
     "id": "acc-adv-s7-r1-q2-h3",
-    "input": "[1,3,4]\n6",
+    "input": "[0,1,0]\n1",
     "expectedOutput": "2"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} coins\n * @param {number} amount\n * @return {number}\n */\nfunction coinChange(coins, amount) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def coinChange(self, coins: List[int], amount: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int coinChange(vector<int>& coins, int amount) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nfunction longestOnes(nums, k) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def longestOnes(self, nums: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int longestOnes(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N*A)",
-   "space": "O(A)"
+   "time": "O(N)",
+   "space": "O(1)"
   },
   "taskIndex": 2,
   "totalTasks": 2,
@@ -4048,71 +4018,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s8-r1-q1": {
   "id": "acc-adv-s8-r1-q1",
-  "title": "Flood Fill Canvas",
+  "title": "Balanced Load Pivot",
   "difficulty": "Easy",
   "company": "Accenture",
-  "category": "DFS",
+  "category": "Prefix Sum",
   "tags": [
    "Accenture Round 1",
-   "DFS",
-   "Grid",
+   "Prefix Sum",
    "Set 8"
   ],
   "paragraphs": [
-   "Starting at pixel (sr, sc), replace its colour and every 4-connected pixel of the same original colour with newColor. Return the image."
+   "Return the leftmost index where the sum on its left equals the sum on its right, or -1."
   ],
   "examples": [
    {
-    "input": "image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, newColor = 2",
-    "output": "[[2,2,2],[2,2,0],[2,0,1]]"
+    "input": "nums = [1,7,3,6,5,6]",
+    "output": "3"
    },
    {
-    "input": "image = [[0,0,0],[0,0,0]], sr = 0, sc = 0, newColor = 0",
-    "output": "[[0,0,0],[0,0,0]]"
+    "input": "nums = [1,2,3]",
+    "output": "-1"
    }
   ],
   "constraints": [
-   "Target O(M*N) time and O(M*N) space.",
+   "Target O(N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-adv-s8-r1-q1-v1",
-    "input": "[[1,1,1],[1,1,0],[1,0,1]]\n1\n1\n2",
-    "expectedOutput": "[[2,2,2],[2,2,0],[2,0,1]]"
+    "input": "[1,7,3,6,5,6]",
+    "expectedOutput": "3"
    },
    {
     "id": "acc-adv-s8-r1-q1-v2",
-    "input": "[[0,0,0],[0,0,0]]\n0\n0\n0",
-    "expectedOutput": "[[0,0,0],[0,0,0]]"
+    "input": "[1,2,3]",
+    "expectedOutput": "-1"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s8-r1-q1-h1",
-    "input": "[[0,0,0],[0,1,1]]\n1\n1\n1",
-    "expectedOutput": "[[0,0,0],[0,1,1]]"
+    "input": "[2,1,-1]",
+    "expectedOutput": "0"
    },
    {
     "id": "acc-adv-s8-r1-q1-h2",
-    "input": "[[1,2],[2,1]]\n0\n0\n3",
-    "expectedOutput": "[[3,2],[2,1]]"
+    "input": "[0]",
+    "expectedOutput": "0"
    },
    {
     "id": "acc-adv-s8-r1-q1-h3",
-    "input": "[[5]]\n0\n0\n9",
-    "expectedOutput": "[[9]]"
+    "input": "[-1,-1,0,1,1,0]",
+    "expectedOutput": "5"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} image\n * @param {number} sr\n * @param {number} sc\n * @param {number} newColor\n * @return {number[][]}\n */\nfunction floodFill(image, sr, sc, newColor) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def floodFill(self, image: List[List[int]], sr: int, sc: int, newColor: int) -> List[List[int]]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int newColor) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction pivotIndex(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def pivotIndex(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int pivotIndex(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(M*N)"
+   "time": "O(N)",
+   "space": "O(1)"
   },
   "taskIndex": 1,
   "totalTasks": 2,
@@ -4120,71 +4089,70 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s8-r1-q2": {
   "id": "acc-adv-s8-r1-q2",
-  "title": "Shortest Clear Route",
-  "difficulty": "Medium",
+  "title": "Even Numbers First",
+  "difficulty": "Easy",
   "company": "Accenture",
-  "category": "BFS",
+  "category": "Two Pointers",
   "tags": [
    "Accenture Round 1",
-   "BFS",
-   "Matrix",
+   "Two Pointers",
    "Set 8"
   ],
   "paragraphs": [
-   "In an n x n binary matrix (0 = open, 1 = blocked), return the length of the shortest path from the top-left to the bottom-right moving in 8 directions, or -1 if none exists."
+   "Return the array with all even numbers first (original relative order kept), followed by the odd numbers."
   ],
   "examples": [
    {
-    "input": "grid = [[0,1],[1,0]]",
-    "output": "2"
+    "input": "nums = [3,1,2,4]",
+    "output": "[2,4,3,1]"
    },
    {
-    "input": "grid = [[0,0,0],[1,1,0],[1,1,0]]",
-    "output": "4"
+    "input": "nums = [0]",
+    "output": "[0]"
    }
   ],
   "constraints": [
-   "Target O(N^2) time and O(N^2) space.",
+   "Target O(N) time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-adv-s8-r1-q2-v1",
-    "input": "[[0,1],[1,0]]",
-    "expectedOutput": "2"
+    "input": "[3,1,2,4]",
+    "expectedOutput": "[2,4,3,1]"
    },
    {
     "id": "acc-adv-s8-r1-q2-v2",
-    "input": "[[0,0,0],[1,1,0],[1,1,0]]",
-    "expectedOutput": "4"
+    "input": "[0]",
+    "expectedOutput": "[0]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s8-r1-q2-h1",
-    "input": "[[1,0,0],[1,1,0],[1,1,0]]",
-    "expectedOutput": "-1"
+    "input": "[1,3,5]",
+    "expectedOutput": "[1,3,5]"
    },
    {
     "id": "acc-adv-s8-r1-q2-h2",
-    "input": "[[0]]",
-    "expectedOutput": "1"
+    "input": "[2,4,6]",
+    "expectedOutput": "[2,4,6]"
    },
    {
     "id": "acc-adv-s8-r1-q2-h3",
-    "input": "[[0,0],[0,0]]",
-    "expectedOutput": "2"
+    "input": "[5,2,7,8,9,4]",
+    "expectedOutput": "[2,8,4,5,7,9]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nfunction shortestPathBinaryMatrix(grid) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def shortestPathBinaryMatrix(self, grid: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int shortestPathBinaryMatrix(vector<vector<int>>& grid) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction sortByParity(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def sortByParity(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> sortByParity(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N^2)",
-   "space": "O(N^2)"
+   "time": "O(N)",
+   "space": "O(N)"
   },
   "taskIndex": 2,
   "totalTasks": 2,
@@ -4192,27 +4160,26 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s9-r1-q1": {
   "id": "acc-adv-s9-r1-q1",
-  "title": "Compact Active Slots",
+  "title": "Was the Log Sorted Then Rotated",
   "difficulty": "Easy",
   "company": "Accenture",
-  "category": "Two Pointers",
+  "category": "Array",
   "tags": [
    "Accenture Round 1",
-   "Two Pointers",
    "Array",
    "Set 9"
   ],
   "paragraphs": [
-   "Move all zeros to the end of the array while keeping the order of the non-zero elements. Return the resulting array."
+   "Return true if the array was originally non-decreasing and then rotated some number of positions (possibly zero)."
   ],
   "examples": [
    {
-    "input": "nums = [0,1,0,3,12]",
-    "output": "[1,3,12,0,0]"
+    "input": "nums = [3,4,5,1,2]",
+    "output": "true"
    },
    {
-    "input": "nums = [0]",
-    "output": "[0]"
+    "input": "nums = [2,1,3,4]",
+    "output": "false"
    }
   ],
   "constraints": [
@@ -4223,36 +4190,36 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-adv-s9-r1-q1-v1",
-    "input": "[0,1,0,3,12]",
-    "expectedOutput": "[1,3,12,0,0]"
+    "input": "[3,4,5,1,2]",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-adv-s9-r1-q1-v2",
-    "input": "[0]",
-    "expectedOutput": "[0]"
+    "input": "[2,1,3,4]",
+    "expectedOutput": "false"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s9-r1-q1-h1",
     "input": "[1,2,3]",
-    "expectedOutput": "[1,2,3]"
+    "expectedOutput": "true"
    },
    {
     "id": "acc-adv-s9-r1-q1-h2",
-    "input": "[0,0,1]",
-    "expectedOutput": "[1,0,0]"
+    "input": "[1,1,1]",
+    "expectedOutput": "true"
    },
    {
     "id": "acc-adv-s9-r1-q1-h3",
-    "input": "[4,0,5,0,0,6]",
-    "expectedOutput": "[4,5,6,0,0,0]"
+    "input": "[5,1,2,3,4,0]",
+    "expectedOutput": "false"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction moveZeroes(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def moveZeroes(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> moveZeroes(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nfunction isSortedRotated(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def isSortedRotated(self, nums: List[int]) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isSortedRotated(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -4264,27 +4231,26 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s9-r1-q2": {
   "id": "acc-adv-s9-r1-q2",
-  "title": "Matching Usage Totals",
+  "title": "Alternate Credits and Debits",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Prefix Sum",
+  "category": "Array",
   "tags": [
    "Accenture Round 1",
-   "Prefix Sum",
-   "Hash Table",
+   "Array",
    "Set 9"
   ],
   "paragraphs": [
-   "Return the number of contiguous subarrays whose sum equals k."
+   "Rearrange so positives and negatives alternate starting with a positive, keeping each group's order; extras go at the end."
   ],
   "examples": [
    {
-    "input": "nums = [1,1,1], k = 2",
-    "output": "2"
+    "input": "nums = [3,1,-2,-5,2,-4]",
+    "output": "[3,-2,1,-5,2,-4]"
    },
    {
-    "input": "nums = [1,2,3], k = 3",
-    "output": "2"
+    "input": "nums = [1,2,3]",
+    "output": "[1,2,3]"
    }
   ],
   "constraints": [
@@ -4295,36 +4261,36 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-adv-s9-r1-q2-v1",
-    "input": "[1,1,1]\n2",
-    "expectedOutput": "2"
+    "input": "[3,1,-2,-5,2,-4]",
+    "expectedOutput": "[3,-2,1,-5,2,-4]"
    },
    {
     "id": "acc-adv-s9-r1-q2-v2",
-    "input": "[1,2,3]\n3",
-    "expectedOutput": "2"
+    "input": "[1,2,3]",
+    "expectedOutput": "[1,2,3]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s9-r1-q2-h1",
-    "input": "[1,-1,0]\n0",
-    "expectedOutput": "3"
+    "input": "[-1,-2,1]",
+    "expectedOutput": "[1,-1,-2]"
    },
    {
     "id": "acc-adv-s9-r1-q2-h2",
-    "input": "[3,4,7,2,-3,1,4,2]\n7",
-    "expectedOutput": "4"
+    "input": "[1,-1]",
+    "expectedOutput": "[1,-1]"
    },
    {
     "id": "acc-adv-s9-r1-q2-h3",
-    "input": "[1]\n5",
-    "expectedOutput": "0"
+    "input": "[5,-1,-2,-3,4]",
+    "expectedOutput": "[5,-1,4,-2,-3]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nfunction subarraySum(nums, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def subarraySum(self, nums: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int subarraySum(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction rearrangeAlternating(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def rearrangeAlternating(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> rearrangeAlternating(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -4336,395 +4302,26 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s10-r1-q1": {
   "id": "acc-adv-s10-r1-q1",
-  "title": "Anagram Tag Check",
-  "difficulty": "Easy",
+  "title": "Find the Duplicate and Missing Id",
+  "difficulty": "Medium",
   "company": "Accenture",
   "category": "Hash Table",
   "tags": [
    "Accenture Round 1",
    "Hash Table",
-   "String",
    "Set 10"
   ],
   "paragraphs": [
-   "Return true if t is an anagram of s (same letters with the same counts)."
+   "An array should hold 1..n once each, but one id is duplicated and another is missing. Return [duplicate, missing]."
   ],
   "examples": [
    {
-    "input": "s = \"anagram\", t = \"nagaram\"",
-    "output": "true"
+    "input": "nums = [1,2,2,4]",
+    "output": "[2,3]"
    },
    {
-    "input": "s = \"rat\", t = \"car\"",
-    "output": "false"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(1) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s10-r1-q1-v1",
-    "input": "\"anagram\"\n\"nagaram\"",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-adv-s10-r1-q1-v2",
-    "input": "\"rat\"\n\"car\"",
-    "expectedOutput": "false"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s10-r1-q1-h1",
-    "input": "\"a\"\n\"a\"",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-adv-s10-r1-q1-h2",
-    "input": "\"ab\"\n\"a\"",
-    "expectedOutput": "false"
-   },
-   {
-    "id": "acc-adv-s10-r1-q1-h3",
-    "input": "\"listen\"\n\"silent\"",
-    "expectedOutput": "true"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @param {string} t\n * @return {boolean}\n */\nfunction isAnagram(s, t) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isAnagram(string s, string t) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(1)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-adv-s10-r1-q2"
- },
- "acc-adv-s10-r1-q2": {
-  "id": "acc-adv-s10-r1-q2",
-  "title": "Segment a Search Query",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Dynamic Programming",
-  "tags": [
-   "Accenture Round 1",
-   "DP",
-   "String",
-   "Set 10"
-  ],
-  "paragraphs": [
-   "Given a string s and a dictionary of words, return true if s can be segmented into a sequence of one or more dictionary words (words may repeat)."
-  ],
-  "examples": [
-   {
-    "input": "s = \"leetcode\", wordDict = [\"leet\",\"code\"]",
-    "output": "true"
-   },
-   {
-    "input": "s = \"applepenapple\", wordDict = [\"apple\",\"pen\"]",
-    "output": "true"
-   }
-  ],
-  "constraints": [
-   "Target O(N^2) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s10-r1-q2-v1",
-    "input": "\"leetcode\"\n[\"leet\",\"code\"]",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-adv-s10-r1-q2-v2",
-    "input": "\"applepenapple\"\n[\"apple\",\"pen\"]",
-    "expectedOutput": "true"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s10-r1-q2-h1",
-    "input": "\"catsandog\"\n[\"cats\",\"dog\",\"sand\",\"and\",\"cat\"]",
-    "expectedOutput": "false"
-   },
-   {
-    "id": "acc-adv-s10-r1-q2-h2",
-    "input": "\"a\"\n[\"b\"]",
-    "expectedOutput": "false"
-   },
-   {
-    "id": "acc-adv-s10-r1-q2-h3",
-    "input": "\"aaaaaaa\"\n[\"aaaa\",\"aaa\"]",
-    "expectedOutput": "true"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @param {string[]} wordDict\n * @return {boolean}\n */\nfunction wordBreak(s, wordDict) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def wordBreak(self, s: str, wordDict: List[str]) -> bool:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool wordBreak(string s, vector<string>& wordDict) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N^2)",
-   "space": "O(N)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-adv-s1-r2-q1": {
-  "id": "acc-adv-s1-r2-q1",
-  "title": "Maximum Path Sum in a Service Tree",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Tree / DFS",
-  "tags": [
-   "Accenture Round 2",
-   "Tree",
-   "DFS",
-   "Recursion",
-   "Set 1"
-  ],
-  "paragraphs": [
-   "The tree is given as a level-order array where null marks a missing child. Return the maximum path sum of any non-empty path (it need not pass through the root). Defend your invariant.",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "root = [1,2,3]",
-    "output": "6"
-   },
-   {
-    "input": "root = [-10,9,20,null,null,15,7]",
-    "output": "42"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(H) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s1-r2-q1-v1",
-    "input": "[1,2,3]",
-    "expectedOutput": "6"
-   },
-   {
-    "id": "acc-adv-s1-r2-q1-v2",
-    "input": "[-10,9,20,null,null,15,7]",
-    "expectedOutput": "42"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s1-r2-q1-h1",
-    "input": "[-3]",
-    "expectedOutput": "-3"
-   },
-   {
-    "id": "acc-adv-s1-r2-q1-h2",
-    "input": "[2,-1]",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-adv-s1-r2-q1-h3",
-    "input": "[5,4,8,11,null,13,4,7,2,null,null,null,1]",
-    "expectedOutput": "48"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} root\n * @return {number}\n */\nfunction maxPathSum(root) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def maxPathSum(self, root: List[int]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxPathSum(vector<int>& root) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(H)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
- "acc-adv-s2-r2-q1": {
-  "id": "acc-adv-s2-r2-q1",
-  "title": "Multi-Word Grid Search With Trie Pruning",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Trie / Backtracking",
-  "tags": [
-   "Accenture Round 2",
-   "Trie",
-   "Backtracking",
-   "Matrix",
-   "Set 2"
-  ],
-  "paragraphs": [
-   "Each row of board is a string. Return, sorted, every word from words that can be traced through adjacent cells without reusing a cell in one word. Defend how Trie pruning cuts the search.",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "board = [\"oaan\",\"etae\",\"ihkr\",\"iflv\"], words = [\"oath\",\"pea\",\"eat\",\"rain\"]",
-    "output": "[\"eat\",\"oath\"]"
-   },
-   {
-    "input": "board = [\"ab\",\"cd\"], words = [\"abcb\"]",
-    "output": "[]"
-   }
-  ],
-  "constraints": [
-   "Target O(M*N*4^L) time and O(W*L) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s2-r2-q1-v1",
-    "input": "[\"oaan\",\"etae\",\"ihkr\",\"iflv\"]\n[\"oath\",\"pea\",\"eat\",\"rain\"]",
-    "expectedOutput": "[\"eat\",\"oath\"]"
-   },
-   {
-    "id": "acc-adv-s2-r2-q1-v2",
-    "input": "[\"ab\",\"cd\"]\n[\"abcb\"]",
-    "expectedOutput": "[]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s2-r2-q1-h1",
-    "input": "[\"a\"]\n[\"a\"]",
-    "expectedOutput": "[\"a\"]"
-   },
-   {
-    "id": "acc-adv-s2-r2-q1-h2",
-    "input": "[\"ab\",\"cd\"]\n[\"ab\",\"ac\",\"bd\",\"abdc\"]",
-    "expectedOutput": "[\"ab\",\"abdc\",\"ac\",\"bd\"]"
-   },
-   {
-    "id": "acc-adv-s2-r2-q1-h3",
-    "input": "[\"aaa\",\"aaa\"]\n[\"aaaa\",\"aaaaaaa\"]",
-    "expectedOutput": "[\"aaaa\"]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} board\n * @param {string[]} words\n * @return {string[]}\n */\nfunction findWords(board, words) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def findWords(self, board: List[str], words: List[str]) -> List[str]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<string> findWords(vector<string>& board, vector<string>& words) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(M*N*4^L)",
-   "space": "O(W*L)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
- "acc-adv-s3-r2-q1": {
-  "id": "acc-adv-s3-r2-q1",
-  "title": "Kth Smallest in Sorted Matrix",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Heap / Binary Search",
-  "tags": [
-   "Accenture Round 2",
-   "Heap",
-   "Binary Search",
-   "Matrix",
-   "Set 3"
-  ],
-  "paragraphs": [
-   "Rows and columns are sorted ascending. Return the kth smallest element. Defend a heap or value-range binary search solution.",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "matrix = [[1,5,9],[10,11,13],[12,13,15]], k = 8",
-    "output": "13"
-   },
-   {
-    "input": "matrix = [[-5]], k = 1",
-    "output": "-5"
-   }
-  ],
-  "constraints": [
-   "Target O(N log(max-min)) time and O(1) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s3-r2-q1-v1",
-    "input": "[[1,5,9],[10,11,13],[12,13,15]]\n8",
-    "expectedOutput": "13"
-   },
-   {
-    "id": "acc-adv-s3-r2-q1-v2",
-    "input": "[[-5]]\n1",
-    "expectedOutput": "-5"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s3-r2-q1-h1",
-    "input": "[[1,2],[1,3]]\n2",
-    "expectedOutput": "1"
-   },
-   {
-    "id": "acc-adv-s3-r2-q1-h2",
-    "input": "[[1,3,5],[6,7,12],[11,14,14]]\n6",
-    "expectedOutput": "11"
-   },
-   {
-    "id": "acc-adv-s3-r2-q1-h3",
-    "input": "[[2,2],[2,2]]\n3",
-    "expectedOutput": "2"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} matrix\n * @param {number} k\n * @return {number}\n */\nfunction kthSmallest(matrix, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def kthSmallest(self, matrix: List[List[int]], k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int kthSmallest(vector<vector<int>>& matrix, int k) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N log(max-min))",
-   "space": "O(1)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
- "acc-adv-s4-r2-q1": {
-  "id": "acc-adv-s4-r2-q1",
-  "title": "Best Root Nodes for Latency",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Graph / Topological Peel",
-  "tags": [
-   "Accenture Round 2",
-   "Graph",
-   "BFS",
-   "Tree",
-   "Set 4"
-  ],
-  "paragraphs": [
-   "Given an undirected tree with n nodes and edges, return, sorted, every node that gives the minimum tree height when used as root.",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "n = 4, edges = [[1,0],[1,2],[1,3]]",
-    "output": "[1]"
-   },
-   {
-    "input": "n = 6, edges = [[3,0],[3,1],[3,2],[3,4],[5,4]]",
-    "output": "[3,4]"
+    "input": "nums = [1,1]",
+    "output": "[1,2]"
    }
   ],
   "constraints": [
@@ -4734,143 +4331,67 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-adv-s4-r2-q1-v1",
-    "input": "4\n[[1,0],[1,2],[1,3]]",
-    "expectedOutput": "[1]"
+    "id": "acc-adv-s10-r1-q1-v1",
+    "input": "[1,2,2,4]",
+    "expectedOutput": "[2,3]"
    },
    {
-    "id": "acc-adv-s4-r2-q1-v2",
-    "input": "6\n[[3,0],[3,1],[3,2],[3,4],[5,4]]",
-    "expectedOutput": "[3,4]"
+    "id": "acc-adv-s10-r1-q1-v2",
+    "input": "[1,1]",
+    "expectedOutput": "[1,2]"
    }
   ],
   "hiddenTestCases": [
    {
-    "id": "acc-adv-s4-r2-q1-h1",
-    "input": "1\n[]",
-    "expectedOutput": "[0]"
+    "id": "acc-adv-s10-r1-q1-h1",
+    "input": "[3,2,3,4,6,5]",
+    "expectedOutput": "[3,1]"
    },
    {
-    "id": "acc-adv-s4-r2-q1-h2",
-    "input": "2\n[[0,1]]",
-    "expectedOutput": "[0,1]"
+    "id": "acc-adv-s10-r1-q1-h2",
+    "input": "[2,2]",
+    "expectedOutput": "[2,1]"
    },
    {
-    "id": "acc-adv-s4-r2-q1-h3",
-    "input": "5\n[[0,1],[1,2],[2,3],[3,4]]",
-    "expectedOutput": "[2]"
+    "id": "acc-adv-s10-r1-q1-h3",
+    "input": "[1,5,3,2,2,7,6,4,8,9]",
+    "expectedOutput": "[2,10]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number} n\n * @param {number[][]} edges\n * @return {number[]}\n */\nfunction findMinHeightTrees(n, edges) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def findMinHeightTrees(self, n: int, edges: List[List[int]]) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> findMinHeightTrees(int n, vector<vector<int>>& edges) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction findErrorNums(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def findErrorNums(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> findErrorNums(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
    "space": "O(N)"
   },
   "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
+  "totalTasks": 2,
+  "nextProblemId": "acc-adv-s10-r1-q2"
  },
- "acc-adv-s5-r2-q1": {
-  "id": "acc-adv-s5-r2-q1",
-  "title": "Longest Increasing Path in Grid",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "DFS + Memoization",
-  "tags": [
-   "Accenture Round 2",
-   "DFS",
-   "DP",
-   "Matrix",
-   "Set 5"
-  ],
-  "paragraphs": [
-   "Return the length of the longest strictly increasing path in a matrix, moving in 4 directions. Defend why memoization gives O(M*N).",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "matrix = [[9,9,4],[6,6,8],[2,1,1]]",
-    "output": "4"
-   },
-   {
-    "input": "matrix = [[3,4,5],[3,2,6],[2,2,1]]",
-    "output": "4"
-   }
-  ],
-  "constraints": [
-   "Target O(M*N) time and O(M*N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-adv-s5-r2-q1-v1",
-    "input": "[[9,9,4],[6,6,8],[2,1,1]]",
-    "expectedOutput": "4"
-   },
-   {
-    "id": "acc-adv-s5-r2-q1-v2",
-    "input": "[[3,4,5],[3,2,6],[2,2,1]]",
-    "expectedOutput": "4"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s5-r2-q1-h1",
-    "input": "[[1]]",
-    "expectedOutput": "1"
-   },
-   {
-    "id": "acc-adv-s5-r2-q1-h2",
-    "input": "[[1,2],[4,3]]",
-    "expectedOutput": "4"
-   },
-   {
-    "id": "acc-adv-s5-r2-q1-h3",
-    "input": "[[7,7],[7,7]]",
-    "expectedOutput": "1"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} matrix\n * @return {number}\n */\nfunction longestIncreasingPath(matrix) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int longestIncreasingPath(vector<vector<int>>& matrix) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(M*N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
- "acc-adv-s6-r2-q1": {
-  "id": "acc-adv-s6-r2-q1",
-  "title": "Decode Telemetry Codes",
+ "acc-adv-s10-r1-q2": {
+  "id": "acc-adv-s10-r1-q2",
+  "title": "Total Alert Active Time",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "DP",
+  "category": "Intervals",
   "tags": [
-   "Accenture Round 2",
-   "DP",
-   "String",
-   "Set 6"
+   "Accenture Round 1",
+   "Intervals",
+   "Set 10"
   ],
   "paragraphs": [
-   "A message of digits maps 1->A ... 26->Z. Return the number of ways to decode it.",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+   "Each alert at time t[i] stays active for d seconds, and a new alert restarts the timer. Return the total active seconds."
   ],
   "examples": [
    {
-    "input": "s = \"12\"",
-    "output": "2"
+    "input": "timeSeries = [1,4], duration = 2",
+    "output": "4"
    },
    {
-    "input": "s = \"226\"",
+    "input": "timeSeries = [1,2], duration = 2",
     "output": "3"
    }
   ],
@@ -4881,37 +4402,469 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-adv-s6-r2-q1-v1",
-    "input": "\"12\"",
-    "expectedOutput": "2"
+    "id": "acc-adv-s10-r1-q2-v1",
+    "input": "[1,4]\n2",
+    "expectedOutput": "4"
    },
    {
-    "id": "acc-adv-s6-r2-q1-v2",
-    "input": "\"226\"",
+    "id": "acc-adv-s10-r1-q2-v2",
+    "input": "[1,2]\n2",
     "expectedOutput": "3"
    }
   ],
   "hiddenTestCases": [
    {
-    "id": "acc-adv-s6-r2-q1-h1",
-    "input": "\"06\"",
+    "id": "acc-adv-s10-r1-q2-h1",
+    "input": "[1]\n5",
+    "expectedOutput": "5"
+   },
+   {
+    "id": "acc-adv-s10-r1-q2-h2",
+    "input": "[1,2,3,4,5]\n1",
+    "expectedOutput": "5"
+   },
+   {
+    "id": "acc-adv-s10-r1-q2-h3",
+    "input": "[0,10,20]\n5",
+    "expectedOutput": "15"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} timeSeries\n * @param {number} duration\n * @return {number}\n */\nfunction findPoisonedDuration(timeSeries, duration) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def findPoisonedDuration(self, timeSeries: List[int], duration: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int findPoisonedDuration(vector<int>& timeSeries, int duration) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-adv-s1-r2-q1": {
+  "id": "acc-adv-s1-r2-q1",
+  "title": "Reverse the Bits of a Flag Word",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Bit Manipulation",
+  "tags": [
+   "Accenture Round 2",
+   "Bit Manipulation",
+   "Set 1"
+  ],
+  "paragraphs": [
+   "Reverse the bits of a 32-bit unsigned integer and return the result.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "n = 43261596",
+    "output": "964176192"
+   },
+   {
+    "input": "n = 4294967293",
+    "output": "3221225471"
+   }
+  ],
+  "constraints": [
+   "Target O(1) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s1-r2-q1-v1",
+    "input": "43261596",
+    "expectedOutput": "964176192"
+   },
+   {
+    "id": "acc-adv-s1-r2-q1-v2",
+    "input": "4294967293",
+    "expectedOutput": "3221225471"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s1-r2-q1-h1",
+    "input": "0",
     "expectedOutput": "0"
    },
    {
-    "id": "acc-adv-s6-r2-q1-h2",
-    "input": "\"10\"",
-    "expectedOutput": "1"
+    "id": "acc-adv-s1-r2-q1-h2",
+    "input": "1",
+    "expectedOutput": "2147483648"
    },
    {
-    "id": "acc-adv-s6-r2-q1-h3",
-    "input": "\"2101\"",
+    "id": "acc-adv-s1-r2-q1-h3",
+    "input": "2147483648",
     "expectedOutput": "1"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction numDecodings(s) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def numDecodings(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int numDecodings(string s) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction reverseBits(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def reverseBits(self, n: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int reverseBits(int n) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(1)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-adv-s2-r2-q1": {
+  "id": "acc-adv-s2-r2-q1",
+  "title": "Is One String a Rotation of Another",
+  "difficulty": "Easy",
+  "company": "Accenture",
+  "category": "String",
+  "tags": [
+   "Accenture Round 2",
+   "String",
+   "Set 2"
+  ],
+  "paragraphs": [
+   "Return true if b can be obtained by rotating a some number of positions.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "a = \"abcde\", b = \"cdeab\"",
+    "output": "true"
+   },
+   {
+    "input": "a = \"abcde\", b = \"abced\"",
+    "output": "false"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s2-r2-q1-v1",
+    "input": "\"abcde\"\n\"cdeab\"",
+    "expectedOutput": "true"
+   },
+   {
+    "id": "acc-adv-s2-r2-q1-v2",
+    "input": "\"abcde\"\n\"abced\"",
+    "expectedOutput": "false"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s2-r2-q1-h1",
+    "input": "\"a\"\n\"a\"",
+    "expectedOutput": "true"
+   },
+   {
+    "id": "acc-adv-s2-r2-q1-h2",
+    "input": "\"ab\"\n\"ba\"",
+    "expectedOutput": "true"
+   },
+   {
+    "id": "acc-adv-s2-r2-q1-h3",
+    "input": "\"abc\"\n\"abcd\"",
+    "expectedOutput": "false"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} a\n * @param {string} b\n * @return {boolean}\n */\nfunction isRotation(a, b) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def isRotation(self, a: str, b: str) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool isRotation(string a, string b) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-adv-s3-r2-q1": {
+  "id": "acc-adv-s3-r2-q1",
+  "title": "Count Lit Bulbs After Rounds",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Math",
+  "tags": [
+   "Accenture Round 2",
+   "Math",
+   "Set 3"
+  ],
+  "paragraphs": [
+   "n bulbs start off; round k toggles every k-th bulb. Return how many are on after n rounds.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "n = 3",
+    "output": "1"
+   },
+   {
+    "input": "n = 0",
+    "output": "0"
+   }
+  ],
+  "constraints": [
+   "Target O(1) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s3-r2-q1-v1",
+    "input": "3",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-adv-s3-r2-q1-v2",
+    "input": "0",
+    "expectedOutput": "0"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s3-r2-q1-h1",
+    "input": "1",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-adv-s3-r2-q1-h2",
+    "input": "16",
+    "expectedOutput": "4"
+   },
+   {
+    "id": "acc-adv-s3-r2-q1-h3",
+    "input": "99999",
+    "expectedOutput": "316"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction bulbSwitch(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def bulbSwitch(self, n: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int bulbSwitch(int n) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(1)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-adv-s4-r2-q1": {
+  "id": "acc-adv-s4-r2-q1",
+  "title": "Total Bit Differences Across Pairs",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Bit Manipulation",
+  "tags": [
+   "Accenture Round 2",
+   "Bit Manipulation",
+   "Set 4"
+  ],
+  "paragraphs": [
+   "Return the sum of Hamming distances over all pairs of numbers. Defend an O(32 N) approach.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "nums = [4,14,2]",
+    "output": "6"
+   },
+   {
+    "input": "nums = [4,14,4]",
+    "output": "4"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s4-r2-q1-v1",
+    "input": "[4,14,2]",
+    "expectedOutput": "6"
+   },
+   {
+    "id": "acc-adv-s4-r2-q1-v2",
+    "input": "[4,14,4]",
+    "expectedOutput": "4"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s4-r2-q1-h1",
+    "input": "[1]",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-adv-s4-r2-q1-h2",
+    "input": "[0,0]",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-adv-s4-r2-q1-h3",
+    "input": "[1,2,4,8]",
+    "expectedOutput": "12"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction totalHammingDistance(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def totalHammingDistance(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int totalHammingDistance(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-adv-s5-r2-q1": {
+  "id": "acc-adv-s5-r2-q1",
+  "title": "Items Ordered More Than a Third",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Voting Algorithm",
+  "tags": [
+   "Accenture Round 2",
+   "Voting Algorithm",
+   "Set 5"
+  ],
+  "paragraphs": [
+   "Return, sorted, all values appearing more than N/3 times. Defend an O(1)-space approach.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "nums = [3,2,3]",
+    "output": "[3]"
+   },
+   {
+    "input": "nums = [1]",
+    "output": "[1]"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s5-r2-q1-v1",
+    "input": "[3,2,3]",
+    "expectedOutput": "[3]"
+   },
+   {
+    "id": "acc-adv-s5-r2-q1-v2",
+    "input": "[1]",
+    "expectedOutput": "[1]"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s5-r2-q1-h1",
+    "input": "[1,2]",
+    "expectedOutput": "[1,2]"
+   },
+   {
+    "id": "acc-adv-s5-r2-q1-h2",
+    "input": "[1,1,1,3,3,2,2,2]",
+    "expectedOutput": "[1,2]"
+   },
+   {
+    "id": "acc-adv-s5-r2-q1-h3",
+    "input": "[1,2,3,4]",
+    "expectedOutput": "[]"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction majorityElementII(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def majorityElementII(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> majorityElementII(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-adv-s6-r2-q1": {
+  "id": "acc-adv-s6-r2-q1",
+  "title": "Find All Repeated Ids",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Array",
+  "tags": [
+   "Accenture Round 2",
+   "Array",
+   "Set 6"
+  ],
+  "paragraphs": [
+   "Values are in 1..n and each appears once or twice. Return, sorted, those appearing twice, in O(N) time and O(1) extra space.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "nums = [4,3,2,7,8,2,3,1]",
+    "output": "[2,3]"
+   },
+   {
+    "input": "nums = [1,1,2]",
+    "output": "[1]"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s6-r2-q1-v1",
+    "input": "[4,3,2,7,8,2,3,1]",
+    "expectedOutput": "[2,3]"
+   },
+   {
+    "id": "acc-adv-s6-r2-q1-v2",
+    "input": "[1,1,2]",
+    "expectedOutput": "[1]"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s6-r2-q1-h1",
+    "input": "[1]",
+    "expectedOutput": "[]"
+   },
+   {
+    "id": "acc-adv-s6-r2-q1-h2",
+    "input": "[2,2,3,3]",
+    "expectedOutput": "[2,3]"
+   },
+   {
+    "id": "acc-adv-s6-r2-q1-h3",
+    "input": "[1,2,3]",
+    "expectedOutput": "[]"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction findDuplicates(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def findDuplicates(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> findDuplicates(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -4923,72 +4876,71 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s7-r2-q1": {
   "id": "acc-adv-s7-r2-q1",
-  "title": "Fewest Palindromic Splits",
+  "title": "Smallest Missing Positive Ticket",
   "difficulty": "Hard",
   "company": "Accenture",
-  "category": "DP",
+  "category": "Array",
   "tags": [
    "Accenture Round 2",
-   "DP",
-   "String",
+   "Array",
    "Set 7"
   ],
   "paragraphs": [
-   "Return the minimum number of cuts needed to partition s so every part is a palindrome.",
+   "Return the smallest missing positive integer in O(N) time and O(1) extra space.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "s = \"aab\"",
-    "output": "1"
+    "input": "nums = [1,2,0]",
+    "output": "3"
    },
    {
-    "input": "s = \"a\"",
-    "output": "0"
+    "input": "nums = [3,4,-1,1]",
+    "output": "2"
    }
   ],
   "constraints": [
-   "Target O(N^2) time and O(N^2) space.",
+   "Target O(N) time and O(1) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-adv-s7-r2-q1-v1",
-    "input": "\"aab\"",
-    "expectedOutput": "1"
+    "input": "[1,2,0]",
+    "expectedOutput": "3"
    },
    {
     "id": "acc-adv-s7-r2-q1-v2",
-    "input": "\"a\"",
-    "expectedOutput": "0"
+    "input": "[3,4,-1,1]",
+    "expectedOutput": "2"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s7-r2-q1-h1",
-    "input": "\"ab\"",
+    "input": "[7,8,9,11,12]",
     "expectedOutput": "1"
    },
    {
     "id": "acc-adv-s7-r2-q1-h2",
-    "input": "\"racecar\"",
-    "expectedOutput": "0"
+    "input": "[1]",
+    "expectedOutput": "2"
    },
    {
     "id": "acc-adv-s7-r2-q1-h3",
-    "input": "\"abcbm\"",
-    "expectedOutput": "2"
+    "input": "[2,1]",
+    "expectedOutput": "3"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction minCut(s) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def minCut(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minCut(string s) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction firstMissingPositive(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def firstMissingPositive(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int firstMissingPositive(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N^2)",
-   "space": "O(N^2)"
+   "time": "O(N)",
+   "space": "O(1)"
   },
   "taskIndex": 1,
   "totalTasks": 1,
@@ -4996,28 +4948,27 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s8-r2-q1": {
   "id": "acc-adv-s8-r2-q1",
-  "title": "Largest Dashboard Rectangle",
+  "title": "Largest Gap in Sorted Timestamps",
   "difficulty": "Hard",
   "company": "Accenture",
-  "category": "Monotonic Stack",
+  "category": "Bucket Sort",
   "tags": [
    "Accenture Round 2",
-   "Stack",
-   "Array",
+   "Bucket Sort",
    "Set 8"
   ],
   "paragraphs": [
-   "Given bar heights of width 1, return the area of the largest rectangle in the histogram. Defend the amortised O(N) stack argument.",
+   "Return the maximum difference between successive elements in the sorted form of the array, or 0 if it has fewer than 2 elements. Defend a linear-time bucket approach.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "heights = [2,1,5,6,2,3]",
-    "output": "10"
+    "input": "nums = [3,6,9,1]",
+    "output": "3"
    },
    {
-    "input": "heights = [2,4]",
-    "output": "4"
+    "input": "nums = [10]",
+    "output": "0"
    }
   ],
   "constraints": [
@@ -5028,36 +4979,36 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-adv-s8-r2-q1-v1",
-    "input": "[2,1,5,6,2,3]",
-    "expectedOutput": "10"
+    "input": "[3,6,9,1]",
+    "expectedOutput": "3"
    },
    {
     "id": "acc-adv-s8-r2-q1-v2",
-    "input": "[2,4]",
-    "expectedOutput": "4"
+    "input": "[10]",
+    "expectedOutput": "0"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s8-r2-q1-h1",
-    "input": "[1]",
-    "expectedOutput": "1"
+    "input": "[1,1,1,1]",
+    "expectedOutput": "0"
    },
    {
     "id": "acc-adv-s8-r2-q1-h2",
-    "input": "[6,2,5,4,5,1,6]",
-    "expectedOutput": "12"
+    "input": "[100,3,2,1]",
+    "expectedOutput": "97"
    },
    {
     "id": "acc-adv-s8-r2-q1-h3",
-    "input": "[3,3,3,3]",
-    "expectedOutput": "12"
+    "input": "[1,10000000]",
+    "expectedOutput": "9999999"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} heights\n * @return {number}\n */\nfunction largestRectangleArea(heights) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def largestRectangleArea(self, heights: List[int]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int largestRectangleArea(vector<int>& heights) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction maximumGap(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def maximumGap(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maximumGap(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -5069,28 +5020,99 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-adv-s9-r2-q1": {
   "id": "acc-adv-s9-r2-q1",
-  "title": "Count Smaller Events After",
-  "difficulty": "Hard",
+  "title": "H-Index of Engineer Impact",
+  "difficulty": "Medium",
   "company": "Accenture",
-  "category": "BIT / Merge Sort",
+  "category": "Sorting",
   "tags": [
    "Accenture Round 2",
-   "Binary Indexed Tree",
-   "Merge Sort",
+   "Sorting",
    "Set 9"
   ],
   "paragraphs": [
-   "For each index i, return how many elements to its right are strictly smaller than nums[i]. Defend a sub-quadratic approach.",
+   "h is the largest number such that h items have at least h citations each. Return the h-index.",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "nums = [5,2,6,1]",
-    "output": "[2,1,1,0]"
+    "input": "citations = [3,0,6,1,5]",
+    "output": "3"
    },
    {
-    "input": "nums = [-1]",
-    "output": "[0]"
+    "input": "citations = [1,3,1]",
+    "output": "1"
+   }
+  ],
+  "constraints": [
+   "Target O(N log N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-adv-s9-r2-q1-v1",
+    "input": "[3,0,6,1,5]",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-adv-s9-r2-q1-v2",
+    "input": "[1,3,1]",
+    "expectedOutput": "1"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-adv-s9-r2-q1-h1",
+    "input": "[0]",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-adv-s9-r2-q1-h2",
+    "input": "[10,8,5,4,3]",
+    "expectedOutput": "4"
+   },
+   {
+    "id": "acc-adv-s9-r2-q1-h3",
+    "input": "[100]",
+    "expectedOutput": "1"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} citations\n * @return {number}\n */\nfunction hIndex(citations) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def hIndex(self, citations: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int hIndex(vector<int>& citations) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N log N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-adv-s10-r2-q1": {
+  "id": "acc-adv-s10-r2-q1",
+  "title": "Minimum Platforms for a Schedule",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Sorting / Sweep",
+  "tags": [
+   "Accenture Round 2",
+   "Sorting / Sweep",
+   "Set 10"
+  ],
+  "paragraphs": [
+   "Given arrival and departure times (a train leaving at t frees the platform for one arriving at t), return the minimum platforms needed.",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "arrival = [900,940,950,1100,1500,1800], departure = [910,1200,1120,1130,1900,2000]",
+    "output": "3"
+   },
+   {
+    "input": "arrival = [100,200], departure = [150,250]",
+    "output": "1"
    }
   ],
   "constraints": [
@@ -5100,114 +5122,40 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-adv-s9-r2-q1-v1",
-    "input": "[5,2,6,1]",
-    "expectedOutput": "[2,1,1,0]"
-   },
-   {
-    "id": "acc-adv-s9-r2-q1-v2",
-    "input": "[-1]",
-    "expectedOutput": "[0]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-adv-s9-r2-q1-h1",
-    "input": "[-1,-1]",
-    "expectedOutput": "[0,0]"
-   },
-   {
-    "id": "acc-adv-s9-r2-q1-h2",
-    "input": "[3,2,1]",
-    "expectedOutput": "[2,1,0]"
-   },
-   {
-    "id": "acc-adv-s9-r2-q1-h3",
-    "input": "[1,2,3]",
-    "expectedOutput": "[0,0,0]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {number[]}\n */\nfunction countSmaller(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def countSmaller(self, nums: List[int]) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> countSmaller(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N log N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
- "acc-adv-s10-r2-q1": {
-  "id": "acc-adv-s10-r2-q1",
-  "title": "Most Collinear Probe Points",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Hashing / Geometry",
-  "tags": [
-   "Accenture Round 2",
-   "Hash Table",
-   "Math",
-   "Geometry",
-   "Set 10"
-  ],
-  "paragraphs": [
-   "Given points [x, y], return the maximum number of points lying on one straight line. Defend how you avoid floating-point slopes.",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "points = [[1,1],[2,2],[3,3]]",
-    "output": "3"
-   },
-   {
-    "input": "points = [[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]",
-    "output": "4"
-   }
-  ],
-  "constraints": [
-   "Target O(N^2) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
     "id": "acc-adv-s10-r2-q1-v1",
-    "input": "[[1,1],[2,2],[3,3]]",
+    "input": "[900,940,950,1100,1500,1800]\n[910,1200,1120,1130,1900,2000]",
     "expectedOutput": "3"
    },
    {
     "id": "acc-adv-s10-r2-q1-v2",
-    "input": "[[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]",
-    "expectedOutput": "4"
+    "input": "[100,200]\n[150,250]",
+    "expectedOutput": "1"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-adv-s10-r2-q1-h1",
-    "input": "[[0,0]]",
+    "input": "[100]\n[200]",
     "expectedOutput": "1"
    },
    {
     "id": "acc-adv-s10-r2-q1-h2",
-    "input": "[[0,0],[1,1],[2,2],[3,0]]",
+    "input": "[100,100,100]\n[200,200,200]",
     "expectedOutput": "3"
    },
    {
     "id": "acc-adv-s10-r2-q1-h3",
-    "input": "[[0,0],[0,1],[0,2],[1,5]]",
-    "expectedOutput": "3"
+    "input": "[100,200,300]\n[200,300,400]",
+    "expectedOutput": "1"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} points\n * @return {number}\n */\nfunction maxPoints(points) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def maxPoints(self, points: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxPoints(vector<vector<int>>& points) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {number[]} arrival\n * @param {number[]} departure\n * @return {number}\n */\nfunction minPlatforms(arrival, departure) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def minPlatforms(self, arrival: List[int], departure: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minPlatforms(vector<int>& arrival, vector<int>& departure) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(N^2)",
+   "time": "O(N log N)",
    "space": "O(N)"
   },
   "taskIndex": 1,
@@ -6086,1401 +6034,26 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-sse-s1-r1-q1": {
   "id": "acc-sse-s1-r1-q1",
-  "title": "Alternating Colour Shortest Paths",
+  "title": "Strip Invalid Brackets From a Query",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Graph / BFS",
+  "category": "Stack",
   "tags": [
    "Accenture Round 1",
-   "BFS",
-   "Graph",
-   "State Search",
+   "Stack",
    "Set 1"
   ],
   "paragraphs": [
-   "A directed multigraph has n nodes with red and blue edges. Return, for every node, the shortest path length from node 0 whose edge colours strictly alternate, or -1."
+   "Remove the fewest parentheses so the string is valid; return the string (tests have a unique answer)."
   ],
   "examples": [
    {
-    "input": "n = 3, redEdges = [[0,1],[1,2]], blueEdges = []",
-    "output": "[0,1,-1]"
+    "input": "s = \"lee(t(c)o)de)\"",
+    "output": "\"lee(t(c)o)de\""
    },
    {
-    "input": "n = 3, redEdges = [[0,1]], blueEdges = [[2,1]]",
-    "output": "[0,1,-1]"
-   }
-  ],
-  "constraints": [
-   "Target O(V+E) time and O(V) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s1-r1-q1-v1",
-    "input": "3\n[[0,1],[1,2]]\n[]",
-    "expectedOutput": "[0,1,-1]"
-   },
-   {
-    "id": "acc-sse-s1-r1-q1-v2",
-    "input": "3\n[[0,1]]\n[[2,1]]",
-    "expectedOutput": "[0,1,-1]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s1-r1-q1-h1",
-    "input": "5\n[[0,1],[1,2],[2,3],[3,4]]\n[[1,2],[2,3],[3,1]]",
-    "expectedOutput": "[0,1,2,3,7]"
-   },
-   {
-    "id": "acc-sse-s1-r1-q1-h2",
-    "input": "1\n[]\n[]",
-    "expectedOutput": "[0]"
-   },
-   {
-    "id": "acc-sse-s1-r1-q1-h3",
-    "input": "4\n[[0,1]]\n[[1,2],[2,3]]",
-    "expectedOutput": "[0,1,2,-1]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number} n\n * @param {number[][]} redEdges\n * @param {number[][]} blueEdges\n * @return {number[]}\n */\nfunction shortestAlternatingPaths(n, redEdges, blueEdges) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def shortestAlternatingPaths(self, n: int, redEdges: List[List[int]], blueEdges: List[List[int]]) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> shortestAlternatingPaths(int n, vector<vector<int>>& redEdges, vector<vector<int>>& blueEdges) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(V+E)",
-   "space": "O(V)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s1-r1-q2"
- },
- "acc-sse-s1-r1-q2": {
-  "id": "acc-sse-s1-r1-q2",
-  "title": "Longest Fragment With K Distinct Tokens",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Sliding Window",
-  "tags": [
-   "Accenture Round 1",
-   "Sliding Window",
-   "Hash Table",
-   "Set 1"
-  ],
-  "paragraphs": [
-   "Return the length of the longest substring of s containing at most k distinct characters. If k is 0, return 0."
-  ],
-  "examples": [
-   {
-    "input": "s = \"eceba\", k = 2",
-    "output": "3"
-   },
-   {
-    "input": "s = \"aa\", k = 1",
-    "output": "2"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(K) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s1-r1-q2-v1",
-    "input": "\"eceba\"\n2",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s1-r1-q2-v2",
-    "input": "\"aa\"\n1",
-    "expectedOutput": "2"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s1-r1-q2-h1",
-    "input": "\"a\"\n0",
-    "expectedOutput": "0"
-   },
-   {
-    "id": "acc-sse-s1-r1-q2-h2",
-    "input": "\"abaccc\"\n2",
-    "expectedOutput": "4"
-   },
-   {
-    "id": "acc-sse-s1-r1-q2-h3",
-    "input": "\"abcabc\"\n3",
-    "expectedOutput": "6"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @param {number} k\n * @return {number}\n */\nfunction lengthOfLongestSubstringKDistinct(s, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int lengthOfLongestSubstringKDistinct(string s, int k) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(K)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s2-r1-q1": {
-  "id": "acc-sse-s2-r1-q1",
-  "title": "Distance to Nearest Cache Node",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Multi-source BFS",
-  "tags": [
-   "Accenture Round 1",
-   "BFS",
-   "Matrix",
-   "Multi-source",
-   "Set 2"
-  ],
-  "paragraphs": [
-   "In a binary matrix, return for every cell the distance to the nearest 0. Distances use 4-directional steps."
-  ],
-  "examples": [
-   {
-    "input": "mat = [[0,0,0],[0,1,0],[0,0,0]]",
-    "output": "[[0,0,0],[0,1,0],[0,0,0]]"
-   },
-   {
-    "input": "mat = [[0,0,0],[0,1,0],[1,1,1]]",
-    "output": "[[0,0,0],[0,1,0],[1,2,1]]"
-   }
-  ],
-  "constraints": [
-   "Target O(M*N) time and O(M*N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s2-r1-q1-v1",
-    "input": "[[0,0,0],[0,1,0],[0,0,0]]",
-    "expectedOutput": "[[0,0,0],[0,1,0],[0,0,0]]"
-   },
-   {
-    "id": "acc-sse-s2-r1-q1-v2",
-    "input": "[[0,0,0],[0,1,0],[1,1,1]]",
-    "expectedOutput": "[[0,0,0],[0,1,0],[1,2,1]]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s2-r1-q1-h1",
-    "input": "[[0]]",
-    "expectedOutput": "[[0]]"
-   },
-   {
-    "id": "acc-sse-s2-r1-q1-h2",
-    "input": "[[1,1],[1,0]]",
-    "expectedOutput": "[[2,1],[1,0]]"
-   },
-   {
-    "id": "acc-sse-s2-r1-q1-h3",
-    "input": "[[1,0,1,1],[1,1,1,1]]",
-    "expectedOutput": "[[1,0,1,2],[2,1,2,3]]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} mat\n * @return {number[][]}\n */\nfunction updateMatrix(mat) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def updateMatrix(self, mat: List[List[int]]) -> List[List[int]]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<vector<int>> updateMatrix(vector<vector<int>>& mat) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(M*N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s2-r1-q2"
- },
- "acc-sse-s2-r1-q2": {
-  "id": "acc-sse-s2-r1-q2",
-  "title": "Maximum Batch Jobs by Deadline",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Greedy / Heap",
-  "tags": [
-   "Accenture Round 1",
-   "Greedy",
-   "Heap",
-   "Scheduling",
-   "Set 2"
-  ],
-  "paragraphs": [
-   "Each job is [duration, deadline]. Jobs run one at a time and must finish by their deadline. Return the maximum number of jobs you can complete."
-  ],
-  "examples": [
-   {
-    "input": "jobs = [[100,200],[200,1300],[1000,1250],[2000,3200]]",
-    "output": "3"
-   },
-   {
-    "input": "jobs = [[1,2]]",
-    "output": "1"
-   }
-  ],
-  "constraints": [
-   "Target O(N log N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s2-r1-q2-v1",
-    "input": "[[100,200],[200,1300],[1000,1250],[2000,3200]]",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s2-r1-q2-v2",
-    "input": "[[1,2]]",
-    "expectedOutput": "1"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s2-r1-q2-h1",
-    "input": "[[3,2],[4,3]]",
-    "expectedOutput": "0"
-   },
-   {
-    "id": "acc-sse-s2-r1-q2-h2",
-    "input": "[[5,5],[4,6],[2,6]]",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-sse-s2-r1-q2-h3",
-    "input": "[[7,16],[2,3],[3,12],[3,14],[10,19],[10,16],[6,8],[6,11],[3,13],[6,16]]",
-    "expectedOutput": "4"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} jobs\n * @return {number}\n */\nfunction scheduleJobs(jobs) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def scheduleJobs(self, jobs: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int scheduleJobs(vector<vector<int>>& jobs) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N log N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s3-r1-q1": {
-  "id": "acc-sse-s3-r1-q1",
-  "title": "Rooms to Nearest Gateway",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Multi-source BFS",
-  "tags": [
-   "Accenture Round 1",
-   "BFS",
-   "Matrix",
-   "Set 3"
-  ],
-  "paragraphs": [
-   "In a grid, -1 is a wall, 0 is a gateway and 2147483647 is an empty room. Fill each empty room with the distance to its nearest gateway, leaving it at 2147483647 if unreachable."
-  ],
-  "examples": [
-   {
-    "input": "rooms = [[2147483647,-1,0,2147483647],[2147483647,2147483647,2147483647,-1],[2147483647,-1,2147483647,-1],[0,-1,2147483647,2147483647]]",
-    "output": "[[3,-1,0,1],[2,2,1,-1],[1,-1,2,-1],[0,-1,3,4]]"
-   },
-   {
-    "input": "rooms = [[0]]",
-    "output": "[[0]]"
-   }
-  ],
-  "constraints": [
-   "Target O(M*N) time and O(M*N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s3-r1-q1-v1",
-    "input": "[[2147483647,-1,0,2147483647],[2147483647,2147483647,2147483647,-1],[2147483647,-1,2147483647,-1],[0,-1,2147483647,2147483647]]",
-    "expectedOutput": "[[3,-1,0,1],[2,2,1,-1],[1,-1,2,-1],[0,-1,3,4]]"
-   },
-   {
-    "id": "acc-sse-s3-r1-q1-v2",
-    "input": "[[0]]",
-    "expectedOutput": "[[0]]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s3-r1-q1-h1",
-    "input": "[[2147483647]]",
-    "expectedOutput": "[[2147483647]]"
-   },
-   {
-    "id": "acc-sse-s3-r1-q1-h2",
-    "input": "[[2147483647,0],[-1,2147483647]]",
-    "expectedOutput": "[[1,0],[-1,1]]"
-   },
-   {
-    "id": "acc-sse-s3-r1-q1-h3",
-    "input": "[[0,2147483647,2147483647]]",
-    "expectedOutput": "[[0,1,2]]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} rooms\n * @return {number[][]}\n */\nfunction wallsAndGates(rooms) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def wallsAndGates(self, rooms: List[List[int]]) -> List[List[int]]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<vector<int>> wallsAndGates(vector<vector<int>>& rooms) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(M*N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s3-r1-q2"
- },
- "acc-sse-s3-r1-q2": {
-  "id": "acc-sse-s3-r1-q2",
-  "title": "Rolling Maximum Over Metrics",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Monotonic Deque",
-  "tags": [
-   "Accenture Round 1",
-   "Deque",
-   "Sliding Window",
-   "Set 3"
-  ],
-  "paragraphs": [
-   "Return the maximum of every window of size k as it slides across nums."
-  ],
-  "examples": [
-   {
-    "input": "nums = [1,3,-1,-3,5,3,6,7], k = 3",
-    "output": "[3,3,5,5,6,7]"
-   },
-   {
-    "input": "nums = [1], k = 1",
-    "output": "[1]"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(K) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s3-r1-q2-v1",
-    "input": "[1,3,-1,-3,5,3,6,7]\n3",
-    "expectedOutput": "[3,3,5,5,6,7]"
-   },
-   {
-    "id": "acc-sse-s3-r1-q2-v2",
-    "input": "[1]\n1",
-    "expectedOutput": "[1]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s3-r1-q2-h1",
-    "input": "[9,11]\n2",
-    "expectedOutput": "[11]"
-   },
-   {
-    "id": "acc-sse-s3-r1-q2-h2",
-    "input": "[4,3,2,1]\n2",
-    "expectedOutput": "[4,3,2]"
-   },
-   {
-    "id": "acc-sse-s3-r1-q2-h3",
-    "input": "[1,-1]\n1",
-    "expectedOutput": "[1,-1]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number[]}\n */\nfunction maxSlidingWindow(nums, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> maxSlidingWindow(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(K)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s4-r1-q1": {
-  "id": "acc-sse-s4-r1-q1",
-  "title": "Shortest Route With Removable Blocks",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "BFS with State",
-  "tags": [
-   "Accenture Round 1",
-   "BFS",
-   "Matrix",
-   "State Search",
-   "Set 4"
-  ],
-  "paragraphs": [
-   "In a 0/1 grid (1 = obstacle), find the shortest path from top-left to bottom-right (4 directions) if you may remove at most k obstacles. Return -1 if impossible."
-  ],
-  "examples": [
-   {
-    "input": "grid = [[0,0,0],[1,1,0],[0,0,0],[0,1,1],[0,0,0]], k = 1",
-    "output": "6"
-   },
-   {
-    "input": "grid = [[0,1,1],[1,1,1],[1,0,0]], k = 1",
-    "output": "-1"
-   }
-  ],
-  "constraints": [
-   "Target O(M*N*K) time and O(M*N*K) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s4-r1-q1-v1",
-    "input": "[[0,0,0],[1,1,0],[0,0,0],[0,1,1],[0,0,0]]\n1",
-    "expectedOutput": "6"
-   },
-   {
-    "id": "acc-sse-s4-r1-q1-v2",
-    "input": "[[0,1,1],[1,1,1],[1,0,0]]\n1",
-    "expectedOutput": "-1"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s4-r1-q1-h1",
-    "input": "[[0]]\n0",
-    "expectedOutput": "0"
-   },
-   {
-    "id": "acc-sse-s4-r1-q1-h2",
-    "input": "[[0,1],[1,0]]\n1",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-sse-s4-r1-q1-h3",
-    "input": "[[0,0],[0,0]]\n0",
-    "expectedOutput": "2"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} grid\n * @param {number} k\n * @return {number}\n */\nfunction shortestPath(grid, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def shortestPath(self, grid: List[List[int]], k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int shortestPath(vector<vector<int>>& grid, int k) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(M*N*K)",
-   "space": "O(M*N*K)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s4-r1-q2"
- },
- "acc-sse-s4-r1-q2": {
-  "id": "acc-sse-s4-r1-q2",
-  "title": "Smallest Covering Log Window",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Sliding Window",
-  "tags": [
-   "Accenture Round 1",
-   "Sliding Window",
-   "Hash Table",
-   "Set 4"
-  ],
-  "paragraphs": [
-   "Return the smallest substring of s that contains every character of t (with multiplicity), or an empty string if none exists. The answer is unique in the tests."
-  ],
-  "examples": [
-   {
-    "input": "s = \"ADOBECODEBANC\", t = \"ABC\"",
-    "output": "\"BANC\""
-   },
-   {
-    "input": "s = \"a\", t = \"a\"",
-    "output": "\"a\""
-   }
-  ],
-  "constraints": [
-   "Target O(N+M) time and O(A) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s4-r1-q2-v1",
-    "input": "\"ADOBECODEBANC\"\n\"ABC\"",
-    "expectedOutput": "\"BANC\""
-   },
-   {
-    "id": "acc-sse-s4-r1-q2-v2",
-    "input": "\"a\"\n\"a\"",
-    "expectedOutput": "\"a\""
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s4-r1-q2-h1",
-    "input": "\"a\"\n\"aa\"",
-    "expectedOutput": "\"\""
-   },
-   {
-    "id": "acc-sse-s4-r1-q2-h2",
-    "input": "\"abc\"\n\"b\"",
-    "expectedOutput": "\"b\""
-   },
-   {
-    "id": "acc-sse-s4-r1-q2-h3",
-    "input": "\"xyzzy\"\n\"zy\"",
-    "expectedOutput": "\"yz\""
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} s\n * @param {string} t\n * @return {string}\n */\nfunction minWindow(s, t) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def minWindow(self, s: str, t: str) -> str:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string minWindow(string s, string t) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N+M)",
-   "space": "O(A)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s5-r1-q1": {
-  "id": "acc-sse-s5-r1-q1",
-  "title": "Word Ladder Transformation Length",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Graph / BFS",
-  "tags": [
-   "Accenture Round 1",
-   "BFS",
-   "String",
-   "Graph",
-   "Set 5"
-  ],
-  "paragraphs": [
-   "Given beginWord, endWord and a word list, return the number of words in the shortest transformation sequence where each step changes one letter and every intermediate word is in the list. Return 0 if none exists."
-  ],
-  "examples": [
-   {
-    "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
-    "output": "5"
-   },
-   {
-    "input": "beginWord = \"hit\", endWord = \"cog\", wordList = [\"hot\",\"dot\",\"dog\",\"lot\",\"log\"]",
-    "output": "0"
-   }
-  ],
-  "constraints": [
-   "Target O(N*L*26) time and O(N*L) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s5-r1-q1-v1",
-    "input": "\"hit\"\n\"cog\"\n[\"hot\",\"dot\",\"dog\",\"lot\",\"log\",\"cog\"]",
-    "expectedOutput": "5"
-   },
-   {
-    "id": "acc-sse-s5-r1-q1-v2",
-    "input": "\"hit\"\n\"cog\"\n[\"hot\",\"dot\",\"dog\",\"lot\",\"log\"]",
-    "expectedOutput": "0"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s5-r1-q1-h1",
-    "input": "\"a\"\n\"c\"\n[\"a\",\"b\",\"c\"]",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-sse-s5-r1-q1-h2",
-    "input": "\"lost\"\n\"cost\"\n[\"most\",\"fust\",\"lost\",\"cost\",\"cast\"]",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-sse-s5-r1-q1-h3",
-    "input": "\"red\"\n\"tax\"\n[\"ted\",\"tex\",\"red\",\"tax\",\"tad\",\"den\",\"rex\",\"pee\"]",
-    "expectedOutput": "4"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} beginWord\n * @param {string} endWord\n * @param {string[]} wordList\n * @return {number}\n */\nfunction ladderLength(beginWord, endWord, wordList) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N*L*26)",
-   "space": "O(N*L)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s5-r1-q2"
- },
- "acc-sse-s5-r1-q2": {
-  "id": "acc-sse-s5-r1-q2",
-  "title": "Longest Rising Trend",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "DP / Binary Search",
-  "tags": [
-   "Accenture Round 1",
-   "DP",
-   "Binary Search",
-   "Set 5"
-  ],
-  "paragraphs": [
-   "Return the length of the longest strictly increasing subsequence of nums in O(N log N)."
-  ],
-  "examples": [
-   {
-    "input": "nums = [10,9,2,5,3,7,101,18]",
-    "output": "4"
-   },
-   {
-    "input": "nums = [0,1,0,3,2,3]",
-    "output": "4"
-   }
-  ],
-  "constraints": [
-   "Target O(N log N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s5-r1-q2-v1",
-    "input": "[10,9,2,5,3,7,101,18]",
-    "expectedOutput": "4"
-   },
-   {
-    "id": "acc-sse-s5-r1-q2-v2",
-    "input": "[0,1,0,3,2,3]",
-    "expectedOutput": "4"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s5-r1-q2-h1",
-    "input": "[7,7,7,7]",
-    "expectedOutput": "1"
-   },
-   {
-    "id": "acc-sse-s5-r1-q2-h2",
-    "input": "[1]",
-    "expectedOutput": "1"
-   },
-   {
-    "id": "acc-sse-s5-r1-q2-h3",
-    "input": "[4,10,4,3,8,9]",
-    "expectedOutput": "3"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction lengthOfLIS(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def lengthOfLIS(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int lengthOfLIS(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N log N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s6-r1-q1": {
-  "id": "acc-sse-s6-r1-q1",
-  "title": "Farthest Zone From Any Node",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Multi-source BFS",
-  "tags": [
-   "Accenture Round 1",
-   "BFS",
-   "Matrix",
-   "Set 6"
-  ],
-  "paragraphs": [
-   "In an n x n grid, 1 is a hosting zone and 0 is an empty zone. Return the maximum Manhattan distance from an empty zone to its nearest hosting zone, or -1 if the grid is all empty or all hosting."
-  ],
-  "examples": [
-   {
-    "input": "grid = [[1,0,1],[0,0,0],[1,0,1]]",
-    "output": "2"
-   },
-   {
-    "input": "grid = [[1,0,0],[0,0,0],[0,0,0]]",
-    "output": "4"
-   }
-  ],
-  "constraints": [
-   "Target O(N^2) time and O(N^2) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s6-r1-q1-v1",
-    "input": "[[1,0,1],[0,0,0],[1,0,1]]",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-sse-s6-r1-q1-v2",
-    "input": "[[1,0,0],[0,0,0],[0,0,0]]",
-    "expectedOutput": "4"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s6-r1-q1-h1",
-    "input": "[[0,0],[0,0]]",
-    "expectedOutput": "-1"
-   },
-   {
-    "id": "acc-sse-s6-r1-q1-h2",
-    "input": "[[1,1],[1,1]]",
-    "expectedOutput": "-1"
-   },
-   {
-    "id": "acc-sse-s6-r1-q1-h3",
-    "input": "[[0,0,0],[0,0,0],[0,0,1]]",
-    "expectedOutput": "4"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} grid\n * @return {number}\n */\nfunction maxDistance(grid) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def maxDistance(self, grid: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxDistance(vector<vector<int>>& grid) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N^2)",
-   "space": "O(N^2)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s6-r1-q2"
- },
- "acc-sse-s6-r1-q2": {
-  "id": "acc-sse-s6-r1-q2",
-  "title": "Minimum Edits Between Configs",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "DP (rolling row)",
-  "tags": [
-   "Accenture Round 1",
-   "DP",
-   "String",
-   "Set 6"
-  ],
-  "paragraphs": [
-   "Return the minimum number of insert, delete or replace operations to convert word1 into word2. Use O(min(M,N)) extra space."
-  ],
-  "examples": [
-   {
-    "input": "word1 = \"horse\", word2 = \"ros\"",
-    "output": "3"
-   },
-   {
-    "input": "word1 = \"intention\", word2 = \"execution\"",
-    "output": "5"
-   }
-  ],
-  "constraints": [
-   "Target O(M*N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s6-r1-q2-v1",
-    "input": "\"horse\"\n\"ros\"",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s6-r1-q2-v2",
-    "input": "\"intention\"\n\"execution\"",
-    "expectedOutput": "5"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s6-r1-q2-h1",
-    "input": "\"\"\n\"\"",
-    "expectedOutput": "0"
-   },
-   {
-    "id": "acc-sse-s6-r1-q2-h2",
-    "input": "\"abc\"\n\"\"",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s6-r1-q2-h3",
-    "input": "\"kitten\"\n\"sitting\"",
-    "expectedOutput": "3"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} word1\n * @param {string} word2\n * @return {number}\n */\nfunction minDistance(word1, word2) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def minDistance(self, word1: str, word2: str) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minDistance(string word1, string word2) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s7-r1-q1": {
-  "id": "acc-sse-s7-r1-q1",
-  "title": "Circular Server Rack Harvest",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "DP",
-  "tags": [
-   "Accenture Round 1",
-   "DP",
-   "Set 7"
-  ],
-  "paragraphs": [
-   "Servers sit on a circular rack with values nums. Adjacent servers cannot both be chosen. Return the maximum total value."
-  ],
-  "examples": [
-   {
-    "input": "nums = [2,3,2]",
-    "output": "3"
-   },
-   {
-    "input": "nums = [1,2,3,1]",
-    "output": "4"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(1) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s7-r1-q1-v1",
-    "input": "[2,3,2]",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s7-r1-q1-v2",
-    "input": "[1,2,3,1]",
-    "expectedOutput": "4"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s7-r1-q1-h1",
-    "input": "[1,2,3]",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s7-r1-q1-h2",
-    "input": "[5]",
-    "expectedOutput": "5"
-   },
-   {
-    "id": "acc-sse-s7-r1-q1-h3",
-    "input": "[2,7,9,3,1]",
-    "expectedOutput": "11"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction rob(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def rob(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int rob(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(1)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s7-r1-q2"
- },
- "acc-sse-s7-r1-q2": {
-  "id": "acc-sse-s7-r1-q2",
-  "title": "Largest Healthy Square",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "DP",
-  "tags": [
-   "Accenture Round 1",
-   "DP",
-   "Matrix",
-   "Set 7"
-  ],
-  "paragraphs": [
-   "Rows of matrix are strings of '0' and '1'. Return the area of the largest square containing only '1'."
-  ],
-  "examples": [
-   {
-    "input": "matrix = [\"10100\",\"10111\",\"11111\",\"10010\"]",
-    "output": "4"
-   },
-   {
-    "input": "matrix = [\"01\",\"10\"]",
-    "output": "1"
-   }
-  ],
-  "constraints": [
-   "Target O(M*N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s7-r1-q2-v1",
-    "input": "[\"10100\",\"10111\",\"11111\",\"10010\"]",
-    "expectedOutput": "4"
-   },
-   {
-    "id": "acc-sse-s7-r1-q2-v2",
-    "input": "[\"01\",\"10\"]",
-    "expectedOutput": "1"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s7-r1-q2-h1",
-    "input": "[\"0\"]",
-    "expectedOutput": "0"
-   },
-   {
-    "id": "acc-sse-s7-r1-q2-h2",
-    "input": "[\"11\",\"11\"]",
-    "expectedOutput": "4"
-   },
-   {
-    "id": "acc-sse-s7-r1-q2-h3",
-    "input": "[\"111\",\"111\",\"111\"]",
-    "expectedOutput": "9"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} matrix\n * @return {number}\n */\nfunction maximalSquare(matrix) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def maximalSquare(self, matrix: List[str]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maximalSquare(vector<string>& matrix) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(M*N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s8-r1-q1": {
-  "id": "acc-sse-s8-r1-q1",
-  "title": "Signal Propagation Time",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Dijkstra",
-  "tags": [
-   "Accenture Round 1",
-   "Dijkstra",
-   "Graph",
-   "Heap",
-   "Set 8"
-  ],
-  "paragraphs": [
-   "times[i] = [u, v, w] is a directed link taking w units. A signal starts at node k of n nodes. Return the time for all nodes to receive it, or -1."
-  ],
-  "examples": [
-   {
-    "input": "times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2",
-    "output": "2"
-   },
-   {
-    "input": "times = [[1,2,1]], n = 2, k = 1",
-    "output": "1"
-   }
-  ],
-  "constraints": [
-   "Target O(E log V) time and O(V+E) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s8-r1-q1-v1",
-    "input": "[[2,1,1],[2,3,1],[3,4,1]]\n4\n2",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-sse-s8-r1-q1-v2",
-    "input": "[[1,2,1]]\n2\n1",
-    "expectedOutput": "1"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s8-r1-q1-h1",
-    "input": "[[1,2,1]]\n2\n2",
-    "expectedOutput": "-1"
-   },
-   {
-    "id": "acc-sse-s8-r1-q1-h2",
-    "input": "[[1,2,1],[2,3,2],[1,3,4]]\n3\n1",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s8-r1-q1-h3",
-    "input": "[[1,2,5],[1,3,2],[3,2,1]]\n3\n1",
-    "expectedOutput": "3"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} times\n * @param {number} n\n * @param {number} k\n * @return {number}\n */\nfunction networkDelayTime(times, n, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def networkDelayTime(self, times: List[List[int]], n: int, k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int networkDelayTime(vector<vector<int>>& times, int n, int k) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(E log V)",
-   "space": "O(V+E)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s8-r1-q2"
- },
- "acc-sse-s8-r1-q2": {
-  "id": "acc-sse-s8-r1-q2",
-  "title": "Balanced Shard Split",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "DP (bitset)",
-  "tags": [
-   "Accenture Round 1",
-   "DP",
-   "Knapsack",
-   "Set 8"
-  ],
-  "paragraphs": [
-   "Return true if nums can be split into two subsets with equal sum."
-  ],
-  "examples": [
-   {
-    "input": "nums = [1,5,11,5]",
-    "output": "true"
-   },
-   {
-    "input": "nums = [1,2,3,5]",
-    "output": "false"
-   }
-  ],
-  "constraints": [
-   "Target O(N*S) time and O(S) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s8-r1-q2-v1",
-    "input": "[1,5,11,5]",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-sse-s8-r1-q2-v2",
-    "input": "[1,2,3,5]",
-    "expectedOutput": "false"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s8-r1-q2-h1",
-    "input": "[2,2]",
-    "expectedOutput": "true"
-   },
-   {
-    "id": "acc-sse-s8-r1-q2-h2",
-    "input": "[1]",
-    "expectedOutput": "false"
-   },
-   {
-    "id": "acc-sse-s8-r1-q2-h3",
-    "input": "[3,3,3,4,5]",
-    "expectedOutput": "true"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {boolean}\n */\nfunction canPartition(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def canPartition(self, nums: List[int]) -> bool:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool canPartition(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N*S)",
-   "space": "O(S)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s9-r1-q1": {
-  "id": "acc-sse-s9-r1-q1",
-  "title": "Cooldown Task Slots",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Greedy",
-  "tags": [
-   "Accenture Round 1",
-   "Greedy",
-   "Counting",
-   "Set 9"
-  ],
-  "paragraphs": [
-   "tasks is a string where each letter is a task type. The same type needs n idle slots between runs. Return the minimum number of slots to finish all tasks."
-  ],
-  "examples": [
-   {
-    "input": "tasks = \"AAABBB\", n = 2",
-    "output": "8"
-   },
-   {
-    "input": "tasks = \"AAABBB\", n = 0",
-    "output": "6"
-   }
-  ],
-  "constraints": [
-   "Target O(N) time and O(1) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s9-r1-q1-v1",
-    "input": "\"AAABBB\"\n2",
-    "expectedOutput": "8"
-   },
-   {
-    "id": "acc-sse-s9-r1-q1-v2",
-    "input": "\"AAABBB\"\n0",
-    "expectedOutput": "6"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s9-r1-q1-h1",
-    "input": "\"AAAAAABCDEFG\"\n2",
-    "expectedOutput": "16"
-   },
-   {
-    "id": "acc-sse-s9-r1-q1-h2",
-    "input": "\"ABC\"\n5",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s9-r1-q1-h3",
-    "input": "\"AABBCC\"\n1",
-    "expectedOutput": "6"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string} tasks\n * @param {number} n\n * @return {number}\n */\nfunction leastInterval(tasks, n) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def leastInterval(self, tasks: str, n: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int leastInterval(string tasks, int n) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N)",
-   "space": "O(1)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s9-r1-q2"
- },
- "acc-sse-s9-r1-q2": {
-  "id": "acc-sse-s9-r1-q2",
-  "title": "Concurrent Booking Rooms",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Sorting / Sweep",
-  "tags": [
-   "Accenture Round 1",
-   "Sweep Line",
-   "Heap",
-   "Set 9"
-  ],
-  "paragraphs": [
-   "Given meeting intervals [start, end], return the minimum number of rooms needed. A meeting ending at t does not conflict with one starting at t."
-  ],
-  "examples": [
-   {
-    "input": "intervals = [[0,30],[5,10],[15,20]]",
-    "output": "2"
-   },
-   {
-    "input": "intervals = [[7,10],[2,4]]",
-    "output": "1"
-   }
-  ],
-  "constraints": [
-   "Target O(N log N) time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s9-r1-q2-v1",
-    "input": "[[0,30],[5,10],[15,20]]",
-    "expectedOutput": "2"
-   },
-   {
-    "id": "acc-sse-s9-r1-q2-v2",
-    "input": "[[7,10],[2,4]]",
-    "expectedOutput": "1"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s9-r1-q2-h1",
-    "input": "[[1,5],[5,10]]",
-    "expectedOutput": "1"
-   },
-   {
-    "id": "acc-sse-s9-r1-q2-h2",
-    "input": "[[1,10],[2,9],[3,8]]",
-    "expectedOutput": "3"
-   },
-   {
-    "id": "acc-sse-s9-r1-q2-h3",
-    "input": "[[0,5],[1,2],[3,4],[6,7]]",
-    "expectedOutput": "2"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number[][]} intervals\n * @return {number}\n */\nfunction minMeetingRooms(intervals) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def minMeetingRooms(self, intervals: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minMeetingRooms(vector<vector<int>>& intervals) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(N log N)",
-   "space": "O(N)"
-  },
-  "taskIndex": 2,
-  "totalTasks": 2,
-  "nextProblemId": null
- },
- "acc-sse-s10-r1-q1": {
-  "id": "acc-sse-s10-r1-q1",
-  "title": "Cheapest Route With Hop Limit",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Bellman-Ford",
-  "tags": [
-   "Accenture Round 1",
-   "Graph",
-   "DP",
-   "Shortest Path",
-   "Set 10"
-  ],
-  "paragraphs": [
-   "Given flights [from, to, price], return the cheapest price from src to dst using at most k stops, or -1."
-  ],
-  "examples": [
-   {
-    "input": "n = 4, flights = [[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]], src = 0, dst = 3, k = 1",
-    "output": "700"
-   },
-   {
-    "input": "n = 3, flights = [[0,1,100],[1,2,100],[0,2,500]], src = 0, dst = 2, k = 1",
-    "output": "200"
-   }
-  ],
-  "constraints": [
-   "Target O(K*E) time and O(V) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s10-r1-q1-v1",
-    "input": "4\n[[0,1,100],[1,2,100],[2,0,100],[1,3,600],[2,3,200]]\n0\n3\n1",
-    "expectedOutput": "700"
-   },
-   {
-    "id": "acc-sse-s10-r1-q1-v2",
-    "input": "3\n[[0,1,100],[1,2,100],[0,2,500]]\n0\n2\n1",
-    "expectedOutput": "200"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s10-r1-q1-h1",
-    "input": "3\n[[0,1,100],[1,2,100],[0,2,500]]\n0\n2\n0",
-    "expectedOutput": "500"
-   },
-   {
-    "id": "acc-sse-s10-r1-q1-h2",
-    "input": "2\n[[0,1,5]]\n1\n0\n1",
-    "expectedOutput": "-1"
-   },
-   {
-    "id": "acc-sse-s10-r1-q1-h3",
-    "input": "5\n[[0,1,1],[1,2,1],[2,3,1],[3,4,1]]\n0\n4\n2",
-    "expectedOutput": "-1"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {number} n\n * @param {number[][]} flights\n * @param {number} src\n * @param {number} dst\n * @param {number} k\n * @return {number}\n */\nfunction findCheapestPrice(n, flights, src, dst, k) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def findCheapestPrice(self, n: int, flights: List[List[int]], src: int, dst: int, k: int) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(K*E)",
-   "space": "O(V)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 2,
-  "nextProblemId": "acc-sse-s10-r1-q2"
- },
- "acc-sse-s10-r1-q2": {
-  "id": "acc-sse-s10-r1-q2",
-  "title": "Longest Consecutive Id Run",
-  "difficulty": "Medium",
-  "company": "Accenture",
-  "category": "Hash Set",
-  "tags": [
-   "Accenture Round 1",
-   "Hash Table",
-   "Union Find",
-   "Set 10"
-  ],
-  "paragraphs": [
-   "Return the length of the longest run of consecutive integers present in nums, in O(N) time."
-  ],
-  "examples": [
-   {
-    "input": "nums = [100,4,200,1,3,2]",
-    "output": "4"
-   },
-   {
-    "input": "nums = [0,3,7,2,5,8,4,6,0,1]",
-    "output": "9"
+    "input": "s = \"a)b(c)d\"",
+    "output": "\"ab(c)d\""
    }
   ],
   "constraints": [
@@ -7490,37 +6063,108 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-sse-s10-r1-q2-v1",
-    "input": "[100,4,200,1,3,2]",
-    "expectedOutput": "4"
+    "id": "acc-sse-s1-r1-q1-v1",
+    "input": "\"lee(t(c)o)de)\"",
+    "expectedOutput": "\"lee(t(c)o)de\""
    },
    {
-    "id": "acc-sse-s10-r1-q2-v2",
-    "input": "[0,3,7,2,5,8,4,6,0,1]",
-    "expectedOutput": "9"
+    "id": "acc-sse-s1-r1-q1-v2",
+    "input": "\"a)b(c)d\"",
+    "expectedOutput": "\"ab(c)d\""
    }
   ],
   "hiddenTestCases": [
    {
-    "id": "acc-sse-s10-r1-q2-h1",
-    "input": "[]",
-    "expectedOutput": "0"
+    "id": "acc-sse-s1-r1-q1-h1",
+    "input": "\"))((\"",
+    "expectedOutput": "\"\""
    },
    {
-    "id": "acc-sse-s10-r1-q2-h2",
-    "input": "[1,2,0,1]",
-    "expectedOutput": "3"
+    "id": "acc-sse-s1-r1-q1-h2",
+    "input": "\"abc\"",
+    "expectedOutput": "\"abc\""
    },
    {
-    "id": "acc-sse-s10-r1-q2-h3",
-    "input": "[9]",
-    "expectedOutput": "1"
+    "id": "acc-sse-s1-r1-q1-h3",
+    "input": "\"(a(b(c)d)\"",
+    "expectedOutput": "\"a(b(c)d)\""
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction longestConsecutive(nums) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def longestConsecutive(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int longestConsecutive(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nfunction minRemoveToMakeValid(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def minRemoveToMakeValid(self, s: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string minRemoveToMakeValid(string s) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s1-r1-q2"
+ },
+ "acc-sse-s1-r1-q2": {
+  "id": "acc-sse-s1-r1-q2",
+  "title": "Evaluate a Billing Expression",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Stack",
+  "tags": [
+   "Accenture Round 1",
+   "Stack",
+   "Set 1"
+  ],
+  "paragraphs": [
+   "Evaluate an expression of non-negative integers with + - * / (integer division truncating toward zero) and spaces, no parentheses."
+  ],
+  "examples": [
+   {
+    "input": "s = \"3+2*2\"",
+    "output": "7"
+   },
+   {
+    "input": "s = \" 3/2 \"",
+    "output": "1"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s1-r1-q2-v1",
+    "input": "\"3+2*2\"",
+    "expectedOutput": "7"
+   },
+   {
+    "id": "acc-sse-s1-r1-q2-v2",
+    "input": "\" 3/2 \"",
+    "expectedOutput": "1"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s1-r1-q2-h1",
+    "input": "\" 3+5 / 2 \"",
+    "expectedOutput": "5"
+   },
+   {
+    "id": "acc-sse-s1-r1-q2-h2",
+    "input": "\"14-3/2\"",
+    "expectedOutput": "13"
+   },
+   {
+    "id": "acc-sse-s1-r1-q2-h3",
+    "input": "\"100*2-50/5\"",
+    "expectedOutput": "190"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction calculate(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def calculate(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int calculate(string s) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(N)",
@@ -7530,75 +6174,1346 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "totalTasks": 2,
   "nextProblemId": null
  },
- "acc-sse-s1-r2-q1": {
-  "id": "acc-sse-s1-r2-q1",
-  "title": "LRU Cache Internals",
+ "acc-sse-s2-r1-q1": {
+  "id": "acc-sse-s2-r1-q1",
+  "title": "Expand a Compressed Template",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Design / Linked List",
+  "category": "Stack",
+  "tags": [
+   "Accenture Round 1",
+   "Stack",
+   "Set 2"
+  ],
+  "paragraphs": [
+   "Expand an encoded string where k[text] means text repeated k times (nesting allowed)."
+  ],
+  "examples": [
+   {
+    "input": "s = \"3[a]2[bc]\"",
+    "output": "\"aaabcbc\""
+   },
+   {
+    "input": "s = \"3[a2[c]]\"",
+    "output": "\"accaccacc\""
+   }
+  ],
+  "constraints": [
+   "Target O(output) time and O(output) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s2-r1-q1-v1",
+    "input": "\"3[a]2[bc]\"",
+    "expectedOutput": "\"aaabcbc\""
+   },
+   {
+    "id": "acc-sse-s2-r1-q1-v2",
+    "input": "\"3[a2[c]]\"",
+    "expectedOutput": "\"accaccacc\""
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s2-r1-q1-h1",
+    "input": "\"2[abc]3[cd]ef\"",
+    "expectedOutput": "\"abcabccdcdcdef\""
+   },
+   {
+    "id": "acc-sse-s2-r1-q1-h2",
+    "input": "\"abc\"",
+    "expectedOutput": "\"abc\""
+   },
+   {
+    "id": "acc-sse-s2-r1-q1-h3",
+    "input": "\"10[x]\"",
+    "expectedOutput": "\"xxxxxxxxxx\""
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} s\n * @return {string}\n */\nfunction decodeString(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def decodeString(self, s: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string decodeString(string s) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(output)",
+   "space": "O(output)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s2-r1-q2"
+ },
+ "acc-sse-s2-r1-q2": {
+  "id": "acc-sse-s2-r1-q2",
+  "title": "Normalize a File Path",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Stack",
+  "tags": [
+   "Accenture Round 1",
+   "Stack",
+   "Set 2"
+  ],
+  "paragraphs": [
+   "Simplify an absolute Unix-style path ('.' is current, '..' is parent, repeated slashes collapse)."
+  ],
+  "examples": [
+   {
+    "input": "path = \"/home/\"",
+    "output": "\"/home\""
+   },
+   {
+    "input": "path = \"/../\"",
+    "output": "\"/\""
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s2-r1-q2-v1",
+    "input": "\"/home/\"",
+    "expectedOutput": "\"/home\""
+   },
+   {
+    "id": "acc-sse-s2-r1-q2-v2",
+    "input": "\"/../\"",
+    "expectedOutput": "\"/\""
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s2-r1-q2-h1",
+    "input": "\"/home//foo/\"",
+    "expectedOutput": "\"/home/foo\""
+   },
+   {
+    "id": "acc-sse-s2-r1-q2-h2",
+    "input": "\"/a/./b/../../c/\"",
+    "expectedOutput": "\"/c\""
+   },
+   {
+    "id": "acc-sse-s2-r1-q2-h3",
+    "input": "\"/a//b////c/d//././/..\"",
+    "expectedOutput": "\"/a/b/c\""
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} path\n * @return {string}\n */\nfunction simplifyPath(path) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def simplifyPath(self, path: str) -> str:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    string simplifyPath(string path) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s3-r1-q1": {
+  "id": "acc-sse-s3-r1-q1",
+  "title": "Earliest Common Meeting Slot",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Two Pointers",
+  "tags": [
+   "Accenture Round 1",
+   "Two Pointers",
+   "Set 3"
+  ],
+  "paragraphs": [
+   "Given two people's free slots [start, end] and a duration, return the earliest [start, start+duration] that fits both, or []."
+  ],
+  "examples": [
+   {
+    "input": "slots1 = [[10,50],[60,120],[140,210]], slots2 = [[0,15],[60,70]], duration = 8",
+    "output": "[60,68]"
+   },
+   {
+    "input": "slots1 = [[10,50],[60,120],[140,210]], slots2 = [[0,15],[60,70]], duration = 12",
+    "output": "[]"
+   }
+  ],
+  "constraints": [
+   "Target O(N+M) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s3-r1-q1-v1",
+    "input": "[[10,50],[60,120],[140,210]]\n[[0,15],[60,70]]\n8",
+    "expectedOutput": "[60,68]"
+   },
+   {
+    "id": "acc-sse-s3-r1-q1-v2",
+    "input": "[[10,50],[60,120],[140,210]]\n[[0,15],[60,70]]\n12",
+    "expectedOutput": "[]"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s3-r1-q1-h1",
+    "input": "[[1,5]]\n[[2,3]]\n2",
+    "expectedOutput": "[]"
+   },
+   {
+    "id": "acc-sse-s3-r1-q1-h2",
+    "input": "[[0,10]]\n[[5,15]]\n5",
+    "expectedOutput": "[5,10]"
+   },
+   {
+    "id": "acc-sse-s3-r1-q1-h3",
+    "input": "[[1,2]]\n[[3,4]]\n1",
+    "expectedOutput": "[]"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[][]} slots1\n * @param {number[][]} slots2\n * @param {number} duration\n * @return {number[]}\n */\nfunction minAvailableDuration(slots1, slots2, duration) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def minAvailableDuration(self, slots1: List[List[int]], slots2: List[List[int]], duration: int) -> List[int]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<int> minAvailableDuration(vector<vector<int>>& slots1, vector<vector<int>>& slots2, int duration) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N+M)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s3-r1-q2"
+ },
+ "acc-sse-s3-r1-q2": {
+  "id": "acc-sse-s3-r1-q2",
+  "title": "Shared Availability Windows",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Two Pointers",
+  "tags": [
+   "Accenture Round 1",
+   "Two Pointers",
+   "Set 3"
+  ],
+  "paragraphs": [
+   "Given two sorted lists of disjoint intervals, return their intersection."
+  ],
+  "examples": [
+   {
+    "input": "a = [[0,2],[5,10],[13,23],[24,25]], b = [[1,5],[8,12],[15,24],[25,26]]",
+    "output": "[[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]"
+   },
+   {
+    "input": "a = [[1,3],[5,9]], b = []",
+    "output": "[]"
+   }
+  ],
+  "constraints": [
+   "Target O(N+M) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s3-r1-q2-v1",
+    "input": "[[0,2],[5,10],[13,23],[24,25]]\n[[1,5],[8,12],[15,24],[25,26]]",
+    "expectedOutput": "[[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]"
+   },
+   {
+    "id": "acc-sse-s3-r1-q2-v2",
+    "input": "[[1,3],[5,9]]\n[]",
+    "expectedOutput": "[]"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s3-r1-q2-h1",
+    "input": "[]\n[[4,8],[10,12]]",
+    "expectedOutput": "[]"
+   },
+   {
+    "id": "acc-sse-s3-r1-q2-h2",
+    "input": "[[1,7]]\n[[3,10]]",
+    "expectedOutput": "[[3,7]]"
+   },
+   {
+    "id": "acc-sse-s3-r1-q2-h3",
+    "input": "[[1,2]]\n[[3,4]]",
+    "expectedOutput": "[]"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[][]} a\n * @param {number[][]} b\n * @return {number[][]}\n */\nfunction intervalIntersection(a, b) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def intervalIntersection(self, a: List[List[int]], b: List[List[int]]) -> List[List[int]]:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    vector<vector<int>> intervalIntersection(vector<vector<int>>& a, vector<vector<int>>& b) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N+M)",
+   "space": "O(1)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s4-r1-q1": {
+  "id": "acc-sse-s4-r1-q1",
+  "title": "Batches Divisible by K",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Prefix Sum",
+  "tags": [
+   "Accenture Round 1",
+   "Prefix Sum",
+   "Set 4"
+  ],
+  "paragraphs": [
+   "Return the number of contiguous subarrays whose sum is divisible by k."
+  ],
+  "examples": [
+   {
+    "input": "nums = [4,5,0,-2,-3,1], k = 5",
+    "output": "7"
+   },
+   {
+    "input": "nums = [5], k = 9",
+    "output": "0"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(K) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s4-r1-q1-v1",
+    "input": "[4,5,0,-2,-3,1]\n5",
+    "expectedOutput": "7"
+   },
+   {
+    "id": "acc-sse-s4-r1-q1-v2",
+    "input": "[5]\n9",
+    "expectedOutput": "0"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s4-r1-q1-h1",
+    "input": "[2,2,2]\n2",
+    "expectedOutput": "6"
+   },
+   {
+    "id": "acc-sse-s4-r1-q1-h2",
+    "input": "[1,2,3]\n1",
+    "expectedOutput": "6"
+   },
+   {
+    "id": "acc-sse-s4-r1-q1-h3",
+    "input": "[-1,2,9]\n2",
+    "expectedOutput": "2"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nfunction subarraysDivByK(nums, k) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def subarraysDivByK(self, nums: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int subarraysDivByK(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(K)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s4-r1-q2"
+ },
+ "acc-sse-s4-r1-q2": {
+  "id": "acc-sse-s4-r1-q2",
+  "title": "Continuous Multiple Window",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Prefix Sum",
+  "tags": [
+   "Accenture Round 1",
+   "Prefix Sum",
+   "Set 4"
+  ],
+  "paragraphs": [
+   "Return true if some subarray of length at least 2 has a sum that is a multiple of k."
+  ],
+  "examples": [
+   {
+    "input": "nums = [23,2,4,6,7], k = 6",
+    "output": "true"
+   },
+   {
+    "input": "nums = [23,2,6,4,7], k = 6",
+    "output": "true"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(K) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s4-r1-q2-v1",
+    "input": "[23,2,4,6,7]\n6",
+    "expectedOutput": "true"
+   },
+   {
+    "id": "acc-sse-s4-r1-q2-v2",
+    "input": "[23,2,6,4,7]\n6",
+    "expectedOutput": "true"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s4-r1-q2-h1",
+    "input": "[23,2,6,4,7]\n13",
+    "expectedOutput": "false"
+   },
+   {
+    "id": "acc-sse-s4-r1-q2-h2",
+    "input": "[1,0]\n2",
+    "expectedOutput": "false"
+   },
+   {
+    "id": "acc-sse-s4-r1-q2-h3",
+    "input": "[5,0,0]\n3",
+    "expectedOutput": "true"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {boolean}\n */\nfunction checkSubarraySum(nums, k) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def checkSubarraySum(self, nums: List[int], k: int) -> bool:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    bool checkSubarraySum(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(K)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s5-r1-q1": {
+  "id": "acc-sse-s5-r1-q1",
+  "title": "Longest Window Hitting a Target Sum",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Prefix Sum",
+  "tags": [
+   "Accenture Round 1",
+   "Prefix Sum",
+   "Set 5"
+  ],
+  "paragraphs": [
+   "Return the length of the longest subarray summing exactly to k, or 0."
+  ],
+  "examples": [
+   {
+    "input": "nums = [1,-1,5,-2,3], k = 3",
+    "output": "4"
+   },
+   {
+    "input": "nums = [-2,-1,2,1], k = 1",
+    "output": "2"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s5-r1-q1-v1",
+    "input": "[1,-1,5,-2,3]\n3",
+    "expectedOutput": "4"
+   },
+   {
+    "id": "acc-sse-s5-r1-q1-v2",
+    "input": "[-2,-1,2,1]\n1",
+    "expectedOutput": "2"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s5-r1-q1-h1",
+    "input": "[1,2]\n10",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-sse-s5-r1-q1-h2",
+    "input": "[0,0,0]\n0",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-sse-s5-r1-q1-h3",
+    "input": "[3,-3,3]\n3",
+    "expectedOutput": "3"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nfunction maxSubArrayLen(nums, k) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def maxSubArrayLen(self, nums: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxSubArrayLen(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s5-r1-q2"
+ },
+ "acc-sse-s5-r1-q2": {
+  "id": "acc-sse-s5-r1-q2",
+  "title": "Windows With K Odd Events",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Prefix Sum",
+  "tags": [
+   "Accenture Round 1",
+   "Prefix Sum",
+   "Set 5"
+  ],
+  "paragraphs": [
+   "Return the number of contiguous subarrays containing exactly k odd numbers."
+  ],
+  "examples": [
+   {
+    "input": "nums = [1,1,2,1,1], k = 3",
+    "output": "2"
+   },
+   {
+    "input": "nums = [2,4,6], k = 1",
+    "output": "0"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s5-r1-q2-v1",
+    "input": "[1,1,2,1,1]\n3",
+    "expectedOutput": "2"
+   },
+   {
+    "id": "acc-sse-s5-r1-q2-v2",
+    "input": "[2,4,6]\n1",
+    "expectedOutput": "0"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s5-r1-q2-h1",
+    "input": "[2,2,2,1,2,2,1,2,2,2]\n2",
+    "expectedOutput": "16"
+   },
+   {
+    "id": "acc-sse-s5-r1-q2-h2",
+    "input": "[1]\n1",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s5-r1-q2-h3",
+    "input": "[1,2,1]\n1",
+    "expectedOutput": "4"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @param {number} k\n * @return {number}\n */\nfunction numberOfSubarrays(nums, k) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def numberOfSubarrays(self, nums: List[int], k: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int numberOfSubarrays(vector<int>& nums, int k) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s6-r1-q1": {
+  "id": "acc-sse-s6-r1-q1",
+  "title": "Best Pair of Landmarks",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Dynamic Programming",
+  "tags": [
+   "Accenture Round 1",
+   "Dynamic Programming",
+   "Set 6"
+  ],
+  "paragraphs": [
+   "Score of positions i < j is values[i] + values[j] + i - j. Return the maximum score."
+  ],
+  "examples": [
+   {
+    "input": "values = [8,1,5,2,6]",
+    "output": "11"
+   },
+   {
+    "input": "values = [1,2]",
+    "output": "2"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s6-r1-q1-v1",
+    "input": "[8,1,5,2,6]",
+    "expectedOutput": "11"
+   },
+   {
+    "id": "acc-sse-s6-r1-q1-v2",
+    "input": "[1,2]",
+    "expectedOutput": "2"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s6-r1-q1-h1",
+    "input": "[3,7,2,3]",
+    "expectedOutput": "9"
+   },
+   {
+    "id": "acc-sse-s6-r1-q1-h2",
+    "input": "[10,1,1,10]",
+    "expectedOutput": "17"
+   },
+   {
+    "id": "acc-sse-s6-r1-q1-h3",
+    "input": "[1,1,1]",
+    "expectedOutput": "1"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} values\n * @return {number}\n */\nfunction maxScoreSightseeingPair(values) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def maxScoreSightseeingPair(self, values: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxScoreSightseeingPair(vector<int>& values) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s6-r1-q2"
+ },
+ "acc-sse-s6-r1-q2": {
+  "id": "acc-sse-s6-r1-q2",
+  "title": "Minimum Card Flips for Uniform Face",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Greedy",
+  "tags": [
+   "Accenture Round 1",
+   "Greedy",
+   "Set 6"
+  ],
+  "paragraphs": [
+   "Each card has a top and a bottom value. Return the minimum flips to make all tops equal or all bottoms equal, or -1."
+  ],
+  "examples": [
+   {
+    "input": "tops = [2,1,2,4,2,2], bottoms = [5,2,6,2,3,2]",
+    "output": "2"
+   },
+   {
+    "input": "tops = [3,5,1,2,3], bottoms = [3,6,3,3,4]",
+    "output": "-1"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s6-r1-q2-v1",
+    "input": "[2,1,2,4,2,2]\n[5,2,6,2,3,2]",
+    "expectedOutput": "2"
+   },
+   {
+    "id": "acc-sse-s6-r1-q2-v2",
+    "input": "[3,5,1,2,3]\n[3,6,3,3,4]",
+    "expectedOutput": "-1"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s6-r1-q2-h1",
+    "input": "[1,1]\n[2,2]",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-sse-s6-r1-q2-h2",
+    "input": "[1,2,1]\n[2,1,2]",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s6-r1-q2-h3",
+    "input": "[4]\n[4]",
+    "expectedOutput": "0"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} tops\n * @param {number[]} bottoms\n * @return {number}\n */\nfunction minDominoRotations(tops, bottoms) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def minDominoRotations(self, tops: List[int], bottoms: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minDominoRotations(vector<int>& tops, vector<int>& bottoms) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s7-r1-q1": {
+  "id": "acc-sse-s7-r1-q1",
+  "title": "Fewest Shuttles for Passengers",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Greedy",
+  "tags": [
+   "Accenture Round 1",
+   "Greedy",
+   "Set 7"
+  ],
+  "paragraphs": [
+   "Each shuttle carries at most two people with a combined weight limit. Return the minimum shuttles needed."
+  ],
+  "examples": [
+   {
+    "input": "people = [1,2], limit = 3",
+    "output": "1"
+   },
+   {
+    "input": "people = [3,2,2,1], limit = 3",
+    "output": "3"
+   }
+  ],
+  "constraints": [
+   "Target O(N log N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s7-r1-q1-v1",
+    "input": "[1,2]\n3",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s7-r1-q1-v2",
+    "input": "[3,2,2,1]\n3",
+    "expectedOutput": "3"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s7-r1-q1-h1",
+    "input": "[3,5,3,4]\n5",
+    "expectedOutput": "4"
+   },
+   {
+    "id": "acc-sse-s7-r1-q1-h2",
+    "input": "[5,1,4,2]\n6",
+    "expectedOutput": "2"
+   },
+   {
+    "id": "acc-sse-s7-r1-q1-h3",
+    "input": "[2,2,2,2]\n4",
+    "expectedOutput": "2"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} people\n * @param {number} limit\n * @return {number}\n */\nfunction numShuttles(people, limit) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def numShuttles(self, people: List[int], limit: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int numShuttles(vector<int>& people, int limit) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N log N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s7-r1-q2"
+ },
+ "acc-sse-s7-r1-q2": {
+  "id": "acc-sse-s7-r1-q2",
+  "title": "Minimum Brackets to Insert",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Greedy",
+  "tags": [
+   "Accenture Round 1",
+   "Greedy",
+   "Set 7"
+  ],
+  "paragraphs": [
+   "Return the minimum number of parentheses to add so the string becomes valid."
+  ],
+  "examples": [
+   {
+    "input": "s = \"())\"",
+    "output": "1"
+   },
+   {
+    "input": "s = \"(((\"",
+    "output": "3"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s7-r1-q2-v1",
+    "input": "\"())\"",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s7-r1-q2-v2",
+    "input": "\"(((\"",
+    "expectedOutput": "3"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s7-r1-q2-h1",
+    "input": "\"()\"",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-sse-s7-r1-q2-h2",
+    "input": "\"()))((\"",
+    "expectedOutput": "4"
+   },
+   {
+    "id": "acc-sse-s7-r1-q2-h3",
+    "input": "\"\"",
+    "expectedOutput": "0"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} s\n * @return {number}\n */\nfunction minAddToMakeValid(s) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def minAddToMakeValid(self, s: str) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minAddToMakeValid(string s) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s8-r1-q1": {
+  "id": "acc-sse-s8-r1-q1",
+  "title": "Longest Zigzag Metric Run",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Dynamic Programming",
+  "tags": [
+   "Accenture Round 1",
+   "Dynamic Programming",
+   "Set 8"
+  ],
+  "paragraphs": [
+   "Return the length of the longest subarray where consecutive differences strictly alternate in sign."
+  ],
+  "examples": [
+   {
+    "input": "arr = [9,4,2,10,7,8,8,1,9]",
+    "output": "5"
+   },
+   {
+    "input": "arr = [4,8,12,16]",
+    "output": "2"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s8-r1-q1-v1",
+    "input": "[9,4,2,10,7,8,8,1,9]",
+    "expectedOutput": "5"
+   },
+   {
+    "id": "acc-sse-s8-r1-q1-v2",
+    "input": "[4,8,12,16]",
+    "expectedOutput": "2"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s8-r1-q1-h1",
+    "input": "[100]",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s8-r1-q1-h2",
+    "input": "[9,9]",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s8-r1-q1-h3",
+    "input": "[1,3,2,4,3,5]",
+    "expectedOutput": "6"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} arr\n * @return {number}\n */\nfunction maxTurbulenceSize(arr) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def maxTurbulenceSize(self, arr: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int maxTurbulenceSize(vector<int>& arr) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s8-r1-q2"
+ },
+ "acc-sse-s8-r1-q2": {
+  "id": "acc-sse-s8-r1-q2",
+  "title": "Longest Shared Event Sequence",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Dynamic Programming",
+  "tags": [
+   "Accenture Round 1",
+   "Dynamic Programming",
+   "Set 8"
+  ],
+  "paragraphs": [
+   "Return the length of the longest contiguous subarray appearing in both arrays."
+  ],
+  "examples": [
+   {
+    "input": "a = [1,2,3,2,1], b = [3,2,1,4,7]",
+    "output": "3"
+   },
+   {
+    "input": "a = [0,0,0,0,0], b = [0,0,0,0,0]",
+    "output": "5"
+   }
+  ],
+  "constraints": [
+   "Target O(M*N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s8-r1-q2-v1",
+    "input": "[1,2,3,2,1]\n[3,2,1,4,7]",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-sse-s8-r1-q2-v2",
+    "input": "[0,0,0,0,0]\n[0,0,0,0,0]",
+    "expectedOutput": "5"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s8-r1-q2-h1",
+    "input": "[1,2]\n[3,4]",
+    "expectedOutput": "0"
+   },
+   {
+    "id": "acc-sse-s8-r1-q2-h2",
+    "input": "[5]\n[5]",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s8-r1-q2-h3",
+    "input": "[1,2,3]\n[2,3,4]",
+    "expectedOutput": "2"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} a\n * @param {number[]} b\n * @return {number}\n */\nfunction findLength(a, b) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def findLength(self, a: List[int], b: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int findLength(vector<int>& a, vector<int>& b) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(M*N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s9-r1-q1": {
+  "id": "acc-sse-s9-r1-q1",
+  "title": "Fewest Square-Sized Batches",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Dynamic Programming",
+  "tags": [
+   "Accenture Round 1",
+   "Dynamic Programming",
+   "Set 9"
+  ],
+  "paragraphs": [
+   "Return the fewest perfect squares that sum to n."
+  ],
+  "examples": [
+   {
+    "input": "n = 12",
+    "output": "3"
+   },
+   {
+    "input": "n = 13",
+    "output": "2"
+   }
+  ],
+  "constraints": [
+   "Target O(N sqrt N) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s9-r1-q1-v1",
+    "input": "12",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-sse-s9-r1-q1-v2",
+    "input": "13",
+    "expectedOutput": "2"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s9-r1-q1-h1",
+    "input": "1",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s9-r1-q1-h2",
+    "input": "43",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-sse-s9-r1-q1-h3",
+    "input": "100",
+    "expectedOutput": "1"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number} n\n * @return {number}\n */\nfunction numSquares(n) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def numSquares(self, n: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int numSquares(int n) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N sqrt N)",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s9-r1-q2"
+ },
+ "acc-sse-s9-r1-q2": {
+  "id": "acc-sse-s9-r1-q2",
+  "title": "Count Longest Rising Trends",
+  "difficulty": "Hard",
+  "company": "Accenture",
+  "category": "Dynamic Programming",
+  "tags": [
+   "Accenture Round 1",
+   "Dynamic Programming",
+   "Set 9"
+  ],
+  "paragraphs": [
+   "Return the number of longest strictly increasing subsequences."
+  ],
+  "examples": [
+   {
+    "input": "nums = [1,3,5,4,7]",
+    "output": "2"
+   },
+   {
+    "input": "nums = [2,2,2,2,2]",
+    "output": "5"
+   }
+  ],
+  "constraints": [
+   "Target O(N^2) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s9-r1-q2-v1",
+    "input": "[1,3,5,4,7]",
+    "expectedOutput": "2"
+   },
+   {
+    "id": "acc-sse-s9-r1-q2-v2",
+    "input": "[2,2,2,2,2]",
+    "expectedOutput": "5"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s9-r1-q2-h1",
+    "input": "[1]",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s9-r1-q2-h2",
+    "input": "[1,2,4,3,5,4,7,2]",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-sse-s9-r1-q2-h3",
+    "input": "[3,1,2]",
+    "expectedOutput": "1"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[]} nums\n * @return {number}\n */\nfunction findNumberOfLIS(nums) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def findNumberOfLIS(self, nums: List[int]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int findNumberOfLIS(vector<int>& nums) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N^2)",
+   "space": "O(N)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s10-r1-q1": {
+  "id": "acc-sse-s10-r1-q1",
+  "title": "Cheapest Top-to-Bottom Path in a Triangle",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Dynamic Programming",
+  "tags": [
+   "Accenture Round 1",
+   "Dynamic Programming",
+   "Set 10"
+  ],
+  "paragraphs": [
+   "Move to adjacent numbers on the row below; return the minimum path sum from top to bottom in O(N) extra space."
+  ],
+  "examples": [
+   {
+    "input": "triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]",
+    "output": "11"
+   },
+   {
+    "input": "triangle = [[-10]]",
+    "output": "-10"
+   }
+  ],
+  "constraints": [
+   "Target O(N^2) time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s10-r1-q1-v1",
+    "input": "[[2],[3,4],[6,5,7],[4,1,8,3]]",
+    "expectedOutput": "11"
+   },
+   {
+    "id": "acc-sse-s10-r1-q1-v2",
+    "input": "[[-10]]",
+    "expectedOutput": "-10"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s10-r1-q1-h1",
+    "input": "[[1],[2,3]]",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-sse-s10-r1-q1-h2",
+    "input": "[[1],[1,1],[1,1,1]]",
+    "expectedOutput": "3"
+   },
+   {
+    "id": "acc-sse-s10-r1-q1-h3",
+    "input": "[[5],[9,6],[4,6,8],[0,7,1,5]]",
+    "expectedOutput": "18"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {number[][]} triangle\n * @return {number}\n */\nfunction minimumTotal(triangle) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def minimumTotal(self, triangle: List[List[int]]) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int minimumTotal(vector<vector<int>>& triangle) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N^2)",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 2,
+  "nextProblemId": "acc-sse-s10-r1-q2"
+ },
+ "acc-sse-s10-r1-q2": {
+  "id": "acc-sse-s10-r1-q2",
+  "title": "Windows Using At Most K Services",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Sliding Window",
+  "tags": [
+   "Accenture Round 1",
+   "Sliding Window",
+   "Set 10"
+  ],
+  "paragraphs": [
+   "Return the number of substrings of s that contain at most k distinct characters."
+  ],
+  "examples": [
+   {
+    "input": "s = \"abc\", k = 2",
+    "output": "5"
+   },
+   {
+    "input": "s = \"aab\", k = 1",
+    "output": "4"
+   }
+  ],
+  "constraints": [
+   "Target O(N) time and O(K) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s10-r1-q2-v1",
+    "input": "\"abc\"\n2",
+    "expectedOutput": "5"
+   },
+   {
+    "id": "acc-sse-s10-r1-q2-v2",
+    "input": "\"aab\"\n1",
+    "expectedOutput": "4"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s10-r1-q2-h1",
+    "input": "\"a\"\n1",
+    "expectedOutput": "1"
+   },
+   {
+    "id": "acc-sse-s10-r1-q2-h2",
+    "input": "\"abcabc\"\n3",
+    "expectedOutput": "21"
+   },
+   {
+    "id": "acc-sse-s10-r1-q2-h3",
+    "input": "\"xxyz\"\n2",
+    "expectedOutput": "8"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string} s\n * @param {number} k\n * @return {number}\n */\nfunction countAtMostKDistinct(s, k) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def countAtMostKDistinct(self, s: str, k: int) -> int:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version.\nclass Solution {\npublic:\n    int countAtMostKDistinct(string s, int k) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N)",
+   "space": "O(K)"
+  },
+  "taskIndex": 2,
+  "totalTasks": 2,
+  "nextProblemId": null
+ },
+ "acc-sse-s1-r2-q1": {
+  "id": "acc-sse-s1-r2-q1",
+  "title": "Circular Task Queue",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Design",
   "tags": [
    "Accenture Round 2",
    "Design",
-   "Hash Table",
-   "Doubly Linked List",
    "Set 1"
   ],
   "paragraphs": [
-   "Implement an LRU cache with O(1) get and put, then defend your hash map plus doubly linked list invariants. ops/args describe a call sequence; return each call's result (null for put and the constructor, -1 for a miss).",
+   "Implement a fixed-capacity circular queue (enQueue, deQueue, Front, Rear, isEmpty, isFull). Return each call's result (null for the constructor; Front and Rear return -1 when empty).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"LRUCache\",\"put\",\"put\",\"get\",\"put\",\"get\",\"put\",\"get\",\"get\",\"get\"], args = [[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]",
-    "output": "[null,null,null,1,null,-1,null,-1,3,4]"
+    "input": "ops = [\"CircularQueue\",\"enQueue\",\"enQueue\",\"enQueue\",\"enQueue\",\"Rear\",\"isFull\",\"deQueue\",\"enQueue\",\"Rear\"], args = [[3],[1],[2],[3],[4],[],[],[],[4],[]]",
+    "output": "[null,true,true,true,false,3,true,true,true,4]"
    },
    {
-    "input": "ops = [\"LRUCache\",\"put\",\"get\"], args = [[1],[5,50],[5]]",
-    "output": "[null,null,50]"
+    "input": "ops = [\"CircularQueue\",\"Front\",\"isEmpty\"], args = [[2],[],[]]",
+    "output": "[null,-1,true]"
    }
   ],
   "constraints": [
-   "Target O(1) per op time and O(C) space.",
+   "Target O(1) per op time and O(K) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-sse-s1-r2-q1-v1",
-    "input": "[\"LRUCache\",\"put\",\"put\",\"get\",\"put\",\"get\",\"put\",\"get\",\"get\",\"get\"]\n[[2],[1,1],[2,2],[1],[3,3],[2],[4,4],[1],[3],[4]]",
-    "expectedOutput": "[null,null,null,1,null,-1,null,-1,3,4]"
+    "input": "[\"CircularQueue\",\"enQueue\",\"enQueue\",\"enQueue\",\"enQueue\",\"Rear\",\"isFull\",\"deQueue\",\"enQueue\",\"Rear\"]\n[[3],[1],[2],[3],[4],[],[],[],[4],[]]",
+    "expectedOutput": "[null,true,true,true,false,3,true,true,true,4]"
    },
    {
     "id": "acc-sse-s1-r2-q1-v2",
-    "input": "[\"LRUCache\",\"put\",\"get\"]\n[[1],[5,50],[5]]",
-    "expectedOutput": "[null,null,50]"
+    "input": "[\"CircularQueue\",\"Front\",\"isEmpty\"]\n[[2],[],[]]",
+    "expectedOutput": "[null,-1,true]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-sse-s1-r2-q1-h1",
-    "input": "[\"LRUCache\",\"get\"]\n[[1],[9]]",
-    "expectedOutput": "[null,-1]"
+    "input": "[\"CircularQueue\",\"enQueue\",\"deQueue\",\"deQueue\"]\n[[1],[5],[],[]]",
+    "expectedOutput": "[null,true,true,false]"
    },
    {
     "id": "acc-sse-s1-r2-q1-h2",
-    "input": "[\"LRUCache\",\"put\",\"put\",\"put\",\"get\"]\n[[2],[1,1],[2,2],[1,10],[1]]",
-    "expectedOutput": "[null,null,null,null,10]"
-   },
-   {
-    "id": "acc-sse-s1-r2-q1-h3",
-    "input": "[\"LRUCache\",\"put\",\"put\",\"get\",\"get\"]\n[[1],[1,1],[2,2],[1],[2]]",
-    "expectedOutput": "[null,null,null,-1,2]"
+    "input": "[\"CircularQueue\",\"enQueue\",\"enQueue\",\"isFull\",\"Front\"]\n[[2],[7],[8],[],[]]",
+    "expectedOutput": "[null,true,true,true,7]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runLRU(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runLRU(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runLRU(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runCircularQueue(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runCircularQueue(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runCircularQueue(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(1) per op",
-   "space": "O(C)"
+   "space": "O(K)"
   },
   "taskIndex": 1,
   "totalTasks": 1,
@@ -7606,73 +7521,66 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-sse-s2-r2-q1": {
   "id": "acc-sse-s2-r2-q1",
-  "title": "LFU Cache Frequency Lists",
-  "difficulty": "Hard",
+  "title": "Stack With Bulk Increment",
+  "difficulty": "Medium",
   "company": "Accenture",
   "category": "Design",
   "tags": [
    "Accenture Round 2",
    "Design",
-   "LFU",
-   "Hash Table",
    "Set 2"
   ],
   "paragraphs": [
-   "Implement an LFU cache with O(1) operations. When full, evict the least frequently used key, breaking ties by least recently used. Return each call's result (null for put and the constructor, -1 for a miss).",
+   "Implement a bounded stack with push, pop and increment(k, val) that adds val to the bottom k elements. Return each call's result (null except pop, which returns -1 when empty).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"LFUCache\",\"put\",\"put\",\"get\",\"put\",\"get\",\"get\",\"put\",\"get\",\"get\",\"get\"], args = [[2],[1,1],[2,2],[1],[3,3],[2],[3],[4,4],[1],[3],[4]]",
-    "output": "[null,null,null,1,null,-1,3,null,-1,3,4]"
+    "input": "ops = [\"CustomStack\",\"push\",\"push\",\"pop\",\"push\",\"push\",\"push\",\"increment\",\"increment\",\"pop\",\"pop\",\"pop\",\"pop\"], args = [[3],[1],[2],[],[2],[3],[4],[5,100],[2,100],[],[],[],[]]",
+    "output": "[null,null,null,2,null,null,null,null,null,103,202,201,-1]"
    },
    {
-    "input": "ops = [\"LFUCache\",\"put\",\"get\"], args = [[0],[1,1],[1]]",
-    "output": "[null,null,-1]"
+    "input": "ops = [\"CustomStack\",\"pop\"], args = [[1],[]]",
+    "output": "[null,-1]"
    }
   ],
   "constraints": [
-   "Target O(1) per op time and O(C) space.",
+   "Target O(1) amortised time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-sse-s2-r2-q1-v1",
-    "input": "[\"LFUCache\",\"put\",\"put\",\"get\",\"put\",\"get\",\"get\",\"put\",\"get\",\"get\",\"get\"]\n[[2],[1,1],[2,2],[1],[3,3],[2],[3],[4,4],[1],[3],[4]]",
-    "expectedOutput": "[null,null,null,1,null,-1,3,null,-1,3,4]"
+    "input": "[\"CustomStack\",\"push\",\"push\",\"pop\",\"push\",\"push\",\"push\",\"increment\",\"increment\",\"pop\",\"pop\",\"pop\",\"pop\"]\n[[3],[1],[2],[],[2],[3],[4],[5,100],[2,100],[],[],[],[]]",
+    "expectedOutput": "[null,null,null,2,null,null,null,null,null,103,202,201,-1]"
    },
    {
     "id": "acc-sse-s2-r2-q1-v2",
-    "input": "[\"LFUCache\",\"put\",\"get\"]\n[[0],[1,1],[1]]",
-    "expectedOutput": "[null,null,-1]"
+    "input": "[\"CustomStack\",\"pop\"]\n[[1],[]]",
+    "expectedOutput": "[null,-1]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-sse-s2-r2-q1-h1",
-    "input": "[\"LFUCache\",\"put\",\"put\",\"get\",\"put\",\"get\",\"get\"]\n[[1],[1,1],[2,2],[1],[3,3],[2],[3]]",
-    "expectedOutput": "[null,null,null,-1,null,-1,3]"
+    "input": "[\"CustomStack\",\"push\",\"push\",\"increment\",\"pop\"]\n[[2],[1],[2],[1,5],[]]",
+    "expectedOutput": "[null,null,null,null,2]"
    },
    {
     "id": "acc-sse-s2-r2-q1-h2",
-    "input": "[\"LFUCache\",\"put\",\"put\",\"put\",\"get\",\"get\"]\n[[2],[1,1],[1,5],[2,2],[1],[2]]",
-    "expectedOutput": "[null,null,null,null,5,2]"
-   },
-   {
-    "id": "acc-sse-s2-r2-q1-h3",
-    "input": "[\"LFUCache\",\"put\",\"put\",\"get\",\"get\",\"put\",\"get\"]\n[[2],[1,1],[2,2],[1],[1],[3,3],[2]]",
-    "expectedOutput": "[null,null,null,1,1,null,-1]"
+    "input": "[\"CustomStack\",\"push\",\"push\",\"push\",\"pop\"]\n[[1],[9],[8],[7],[]]",
+    "expectedOutput": "[null,null,null,null,9]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runLFU(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runLFU(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runLFU(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runCustomStack(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runCustomStack(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runCustomStack(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(1) per op",
-   "space": "O(C)"
+   "time": "O(1) amortised",
+   "space": "O(N)"
   },
   "taskIndex": 1,
   "totalTasks": 1,
@@ -7680,72 +7588,65 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-sse-s3-r2-q1": {
   "id": "acc-sse-s3-r2-q1",
-  "title": "Insert Delete Constant-Time Set",
+  "title": "Build a HashMap From Scratch",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Design / Hashing",
+  "category": "Design",
   "tags": [
    "Accenture Round 2",
    "Design",
-   "Hash Table",
-   "Array",
    "Set 3"
   ],
   "paragraphs": [
-   "Implement a set supporting insert, remove and contains in O(1) (the swap-with-last trick that also makes getRandom O(1)), plus size. Return each call's result (null for the constructor).",
+   "Implement put, get (-1 if absent) and remove without a built-in map. Return each call's result (null for put, remove and the constructor).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"RandomizedSet\",\"insert\",\"remove\",\"insert\",\"contains\",\"remove\",\"insert\",\"size\"], args = [[],[1],[2],[2],[2],[1],[2],[]]",
-    "output": "[null,true,false,true,true,true,false,1]"
+    "input": "ops = [\"MyHashMap\",\"put\",\"put\",\"get\",\"get\",\"put\",\"get\",\"remove\",\"get\"], args = [[],[1,1],[2,2],[1],[3],[2,1],[2],[2],[2]]",
+    "output": "[null,null,null,1,-1,null,1,null,-1]"
    },
    {
-    "input": "ops = [\"RandomizedSet\",\"insert\",\"insert\",\"remove\",\"size\"], args = [[],[5],[5],[5],[]]",
-    "output": "[null,true,false,true,0]"
+    "input": "ops = [\"MyHashMap\",\"get\"], args = [[],[5]]",
+    "output": "[null,-1]"
    }
   ],
   "constraints": [
-   "Target O(1) per op time and O(N) space.",
+   "Target O(1) avg per op time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-sse-s3-r2-q1-v1",
-    "input": "[\"RandomizedSet\",\"insert\",\"remove\",\"insert\",\"contains\",\"remove\",\"insert\",\"size\"]\n[[],[1],[2],[2],[2],[1],[2],[]]",
-    "expectedOutput": "[null,true,false,true,true,true,false,1]"
+    "input": "[\"MyHashMap\",\"put\",\"put\",\"get\",\"get\",\"put\",\"get\",\"remove\",\"get\"]\n[[],[1,1],[2,2],[1],[3],[2,1],[2],[2],[2]]",
+    "expectedOutput": "[null,null,null,1,-1,null,1,null,-1]"
    },
    {
     "id": "acc-sse-s3-r2-q1-v2",
-    "input": "[\"RandomizedSet\",\"insert\",\"insert\",\"remove\",\"size\"]\n[[],[5],[5],[5],[]]",
-    "expectedOutput": "[null,true,false,true,0]"
+    "input": "[\"MyHashMap\",\"get\"]\n[[],[5]]",
+    "expectedOutput": "[null,-1]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-sse-s3-r2-q1-h1",
-    "input": "[\"RandomizedSet\",\"remove\",\"size\"]\n[[],[3],[]]",
-    "expectedOutput": "[null,false,0]"
+    "input": "[\"MyHashMap\",\"put\",\"put\",\"get\"]\n[[],[1000000,3],[1000000,4],[1000000]]",
+    "expectedOutput": "[null,null,null,4]"
    },
    {
     "id": "acc-sse-s3-r2-q1-h2",
-    "input": "[\"RandomizedSet\",\"insert\",\"insert\",\"insert\",\"remove\",\"contains\",\"contains\"]\n[[],[1],[2],[3],[1],[3],[1]]",
-    "expectedOutput": "[null,true,true,true,true,true,false]"
-   },
-   {
-    "id": "acc-sse-s3-r2-q1-h3",
-    "input": "[\"RandomizedSet\",\"insert\",\"remove\",\"insert\",\"size\"]\n[[],[7],[7],[7],[]]",
-    "expectedOutput": "[null,true,true,true,1]"
+    "input": "[\"MyHashMap\",\"remove\",\"get\"]\n[[],[1],[1]]",
+    "expectedOutput": "[null,null,-1]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runSet(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runSet(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runSet(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runHashMap(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runHashMap(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runHashMap(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(1) per op",
+   "time": "O(1) avg per op",
    "space": "O(N)"
   },
   "taskIndex": 1,
@@ -7754,177 +7655,27 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-sse-s4-r2-q1": {
   "id": "acc-sse-s4-r2-q1",
-  "title": "Autocomplete Trie With Top-K Ranking",
-  "difficulty": "Hard",
+  "title": "Number Pool Allocator",
+  "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Trie / Design",
+  "category": "Design",
   "tags": [
    "Accenture Round 2",
-   "Trie",
-   "Heap",
    "Design",
    "Set 4"
   ],
   "paragraphs": [
-   "Build an autocomplete system over (sentence, count) pairs. input(c) appends a character and returns the top 3 sentences by count (ties by ASCII order); '#' stores the typed sentence and returns []. args is a JSON array per call.",
+   "Manage numbers 0..n-1: get (smallest-index free number or -1), check availability and release. Return each call's result (null for release and the constructor).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"AutocompleteSystem\",\"input\",\"input\",\"input\",\"input\"], args = [[[\"i love you\",\"island\",\"iroman\",\"i love leetcode\"],[5,3,2,2]],[\"i\"],[\" \"],[\"a\"],[\"#\"]]",
-    "output": "[null,[\"i love you\",\"island\",\"i love leetcode\"],[\"i love you\",\"i love leetcode\"],[],[]]"
+    "input": "ops = [\"PhoneDirectory\",\"get\",\"get\",\"check\",\"get\",\"check\",\"release\",\"check\"], args = [[3],[],[],[2],[],[2],[2],[2]]",
+    "output": "[null,0,1,true,2,false,null,true]"
    },
    {
-    "input": "ops = [\"AutocompleteSystem\",\"input\",\"input\"], args = [[[\"ab\",\"abc\"],[1,2]],[\"a\"],[\"b\"]]",
-    "output": "[null,[\"abc\",\"ab\"],[\"abc\",\"ab\"]]"
-   }
-  ],
-  "constraints": [
-   "Target O(P + K log K) time and O(S*L) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s4-r2-q1-v1",
-    "input": "[\"AutocompleteSystem\",\"input\",\"input\",\"input\",\"input\"]\n[[[\"i love you\",\"island\",\"iroman\",\"i love leetcode\"],[5,3,2,2]],[\"i\"],[\" \"],[\"a\"],[\"#\"]]",
-    "expectedOutput": "[null,[\"i love you\",\"island\",\"i love leetcode\"],[\"i love you\",\"i love leetcode\"],[],[]]"
-   },
-   {
-    "id": "acc-sse-s4-r2-q1-v2",
-    "input": "[\"AutocompleteSystem\",\"input\",\"input\"]\n[[[\"ab\",\"abc\"],[1,2]],[\"a\"],[\"b\"]]",
-    "expectedOutput": "[null,[\"abc\",\"ab\"],[\"abc\",\"ab\"]]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s4-r2-q1-h1",
-    "input": "[\"AutocompleteSystem\",\"input\",\"input\",\"input\"]\n[[[\"x\"],[1]],[\"#\"],[\"y\"],[\"#\"]]",
-    "expectedOutput": "[null,[],[],[]]"
-   },
-   {
-    "id": "acc-sse-s4-r2-q1-h2",
-    "input": "[\"AutocompleteSystem\",\"input\"]\n[[[\"hello\",\"help\",\"helm\",\"held\"],[4,4,4,1]],[\"h\"]]",
-    "expectedOutput": "[null,[\"hello\",\"helm\",\"help\"]]"
-   },
-   {
-    "id": "acc-sse-s4-r2-q1-h3",
-    "input": "[\"AutocompleteSystem\",\"input\",\"input\",\"input\"]\n[[[\"a b\",\"a c\"],[2,2]],[\"a\"],[\" \"],[\"b\"]]",
-    "expectedOutput": "[null,[\"a b\",\"a c\"],[\"a b\",\"a c\"],[\"a b\"]]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {any[]} args\n * @return {any[]}\n */\nfunction runAutocomplete(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runAutocomplete(self, ops: List[str], args: list) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runAutocomplete(vector<string>& ops, vector<string>& args) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(P + K log K)",
-   "space": "O(S*L)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
- "acc-sse-s5-r2-q1": {
-  "id": "acc-sse-s5-r2-q1",
-  "title": "Median From a Data Stream",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Two Heaps",
-  "tags": [
-   "Accenture Round 2",
-   "Heap",
-   "Design",
-   "Streaming",
-   "Set 5"
-  ],
-  "paragraphs": [
-   "Support addNum and findMedian over a stream using two heaps (O(log N) add, O(1) median). Return each call's result (null for the constructor and addNum).",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "ops = [\"MedianFinder\",\"addNum\",\"addNum\",\"findMedian\",\"addNum\",\"findMedian\"], args = [[],[1],[2],[],[3],[]]",
-    "output": "[null,null,null,1.5,null,2.0]"
-   },
-   {
-    "input": "ops = [\"MedianFinder\",\"addNum\",\"findMedian\"], args = [[],[5],[]]",
-    "output": "[null,null,5.0]"
-   }
-  ],
-  "constraints": [
-   "Target O(log N) add, O(1) median time and O(N) space.",
-   "Handle empty, single-element and duplicate-heavy inputs.",
-   "Write readable code with clear names."
-  ],
-  "visibleTestCases": [
-   {
-    "id": "acc-sse-s5-r2-q1-v1",
-    "input": "[\"MedianFinder\",\"addNum\",\"addNum\",\"findMedian\",\"addNum\",\"findMedian\"]\n[[],[1],[2],[],[3],[]]",
-    "expectedOutput": "[null,null,null,1.5,null,2.0]"
-   },
-   {
-    "id": "acc-sse-s5-r2-q1-v2",
-    "input": "[\"MedianFinder\",\"addNum\",\"findMedian\"]\n[[],[5],[]]",
-    "expectedOutput": "[null,null,5.0]"
-   }
-  ],
-  "hiddenTestCases": [
-   {
-    "id": "acc-sse-s5-r2-q1-h1",
-    "input": "[\"MedianFinder\",\"addNum\",\"addNum\",\"addNum\",\"addNum\",\"findMedian\"]\n[[],[6],[10],[2],[6],[]]",
-    "expectedOutput": "[null,null,null,null,null,6.0]"
-   },
-   {
-    "id": "acc-sse-s5-r2-q1-h2",
-    "input": "[\"MedianFinder\",\"addNum\",\"addNum\",\"findMedian\"]\n[[],[-1],[-2],[]]",
-    "expectedOutput": "[null,null,null,-1.5]"
-   },
-   {
-    "id": "acc-sse-s5-r2-q1-h3",
-    "input": "[\"MedianFinder\",\"addNum\",\"addNum\",\"addNum\",\"findMedian\",\"addNum\",\"findMedian\"]\n[[],[40],[12],[16],[],[14],[]]",
-    "expectedOutput": "[null,null,null,null,16.0,null,15.0]"
-   }
-  ],
-  "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runMedian(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runMedian(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runMedian(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
-  },
-  "optimalComplexity": {
-   "time": "O(log N) add, O(1) median",
-   "space": "O(N)"
-  },
-  "taskIndex": 1,
-  "totalTasks": 1,
-  "nextProblemId": null
- },
- "acc-sse-s6-r2-q1": {
-  "id": "acc-sse-s6-r2-q1",
-  "title": "Maximum Frequency Stack",
-  "difficulty": "Hard",
-  "company": "Accenture",
-  "category": "Design / Stack",
-  "tags": [
-   "Accenture Round 2",
-   "Design",
-   "Stack",
-   "Hash Table",
-   "Set 6"
-  ],
-  "paragraphs": [
-   "Implement push(x) and pop(), where pop removes the most frequent element (ties: the one closest to the top). Return each call's result (null for push and the constructor).",
-   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
-  ],
-  "examples": [
-   {
-    "input": "ops = [\"FreqStack\",\"push\",\"push\",\"push\",\"push\",\"push\",\"push\",\"pop\",\"pop\",\"pop\",\"pop\"], args = [[],[5],[7],[5],[7],[4],[5],[],[],[],[]]",
-    "output": "[null,null,null,null,null,null,null,5,7,5,4]"
-   },
-   {
-    "input": "ops = [\"FreqStack\",\"push\",\"pop\"], args = [[],[1],[]]",
-    "output": "[null,null,1]"
+    "input": "ops = [\"PhoneDirectory\",\"get\",\"get\"], args = [[1],[],[]]",
+    "output": "[null,0,-1]"
    }
   ],
   "constraints": [
@@ -7934,37 +7685,32 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   ],
   "visibleTestCases": [
    {
-    "id": "acc-sse-s6-r2-q1-v1",
-    "input": "[\"FreqStack\",\"push\",\"push\",\"push\",\"push\",\"push\",\"push\",\"pop\",\"pop\",\"pop\",\"pop\"]\n[[],[5],[7],[5],[7],[4],[5],[],[],[],[]]",
-    "expectedOutput": "[null,null,null,null,null,null,null,5,7,5,4]"
+    "id": "acc-sse-s4-r2-q1-v1",
+    "input": "[\"PhoneDirectory\",\"get\",\"get\",\"check\",\"get\",\"check\",\"release\",\"check\"]\n[[3],[],[],[2],[],[2],[2],[2]]",
+    "expectedOutput": "[null,0,1,true,2,false,null,true]"
    },
    {
-    "id": "acc-sse-s6-r2-q1-v2",
-    "input": "[\"FreqStack\",\"push\",\"pop\"]\n[[],[1],[]]",
-    "expectedOutput": "[null,null,1]"
+    "id": "acc-sse-s4-r2-q1-v2",
+    "input": "[\"PhoneDirectory\",\"get\",\"get\"]\n[[1],[],[]]",
+    "expectedOutput": "[null,0,-1]"
    }
   ],
   "hiddenTestCases": [
    {
-    "id": "acc-sse-s6-r2-q1-h1",
-    "input": "[\"FreqStack\",\"push\",\"push\",\"pop\",\"pop\"]\n[[],[2],[2],[],[]]",
-    "expectedOutput": "[null,null,null,2,2]"
+    "id": "acc-sse-s4-r2-q1-h1",
+    "input": "[\"PhoneDirectory\",\"get\",\"release\",\"get\"]\n[[2],[],[0],[]]",
+    "expectedOutput": "[null,0,null,1]"
    },
    {
-    "id": "acc-sse-s6-r2-q1-h2",
-    "input": "[\"FreqStack\",\"push\",\"push\",\"push\",\"pop\",\"pop\",\"pop\"]\n[[],[1],[2],[3],[],[],[]]",
-    "expectedOutput": "[null,null,null,null,3,2,1]"
-   },
-   {
-    "id": "acc-sse-s6-r2-q1-h3",
-    "input": "[\"FreqStack\",\"push\",\"push\",\"push\",\"pop\",\"push\",\"pop\",\"pop\"]\n[[],[1],[1],[2],[],[2],[],[]]",
-    "expectedOutput": "[null,null,null,null,1,null,2,2]"
+    "id": "acc-sse-s4-r2-q1-h2",
+    "input": "[\"PhoneDirectory\",\"check\"]\n[[2],[1]]",
+    "expectedOutput": "[null,true]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runFreqStack(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runFreqStack(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runFreqStack(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runNumberPool(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runNumberPool(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runNumberPool(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(1) per op",
@@ -7974,74 +7720,201 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "totalTasks": 1,
   "nextProblemId": null
  },
- "acc-sse-s7-r2-q1": {
-  "id": "acc-sse-s7-r2-q1",
-  "title": "Time-Versioned Key-Value Store",
+ "acc-sse-s5-r2-q1": {
+  "id": "acc-sse-s5-r2-q1",
+  "title": "Session Token Expiry Manager",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Binary Search / Design",
+  "category": "Design",
   "tags": [
    "Accenture Round 2",
    "Design",
-   "Binary Search",
-   "Hash Table",
-   "Set 7"
+   "Set 5"
   ],
   "paragraphs": [
-   "set(key, value, timestamp) stores versions with increasing timestamps; get(key, timestamp) returns the value with the largest timestamp not exceeding the query, or an empty string. Return each call's result (null for set and the constructor).",
+   "Tokens (integer ids) expire timeToLive seconds after creation or renewal; renewing an expired token does nothing; a token expiring exactly at time t counts as expired. countUnexpired(t) returns live tokens. Return each call's result (null except countUnexpired).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"TimeMap\",\"set\",\"get\",\"get\",\"set\",\"get\",\"get\"], args = [[],[\"foo\",\"bar\",1],[\"foo\",1],[\"foo\",3],[\"foo\",\"bar2\",4],[\"foo\",4],[\"foo\",5]]",
-    "output": "[null,null,\"bar\",\"bar\",null,\"bar2\",\"bar2\"]"
+    "input": "ops = [\"AuthenticationManager\",\"renew\",\"generate\",\"countUnexpired\",\"generate\",\"renew\",\"renew\",\"countUnexpired\"], args = [[5],[1,2],[1,3],[6],[2,7],[1,8],[1,10],[15]]",
+    "output": "[null,null,null,1,null,null,null,0]"
    },
    {
-    "input": "ops = [\"TimeMap\",\"get\"], args = [[],[\"x\",1]]",
-    "output": "[null,\"\"]"
+    "input": "ops = [\"AuthenticationManager\",\"generate\",\"countUnexpired\",\"countUnexpired\"], args = [[2],[1,0],[1],[2]]",
+    "output": "[null,null,1,0]"
    }
   ],
   "constraints": [
-   "Target O(log N) get time and O(N) space.",
+   "Target O(N) per count time and O(N) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s5-r2-q1-v1",
+    "input": "[\"AuthenticationManager\",\"renew\",\"generate\",\"countUnexpired\",\"generate\",\"renew\",\"renew\",\"countUnexpired\"]\n[[5],[1,2],[1,3],[6],[2,7],[1,8],[1,10],[15]]",
+    "expectedOutput": "[null,null,null,1,null,null,null,0]"
+   },
+   {
+    "id": "acc-sse-s5-r2-q1-v2",
+    "input": "[\"AuthenticationManager\",\"generate\",\"countUnexpired\",\"countUnexpired\"]\n[[2],[1,0],[1],[2]]",
+    "expectedOutput": "[null,null,1,0]"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s5-r2-q1-h1",
+    "input": "[\"AuthenticationManager\",\"generate\",\"generate\",\"countUnexpired\"]\n[[10],[1,0],[2,5],[9]]",
+    "expectedOutput": "[null,null,null,2]"
+   },
+   {
+    "id": "acc-sse-s5-r2-q1-h2",
+    "input": "[\"AuthenticationManager\",\"countUnexpired\"]\n[[3],[1]]",
+    "expectedOutput": "[null,0]"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runAuthManager(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runAuthManager(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runAuthManager(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(N) per count",
+   "space": "O(N)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-sse-s6-r2-q1": {
+  "id": "acc-sse-s6-r2-q1",
+  "title": "Parking Slot Reservation System",
+  "difficulty": "Easy",
+  "company": "Accenture",
+  "category": "Design",
+  "tags": [
+   "Accenture Round 2",
+   "Design",
+   "Set 6"
+  ],
+  "paragraphs": [
+   "A lot has big (1), medium (2) and small (3) slots. addCar(type) parks a car if a slot of that type is free. Return each call's result (null for the constructor).",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "ops = [\"ParkingSystem\",\"addCar\",\"addCar\",\"addCar\",\"addCar\"], args = [[1,1,0],[1],[2],[3],[1]]",
+    "output": "[null,true,true,false,false]"
+   },
+   {
+    "input": "ops = [\"ParkingSystem\",\"addCar\"], args = [[0,0,0],[2]]",
+    "output": "[null,false]"
+   }
+  ],
+  "constraints": [
+   "Target O(1) per op time and O(1) space.",
+   "Handle empty, single-element and duplicate-heavy inputs.",
+   "Write readable code with clear names."
+  ],
+  "visibleTestCases": [
+   {
+    "id": "acc-sse-s6-r2-q1-v1",
+    "input": "[\"ParkingSystem\",\"addCar\",\"addCar\",\"addCar\",\"addCar\"]\n[[1,1,0],[1],[2],[3],[1]]",
+    "expectedOutput": "[null,true,true,false,false]"
+   },
+   {
+    "id": "acc-sse-s6-r2-q1-v2",
+    "input": "[\"ParkingSystem\",\"addCar\"]\n[[0,0,0],[2]]",
+    "expectedOutput": "[null,false]"
+   }
+  ],
+  "hiddenTestCases": [
+   {
+    "id": "acc-sse-s6-r2-q1-h1",
+    "input": "[\"ParkingSystem\",\"addCar\",\"addCar\"]\n[[2,0,0],[1],[1]]",
+    "expectedOutput": "[null,true,true]"
+   },
+   {
+    "id": "acc-sse-s6-r2-q1-h2",
+    "input": "[\"ParkingSystem\",\"addCar\",\"addCar\",\"addCar\"]\n[[1,1,1],[3],[3],[2]]",
+    "expectedOutput": "[null,true,false,true]"
+   }
+  ],
+  "starterTemplates": {
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runParking(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runParking(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runParking(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+  },
+  "optimalComplexity": {
+   "time": "O(1) per op",
+   "space": "O(1)"
+  },
+  "taskIndex": 1,
+  "totalTasks": 1,
+  "nextProblemId": null
+ },
+ "acc-sse-s7-r2-q1": {
+  "id": "acc-sse-s7-r2-q1",
+  "title": "Product of the Last K Readings",
+  "difficulty": "Medium",
+  "company": "Accenture",
+  "category": "Design / Prefix Product",
+  "tags": [
+   "Accenture Round 2",
+   "Design / Prefix Product",
+   "Set 7"
+  ],
+  "paragraphs": [
+   "Support add(num) and getProduct(k) for the product of the last k numbers, in O(1) per call (handle zeros). Return each call's result (null for add and the constructor).",
+   "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
+  ],
+  "examples": [
+   {
+    "input": "ops = [\"ProductOfNumbers\",\"add\",\"add\",\"add\",\"add\",\"add\",\"getProduct\",\"getProduct\",\"getProduct\",\"add\",\"getProduct\"], args = [[],[3],[0],[2],[5],[4],[2],[3],[4],[8],[2]]",
+    "output": "[null,null,null,null,null,null,20,40,0,null,32]"
+   },
+   {
+    "input": "ops = [\"ProductOfNumbers\",\"add\",\"getProduct\"], args = [[],[5],[1]]",
+    "output": "[null,null,5]"
+   }
+  ],
+  "constraints": [
+   "Target O(1) per op time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-sse-s7-r2-q1-v1",
-    "input": "[\"TimeMap\",\"set\",\"get\",\"get\",\"set\",\"get\",\"get\"]\n[[],[\"foo\",\"bar\",1],[\"foo\",1],[\"foo\",3],[\"foo\",\"bar2\",4],[\"foo\",4],[\"foo\",5]]",
-    "expectedOutput": "[null,null,\"bar\",\"bar\",null,\"bar2\",\"bar2\"]"
+    "input": "[\"ProductOfNumbers\",\"add\",\"add\",\"add\",\"add\",\"add\",\"getProduct\",\"getProduct\",\"getProduct\",\"add\",\"getProduct\"]\n[[],[3],[0],[2],[5],[4],[2],[3],[4],[8],[2]]",
+    "expectedOutput": "[null,null,null,null,null,null,20,40,0,null,32]"
    },
    {
     "id": "acc-sse-s7-r2-q1-v2",
-    "input": "[\"TimeMap\",\"get\"]\n[[],[\"x\",1]]",
-    "expectedOutput": "[null,\"\"]"
+    "input": "[\"ProductOfNumbers\",\"add\",\"getProduct\"]\n[[],[5],[1]]",
+    "expectedOutput": "[null,null,5]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-sse-s7-r2-q1-h1",
-    "input": "[\"TimeMap\",\"set\",\"get\"]\n[[],[\"a\",\"v\",10],[\"a\",5]]",
-    "expectedOutput": "[null,null,\"\"]"
+    "input": "[\"ProductOfNumbers\",\"add\",\"add\",\"getProduct\"]\n[[],[0],[4],[2]]",
+    "expectedOutput": "[null,null,null,0]"
    },
    {
     "id": "acc-sse-s7-r2-q1-h2",
-    "input": "[\"TimeMap\",\"set\",\"set\",\"get\",\"get\"]\n[[],[\"k\",\"a\",1],[\"k\",\"b\",2],[\"k\",2],[\"k\",1]]",
-    "expectedOutput": "[null,null,null,\"b\",\"a\"]"
-   },
-   {
-    "id": "acc-sse-s7-r2-q1-h3",
-    "input": "[\"TimeMap\",\"set\",\"get\",\"get\"]\n[[],[\"m\",\"z\",3],[\"m\",3],[\"n\",3]]",
-    "expectedOutput": "[null,null,\"z\",\"\"]"
+    "input": "[\"ProductOfNumbers\",\"add\",\"add\",\"add\",\"getProduct\"]\n[[],[2],[3],[4],[3]]",
+    "expectedOutput": "[null,null,null,null,24]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {any[]} args\n * @return {any[]}\n */\nfunction runTimeMap(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runTimeMap(self, ops: List[str], args: list) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runTimeMap(vector<string>& ops, vector<string>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runProductOfNumbers(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runProductOfNumbers(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runProductOfNumbers(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(log N) get",
+   "time": "O(1) per op",
    "space": "O(N)"
   },
   "taskIndex": 1,
@@ -8050,73 +7923,66 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-sse-s8-r2-q1": {
   "id": "acc-sse-s8-r2-q1",
-  "title": "Snapshot Array With Versioned Cells",
+  "title": "Ordered Event Stream Release",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Binary Search / Design",
+  "category": "Design",
   "tags": [
    "Accenture Round 2",
    "Design",
-   "Binary Search",
-   "Versioning",
    "Set 8"
   ],
   "paragraphs": [
-   "Implement SnapshotArray(length): set(i, v), snap() returning the snapshot id, and get(i, snap_id). Store only changed cells per version. Return each call's result (null for set and the constructor).",
+   "Events arrive as (id, value) in any order; after each insert, return the longest run of consecutive values starting at the next unreleased id. Return each call's result (null for the constructor).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"SnapshotArray\",\"set\",\"snap\",\"set\",\"get\"], args = [[3],[0,5],[],[0,6],[0,0]]",
-    "output": "[null,null,0,null,5]"
+    "input": "ops = [\"OrderedStream\",\"insert\",\"insert\",\"insert\",\"insert\",\"insert\"], args = [[5],[3,30],[1,10],[2,20],[5,50],[4,40]]",
+    "output": "[null,[],[10],[20,30],[],[40,50]]"
    },
    {
-    "input": "ops = [\"SnapshotArray\",\"snap\",\"snap\",\"get\"], args = [[1],[],[],[0,1]]",
-    "output": "[null,0,1,0]"
+    "input": "ops = [\"OrderedStream\",\"insert\"], args = [[2],[2,2]]",
+    "output": "[null,[]]"
    }
   ],
   "constraints": [
-   "Target O(log S) get time and O(changes) space.",
+   "Target O(N) total time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-sse-s8-r2-q1-v1",
-    "input": "[\"SnapshotArray\",\"set\",\"snap\",\"set\",\"get\"]\n[[3],[0,5],[],[0,6],[0,0]]",
-    "expectedOutput": "[null,null,0,null,5]"
+    "input": "[\"OrderedStream\",\"insert\",\"insert\",\"insert\",\"insert\",\"insert\"]\n[[5],[3,30],[1,10],[2,20],[5,50],[4,40]]",
+    "expectedOutput": "[null,[],[10],[20,30],[],[40,50]]"
    },
    {
     "id": "acc-sse-s8-r2-q1-v2",
-    "input": "[\"SnapshotArray\",\"snap\",\"snap\",\"get\"]\n[[1],[],[],[0,1]]",
-    "expectedOutput": "[null,0,1,0]"
+    "input": "[\"OrderedStream\",\"insert\"]\n[[2],[2,2]]",
+    "expectedOutput": "[null,[]]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-sse-s8-r2-q1-h1",
-    "input": "[\"SnapshotArray\",\"set\",\"snap\",\"set\",\"snap\",\"get\",\"get\"]\n[[2],[1,9],[],[1,4],[],[1,0],[1,1]]",
-    "expectedOutput": "[null,null,0,null,1,9,4]"
+    "input": "[\"OrderedStream\",\"insert\",\"insert\"]\n[[2],[1,1],[2,2]]",
+    "expectedOutput": "[null,[1],[2]]"
    },
    {
     "id": "acc-sse-s8-r2-q1-h2",
-    "input": "[\"SnapshotArray\",\"snap\",\"get\"]\n[[2],[],[1,0]]",
-    "expectedOutput": "[null,0,0]"
-   },
-   {
-    "id": "acc-sse-s8-r2-q1-h3",
-    "input": "[\"SnapshotArray\",\"set\",\"set\",\"snap\",\"get\"]\n[[2],[0,1],[0,2],[],[0,0]]",
-    "expectedOutput": "[null,null,null,0,2]"
+    "input": "[\"OrderedStream\",\"insert\",\"insert\",\"insert\"]\n[[3],[3,3],[2,2],[1,1]]",
+    "expectedOutput": "[null,[],[],[1,2,3]]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runSnapshot(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runSnapshot(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runSnapshot(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runOrderedStream(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runOrderedStream(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runOrderedStream(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(log S) get",
-   "space": "O(changes)"
+   "time": "O(N) total",
+   "space": "O(N)"
   },
   "taskIndex": 1,
   "totalTasks": 1,
@@ -8124,29 +7990,27 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-sse-s9-r2-q1": {
   "id": "acc-sse-s9-r2-q1",
-  "title": "Mutable Range Sums With Fenwick Tree",
+  "title": "Slot Number Lookup",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Binary Indexed Tree",
+  "category": "Design / Heap",
   "tags": [
    "Accenture Round 2",
-   "Design",
-   "Fenwick Tree",
-   "Segment Tree",
+   "Design / Heap",
    "Set 9"
   ],
   "paragraphs": [
-   "Implement NumArray(nums), update(index, val) and sumRange(left, right) both in O(log N). Return each call's result (null for update and the constructor).",
+   "change(index, number) sets a slot's number; find(number) returns the smallest index holding it, or -1. Return each call's result (null for change and the constructor).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"NumArray\",\"sumRange\",\"update\",\"sumRange\"], args = [[[1,3,5]],[0,2],[1,2],[0,2]]",
-    "output": "[null,9,null,8]"
+    "input": "ops = [\"NumberContainers\",\"find\",\"change\",\"change\",\"change\",\"change\",\"find\",\"change\",\"find\"], args = [[],[10],[2,10],[1,10],[3,10],[5,10],[10],[1,20],[10]]",
+    "output": "[null,-1,null,null,null,null,1,null,2]"
    },
    {
-    "input": "ops = [\"NumArray\",\"sumRange\"], args = [[[7]],[0,0]]",
-    "output": "[null,7]"
+    "input": "ops = [\"NumberContainers\",\"find\"], args = [[],[5]]",
+    "output": "[null,-1]"
    }
   ],
   "constraints": [
@@ -8157,36 +8021,31 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
   "visibleTestCases": [
    {
     "id": "acc-sse-s9-r2-q1-v1",
-    "input": "[\"NumArray\",\"sumRange\",\"update\",\"sumRange\"]\n[[[1,3,5]],[0,2],[1,2],[0,2]]",
-    "expectedOutput": "[null,9,null,8]"
+    "input": "[\"NumberContainers\",\"find\",\"change\",\"change\",\"change\",\"change\",\"find\",\"change\",\"find\"]\n[[],[10],[2,10],[1,10],[3,10],[5,10],[10],[1,20],[10]]",
+    "expectedOutput": "[null,-1,null,null,null,null,1,null,2]"
    },
    {
     "id": "acc-sse-s9-r2-q1-v2",
-    "input": "[\"NumArray\",\"sumRange\"]\n[[[7]],[0,0]]",
-    "expectedOutput": "[null,7]"
+    "input": "[\"NumberContainers\",\"find\"]\n[[],[5]]",
+    "expectedOutput": "[null,-1]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-sse-s9-r2-q1-h1",
-    "input": "[\"NumArray\",\"update\",\"sumRange\",\"sumRange\"]\n[[[1,2,3,4]],[0,10],[0,3],[1,2]]",
-    "expectedOutput": "[null,null,19,5]"
+    "input": "[\"NumberContainers\",\"change\",\"change\",\"find\"]\n[[],[1,7],[1,8],[7]]",
+    "expectedOutput": "[null,null,null,-1]"
    },
    {
     "id": "acc-sse-s9-r2-q1-h2",
-    "input": "[\"NumArray\",\"sumRange\",\"sumRange\"]\n[[[-1,-2,-3]],[0,1],[1,2]]",
-    "expectedOutput": "[null,-3,-5]"
-   },
-   {
-    "id": "acc-sse-s9-r2-q1-h3",
-    "input": "[\"NumArray\",\"update\",\"update\",\"sumRange\"]\n[[[0,0,0]],[1,5],[2,6],[0,2]]",
-    "expectedOutput": "[null,null,null,11]"
+    "input": "[\"NumberContainers\",\"change\",\"change\",\"find\"]\n[[],[4,2],[3,2],[2]]",
+    "expectedOutput": "[null,null,null,3]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {any[]} args\n * @return {any[]}\n */\nfunction runNumArray(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runNumArray(self, ops: List[str], args: list) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runNumArray(vector<string>& ops, vector<string>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runNumberContainers(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runNumberContainers(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runNumberContainers(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
    "time": "O(log N) per op",
@@ -8198,71 +8057,65 @@ export const ACCENTURE_ALL_PROBLEMS: Record<string, ProblemDefinition> = {
  },
  "acc-sse-s10-r2-q1": {
   "id": "acc-sse-s10-r2-q1",
-  "title": "Min Stack With Constant-Time Minimum",
+  "title": "Room Booking Calendar",
   "difficulty": "Medium",
   "company": "Accenture",
-  "category": "Design / Stack",
+  "category": "Design / Intervals",
   "tags": [
    "Accenture Round 2",
-   "Design",
-   "Stack",
+   "Design / Intervals",
    "Set 10"
   ],
   "paragraphs": [
-   "Implement push, pop, top and getMin all in O(1). Return each call's result (null for push, pop and the constructor).",
+   "book(start, end) books [start, end) if it does not overlap an existing booking, and returns whether it succeeded. Return each call's result (null for the constructor).",
    "Round 2 is a technical interview: after your code works you will explain the logic, complexity and edge cases in plain language."
   ],
   "examples": [
    {
-    "input": "ops = [\"MinStack\",\"push\",\"push\",\"push\",\"getMin\",\"pop\",\"top\",\"getMin\"], args = [[],[-2],[0],[-3],[],[],[],[]]",
-    "output": "[null,null,null,null,-3,null,0,-2]"
+    "input": "ops = [\"MyCalendar\",\"book\",\"book\",\"book\"], args = [[],[10,20],[15,25],[20,30]]",
+    "output": "[null,true,false,true]"
    },
    {
-    "input": "ops = [\"MinStack\",\"push\",\"getMin\"], args = [[],[4],[]]",
-    "output": "[null,null,4]"
+    "input": "ops = [\"MyCalendar\",\"book\",\"book\"], args = [[],[1,2],[1,2]]",
+    "output": "[null,true,false]"
    }
   ],
   "constraints": [
-   "Target O(1) per op time and O(N) space.",
+   "Target O(N) per op time and O(N) space.",
    "Handle empty, single-element and duplicate-heavy inputs.",
    "Write readable code with clear names."
   ],
   "visibleTestCases": [
    {
     "id": "acc-sse-s10-r2-q1-v1",
-    "input": "[\"MinStack\",\"push\",\"push\",\"push\",\"getMin\",\"pop\",\"top\",\"getMin\"]\n[[],[-2],[0],[-3],[],[],[],[]]",
-    "expectedOutput": "[null,null,null,null,-3,null,0,-2]"
+    "input": "[\"MyCalendar\",\"book\",\"book\",\"book\"]\n[[],[10,20],[15,25],[20,30]]",
+    "expectedOutput": "[null,true,false,true]"
    },
    {
     "id": "acc-sse-s10-r2-q1-v2",
-    "input": "[\"MinStack\",\"push\",\"getMin\"]\n[[],[4],[]]",
-    "expectedOutput": "[null,null,4]"
+    "input": "[\"MyCalendar\",\"book\",\"book\"]\n[[],[1,2],[1,2]]",
+    "expectedOutput": "[null,true,false]"
    }
   ],
   "hiddenTestCases": [
    {
     "id": "acc-sse-s10-r2-q1-h1",
-    "input": "[\"MinStack\",\"push\",\"push\",\"getMin\",\"pop\",\"getMin\"]\n[[],[2],[1],[],[],[]]",
-    "expectedOutput": "[null,null,null,1,null,2]"
+    "input": "[\"MyCalendar\",\"book\",\"book\",\"book\"]\n[[],[5,10],[0,5],[0,6]]",
+    "expectedOutput": "[null,true,true,false]"
    },
    {
     "id": "acc-sse-s10-r2-q1-h2",
-    "input": "[\"MinStack\",\"push\",\"push\",\"pop\",\"top\"]\n[[],[3],[9],[],[]]",
-    "expectedOutput": "[null,null,null,null,3]"
-   },
-   {
-    "id": "acc-sse-s10-r2-q1-h3",
-    "input": "[\"MinStack\",\"push\",\"push\",\"push\",\"getMin\"]\n[[],[5],[5],[5],[]]",
-    "expectedOutput": "[null,null,null,null,5]"
+    "input": "[\"MyCalendar\",\"book\"]\n[[],[0,1]]",
+    "expectedOutput": "[null,true]"
    }
   ],
   "starterTemplates": {
-   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runMinStack(ops, args) {\n  // Write your solution here\n}\n",
-   "python": "from typing import List\n\nclass Solution:\n    def runMinStack(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
-   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runMinStack(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
+   "javascript": "/**\n * @param {string[]} ops\n * @param {number[][]} args\n * @return {any[]}\n */\nfunction runCalendar(ops, args) {\n  // Write your solution here\n}\n",
+   "python": "from typing import List\n\nclass Solution:\n    def runCalendar(self, ops: List[str], args: List[List[int]]) -> list:\n        # Write your solution here\n        pass\n",
+   "cpp": "#include <vector>\n#include <string>\nusing namespace std;\n\n// Signature mirrors the JavaScript version. Each element of an any[] value is passed as a JSON string in C++.\nclass Solution {\npublic:\n    vector<string> runCalendar(vector<string>& ops, vector<vector<int>>& args) {\n        // Write your solution here\n    }\n};\n"
   },
   "optimalComplexity": {
-   "time": "O(1) per op",
+   "time": "O(N) per op",
    "space": "O(N)"
   },
   "taskIndex": 1,
