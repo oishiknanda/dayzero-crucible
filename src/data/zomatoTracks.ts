@@ -48,8 +48,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Validate Config Brackets + Longest Unique Query Fragment",
-      "focus": "Stack",
+      "title": "Set 1: First Duplicate Order ID + Majority Cuisine Choice",
+      "focus": "Hash Set",
       "problemIds": [
        "zom-intern-s1-r1-q1",
        "zom-intern-s1-r1-q2"
@@ -57,8 +57,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 2,
-      "title": "Set 2: Sorted Latency Pair + Peak Traffic Window",
-      "focus": "Two Pointers",
+      "title": "Set 2: Repeat Order Within K Minutes + Merge Two Sorted Menus",
+      "focus": "Hash Table",
       "problemIds": [
        "zom-intern-s2-r1-q1",
        "zom-intern-s2-r1-q2"
@@ -66,8 +66,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 3,
-      "title": "Set 3: Insert Position in Sorted Index + Merge Maintenance Windows",
-      "focus": "Binary Search",
+      "title": "Set 3: Customers Common to Two Cities + Largest Delivery Zone Area",
+      "focus": "Hash Set",
       "problemIds": [
        "zom-intern-s3-r1-q1",
        "zom-intern-s3-r1-q2"
@@ -75,8 +75,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 4,
-      "title": "Set 4: Reverse Command Tokens + Longest Repeated Run After Edits",
-      "focus": "String",
+      "title": "Set 4: Zero-Net Combo Triples + Sort Order Priorities 0-1-2",
+      "focus": "Two Pointers",
       "problemIds": [
        "zom-intern-s4-r1-q1",
        "zom-intern-s4-r1-q2"
@@ -84,8 +84,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 5,
-      "title": "Set 5: Count Data Center Clusters + Corrupted Replica Spread",
-      "focus": "Graph / DFS",
+      "title": "Set 5: Next Order Number + Valid Demand Mountain",
+      "focus": "Array",
       "problemIds": [
        "zom-intern-s5-r1-q1",
        "zom-intern-s5-r1-q2"
@@ -93,8 +93,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 6,
-      "title": "Set 6: Best Single Trade + Product Without Self",
-      "focus": "Array",
+      "title": "Set 6: Sorted Squares of Offsets + First Rating Peak",
+      "focus": "Two Pointers",
       "problemIds": [
        "zom-intern-s6-r1-q1",
        "zom-intern-s6-r1-q2"
@@ -102,8 +102,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 7,
-      "title": "Set 7: Climbing Release Stairs + Fewest Quota Units",
-      "focus": "Dynamic Programming",
+      "title": "Set 7: First Unique Dish Code + Count Ingredient Anagram Groups",
+      "focus": "Hash Table",
       "problemIds": [
        "zom-intern-s7-r1-q1",
        "zom-intern-s7-r1-q2"
@@ -111,8 +111,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 8,
-      "title": "Set 8: Flood Fill Canvas + Shortest Clear Route",
-      "focus": "DFS",
+      "title": "Set 8: Isomorphic Menu Codes + Longest Shared Order Pattern",
+      "focus": "Hash Table",
       "problemIds": [
        "zom-intern-s8-r1-q1",
        "zom-intern-s8-r1-q2"
@@ -120,8 +120,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 9,
-      "title": "Set 9: Compact Active Slots + Matching Usage Totals",
-      "focus": "Two Pointers",
+      "title": "Set 9: The One Unpaired Delivery + Count Set Feature Flags",
+      "focus": "Bit Manipulation",
       "problemIds": [
        "zom-intern-s9-r1-q1",
        "zom-intern-s9-r1-q2"
@@ -129,8 +129,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 10,
-      "title": "Set 10: Anagram Tag Check + Segment a Search Query",
-      "focus": "Hash Table",
+      "title": "Set 10: Happy Coupon Number + Roman Table Number Parser",
+      "focus": "Math",
       "problemIds": [
        "zom-intern-s10-r1-q1",
        "zom-intern-s10-r1-q2"
@@ -146,71 +146,71 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Kth Largest Latency",
-      "focus": "Heap",
+      "title": "Set 1: Slowest Safe Packing Speed",
+      "focus": "Binary Search on Answer",
       "problemIds": [
        "zom-intern-s1-r2-q1"
       ]
      },
      {
       "setId": 2,
-      "title": "Set 2: Top K Search Terms",
-      "focus": "Heap / Hashing",
+      "title": "Set 2: Best Contiguous Profit Streak",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "zom-intern-s2-r2-q1"
       ]
      },
      {
       "setId": 3,
-      "title": "Set 3: Build Dependency Order",
-      "focus": "Graph / Topological Sort",
+      "title": "Set 3: Search a Sorted Price Grid",
+      "focus": "Binary Search",
       "problemIds": [
        "zom-intern-s3-r2-q1"
       ]
      },
      {
       "setId": 4,
-      "title": "Set 4: Longest Palindromic Token",
-      "focus": "Expand Around Center",
+      "title": "Set 4: Spiral Delivery Route",
+      "focus": "Matrix",
       "problemIds": [
        "zom-intern-s4-r2-q1"
       ]
      },
      {
       "setId": 5,
-      "title": "Set 5: Generate Balanced Templates",
-      "focus": "Backtracking",
+      "title": "Set 5: Rotate a Seat Map 90 Degrees",
+      "focus": "Matrix",
       "problemIds": [
        "zom-intern-s5-r2-q1"
       ]
      },
      {
       "setId": 6,
-      "title": "Set 6: Search a Rotated Log Index",
-      "focus": "Binary Search",
+      "title": "Set 6: Clear Closed Rows and Columns",
+      "focus": "Matrix",
       "problemIds": [
        "zom-intern-s6-r2-q1"
       ]
      },
      {
       "setId": 7,
-      "title": "Set 7: Days Until Warmer",
-      "focus": "Monotonic Stack",
+      "title": "Set 7: All Delivery Orderings",
+      "focus": "Backtracking",
       "problemIds": [
        "zom-intern-s7-r2-q1"
       ]
      },
      {
       "setId": 8,
-      "title": "Set 8: Reach the Last Shard",
-      "focus": "Greedy",
+      "title": "Set 8: All Add-On Combinations",
+      "focus": "Backtracking",
       "problemIds": [
        "zom-intern-s8-r2-q1"
       ]
      },
      {
       "setId": 9,
-      "title": "Set 9: Keypad Suggestion Expansion",
+      "title": "Set 9: Coupon Value Combinations",
       "focus": "Backtracking",
       "problemIds": [
        "zom-intern-s9-r2-q1"
@@ -218,7 +218,7 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 10,
-      "title": "Set 10: Capacity Between Peaks",
+      "title": "Set 10: Next Larger Order Sequence",
       "focus": "Two Pointers",
       "problemIds": [
        "zom-intern-s10-r2-q1"
@@ -418,8 +418,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Alternating Colour Shortest Paths + Longest Fragment With K Distinct Tokens",
-      "focus": "Graph / BFS",
+      "title": "Set 1: Shortest Batch Reaching Target + Subarrays With Small Product",
+      "focus": "Sliding Window",
       "problemIds": [
        "zom-sde1-s1-r1-q1",
        "zom-sde1-s1-r1-q2"
@@ -427,8 +427,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 2,
-      "title": "Set 2: Distance to Nearest Cache Node + Maximum Batch Jobs by Deadline",
-      "focus": "Multi-source BFS",
+      "title": "Set 2: Find Anagram Start Positions + Is a Permutation Inside",
+      "focus": "Sliding Window",
       "problemIds": [
        "zom-sde1-s2-r1-q1",
        "zom-sde1-s2-r1-q2"
@@ -436,8 +436,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 3,
-      "title": "Set 3: Rooms to Nearest Gateway + Rolling Maximum Over Metrics",
-      "focus": "Multi-source BFS",
+      "title": "Set 3: Longest Demand Mountain + Best Multiplicative Streak",
+      "focus": "Two Pointers",
       "problemIds": [
        "zom-sde1-s3-r1-q1",
        "zom-sde1-s3-r1-q2"
@@ -445,8 +445,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 4,
-      "title": "Set 4: Shortest Route With Removable Blocks + Smallest Covering Log Window",
-      "focus": "BFS with State",
+      "title": "Set 4: Best Circular Shift Window + Starting Depot for a Loop",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "zom-sde1-s4-r1-q1",
        "zom-sde1-s4-r1-q2"
@@ -454,8 +454,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 5,
-      "title": "Set 5: Word Ladder Transformation Length + Longest Rising Trend",
-      "focus": "Graph / BFS",
+      "title": "Set 5: Minimum Reward Points + Fewest Slots to Cancel",
+      "focus": "Greedy",
       "problemIds": [
        "zom-sde1-s5-r1-q1",
        "zom-sde1-s5-r1-q2"
@@ -463,8 +463,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 6,
-      "title": "Set 6: Farthest Zone From Any Node + Minimum Edits Between Configs",
-      "focus": "Multi-source BFS",
+      "title": "Set 6: Fewest Pins to Burst Banners + Partition Shifts by Zone Code",
+      "focus": "Greedy",
       "problemIds": [
        "zom-sde1-s6-r1-q1",
        "zom-sde1-s6-r1-q2"
@@ -472,8 +472,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 7,
-      "title": "Set 7: Circular Server Rack Harvest + Largest Healthy Square",
-      "focus": "DP",
+      "title": "Set 7: Insert a New Delivery Window + Delivery Convoy Count",
+      "focus": "Intervals",
       "problemIds": [
        "zom-sde1-s7-r1-q1",
        "zom-sde1-s7-r1-q2"
@@ -481,8 +481,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 8,
-      "title": "Set 8: Signal Propagation Time + Balanced Shard Split",
-      "focus": "Dijkstra",
+      "title": "Set 8: Rating Span for Each Day + Next Higher Surge in a Cycle",
+      "focus": "Monotonic Stack",
       "problemIds": [
        "zom-sde1-s8-r1-q1",
        "zom-sde1-s8-r1-q2"
@@ -490,8 +490,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 9,
-      "title": "Set 9: Cooldown Task Slots + Concurrent Booking Rooms",
-      "focus": "Greedy",
+      "title": "Set 9: Cheapest Climb Through Tiers + Routes Around Blocked Streets",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "zom-sde1-s9-r1-q1",
        "zom-sde1-s9-r1-q2"
@@ -499,8 +499,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 10,
-      "title": "Set 10: Cheapest Route With Hop Limit + Longest Consecutive Id Run",
-      "focus": "Bellman-Ford",
+      "title": "Set 10: Longest Palindromic Subsequence + Cheapest Rider Path in a Grid",
+      "focus": "Dynamic Programming",
       "problemIds": [
        "zom-sde1-s10-r1-q1",
        "zom-sde1-s10-r1-q2"
@@ -516,80 +516,80 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Maximum Path Sum in a Service Tree",
-      "focus": "Tree / DFS",
+      "title": "Set 1: Connected Kitchen Networks",
+      "focus": "Union Find",
       "problemIds": [
        "zom-sde1-s1-r2-q1"
       ]
      },
      {
       "setId": 2,
-      "title": "Set 2: Multi-Word Grid Search With Trie Pruning",
-      "focus": "Trie / Backtracking",
+      "title": "Set 2: Redundant Delivery Link",
+      "focus": "Union Find",
       "problemIds": [
        "zom-sde1-s2-r2-q1"
       ]
      },
      {
       "setId": 3,
-      "title": "Set 3: Kth Smallest in Sorted Matrix",
-      "focus": "Heap / Binary Search",
+      "title": "Set 3: Split Riders Into Two Teams",
+      "focus": "Graph Coloring",
       "problemIds": [
        "zom-sde1-s3-r2-q1"
       ]
      },
      {
       "setId": 4,
-      "title": "Set 4: Best Root Nodes for Latency",
-      "focus": "Graph / Topological Peel",
+      "title": "Set 4: Capture Enclosed Zones",
+      "focus": "DFS / Matrix",
       "problemIds": [
        "zom-sde1-s4-r2-q1"
       ]
      },
      {
       "setId": 5,
-      "title": "Set 5: Longest Increasing Path in Grid",
-      "focus": "DFS + Memoization",
+      "title": "Set 5: Smoothest Delivery Route",
+      "focus": "Dijkstra / Binary Search",
       "problemIds": [
        "zom-sde1-s5-r2-q1"
       ]
      },
      {
       "setId": 6,
-      "title": "Set 6: Decode Telemetry Codes",
-      "focus": "DP",
+      "title": "Set 6: Wait for the Flood to Subside",
+      "focus": "Dijkstra / Heap",
       "problemIds": [
        "zom-sde1-s6-r2-q1"
       ]
      },
      {
       "setId": 7,
-      "title": "Set 7: Fewest Palindromic Splits",
-      "focus": "DP",
+      "title": "Set 7: Top K Most Ordered Dishes",
+      "focus": "Heap / Sorting",
       "problemIds": [
        "zom-sde1-s7-r2-q1"
       ]
      },
      {
       "setId": 8,
-      "title": "Set 8: Largest Dashboard Rectangle",
-      "focus": "Monotonic Stack",
+      "title": "Set 8: Can Items Be Rearranged Apart",
+      "focus": "Greedy / Heap",
       "problemIds": [
        "zom-sde1-s8-r2-q1"
       ]
      },
      {
       "setId": 9,
-      "title": "Set 9: Count Smaller Events After",
-      "focus": "BIT / Merge Sort",
+      "title": "Set 9: Is the Hub Network a Tree",
+      "focus": "Union Find",
       "problemIds": [
        "zom-sde1-s9-r2-q1"
       ]
      },
      {
       "setId": 10,
-      "title": "Set 10: Most Collinear Probe Points",
-      "focus": "Hashing / Geometry",
+      "title": "Set 10: Quietest Delivery Hub",
+      "focus": "Floyd-Warshall",
       "problemIds": [
        "zom-sde1-s10-r2-q1"
       ]
@@ -788,8 +788,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: Sliding Window Rate Limiter + Merge Sorted Log Streams",
-      "focus": "Queue / Rate Limiting",
+      "title": "Set 1: Median of Two City Feeds + Rolling Median Delivery Time",
+      "focus": "Binary Search",
       "problemIds": [
        "zom-sde2-s1-r1-q1",
        "zom-sde2-s1-r1-q2"
@@ -797,8 +797,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 2,
-      "title": "Set 2: LRU Cache Hit Counter + Optimal Ad Campaign Schedule",
-      "focus": "Cache Eviction",
+      "title": "Set 2: Largest Open Kitchen Floor + Nested Packaging Boxes",
+      "focus": "Stack / DP",
       "problemIds": [
        "zom-sde2-s2-r1-q1",
        "zom-sde2-s2-r1-q2"
@@ -806,8 +806,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 3,
-      "title": "Set 3: LFU Cache Hit Counter + Smallest Range Across Shards",
-      "focus": "Cache Eviction",
+      "title": "Set 3: Fewest Drop Tests for Fragile Packs + Pattern Match With Dots and Stars",
+      "focus": "DP / Math",
       "problemIds": [
        "zom-sde2-s3-r1-q1",
        "zom-sde2-s3-r1-q2"
@@ -815,8 +815,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 4,
-      "title": "Set 4: Token Bucket Admission + Longest Stable Metric Window",
-      "focus": "Rate Limiting",
+      "title": "Set 4: Wildcard Coupon Matching + Count Distinct Order Subsequences",
+      "focus": "DP",
       "problemIds": [
        "zom-sde2-s4-r1-q1",
        "zom-sde2-s4-r1-q2"
@@ -824,8 +824,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 5,
-      "title": "Set 5: K Cheapest Replica Pairs + Minimum Relay Refuels",
-      "focus": "Heap",
+      "title": "Set 5: Interleaved Delivery Logs + Minimum Window Toggles",
+      "focus": "DP",
       "problemIds": [
        "zom-sde2-s5-r1-q1",
        "zom-sde2-s5-r1-q2"
@@ -833,8 +833,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 6,
-      "title": "Set 6: Consistent Hash Ring Lookup + Cheapest Cluster Interconnect",
-      "focus": "Distributed Systems",
+      "title": "Set 6: Two-Rider Pickup Round Trip + Count Important Reversals",
+      "focus": "DP",
       "problemIds": [
        "zom-sde2-s6-r1-q1",
        "zom-sde2-s6-r1-q2"
@@ -842,8 +842,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 7,
-      "title": "Set 7: Lock Wait-For Deadlock Check + Single Points of Link Failure",
-      "focus": "Graph / Cycle Detection",
+      "title": "Set 7: Longest Well-Formed Bracket Run + Largest Divisible Chain of Pack Sizes",
+      "focus": "Stack / DP",
       "problemIds": [
        "zom-sde2-s7-r1-q1",
        "zom-sde2-s7-r1-q2"
@@ -851,8 +851,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 8,
-      "title": "Set 8: Round Robin Completion Times + Maximum Batch Consolidation Value",
-      "focus": "Scheduling",
+      "title": "Set 8: Cheapest Combine Tree of Leaves + Minimum Cost to Merge Crates",
+      "focus": "Monotonic Stack",
       "problemIds": [
        "zom-sde2-s8-r1-q1",
        "zom-sde2-s8-r1-q2"
@@ -860,8 +860,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 9,
-      "title": "Set 9: Recent Hits Counter + Skyline of Reserved Capacity",
-      "focus": "Queue / Binary Search",
+      "title": "Set 9: Shortest Tour Through Every Hub + Fewest Moves for a Scooter Knight",
+      "focus": "BFS + Bitmask",
       "problemIds": [
        "zom-sde2-s9-r1-q1",
        "zom-sde2-s9-r1-q2"
@@ -869,8 +869,8 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
      },
      {
       "setId": 10,
-      "title": "Set 10: Idempotent Request Deduplication + Shortest Burst Over Threshold",
-      "focus": "Hashing / Idempotency",
+      "title": "Set 10: Fewest Bus Changes Across Routes + Fewest Sprinklers to Cover a Lane",
+      "focus": "BFS on Routes",
       "problemIds": [
        "zom-sde2-s10-r1-q1",
        "zom-sde2-s10-r1-q2"
@@ -886,80 +886,80 @@ export const ZOMATO_TRACKS: Record<string, TrackRole> = {
     "sets": [
      {
       "setId": 1,
-      "title": "Set 1: LRU Cache Internals",
-      "focus": "Design / Linked List",
+      "title": "Set 1: Metro-Style Average Travel Time",
+      "focus": "Design / Hashing",
       "problemIds": [
        "zom-sde2-s1-r2-q1"
       ]
      },
      {
       "setId": 2,
-      "title": "Set 2: LFU Cache Frequency Lists",
-      "focus": "Design",
+      "title": "Set 2: Duplicate Notification Suppressor",
+      "focus": "Design / Hashing",
       "problemIds": [
        "zom-sde2-s2-r2-q1"
       ]
      },
      {
       "setId": 3,
-      "title": "Set 3: Insert Delete Constant-Time Set",
-      "focus": "Design / Hashing",
+      "title": "Set 3: Order Page Navigation History",
+      "focus": "Design / Stack",
       "problemIds": [
        "zom-sde2-s3-r2-q1"
       ]
      },
      {
       "setId": 4,
-      "title": "Set 4: Autocomplete Trie With Top-K Ranking",
-      "focus": "Trie / Design",
+      "title": "Set 4: Dish Ratings by Cuisine",
+      "focus": "Design / Heap",
       "problemIds": [
        "zom-sde2-s4-r2-q1"
       ]
      },
      {
       "setId": 5,
-      "title": "Set 5: Median From a Data Stream",
-      "focus": "Two Heaps",
+      "title": "Set 5: Moving Average of Delivery Times",
+      "focus": "Design / Queue",
       "problemIds": [
        "zom-sde2-s5-r2-q1"
       ]
      },
      {
       "setId": 6,
-      "title": "Set 6: Maximum Frequency Stack",
-      "focus": "Design / Stack",
+      "title": "Set 6: Dish Name Prefix Counter",
+      "focus": "Trie / Design",
       "problemIds": [
        "zom-sde2-s6-r2-q1"
       ]
      },
      {
       "setId": 7,
-      "title": "Set 7: Time-Versioned Key-Value Store",
-      "focus": "Binary Search / Design",
+      "title": "Set 7: Wallet Transfer Validation",
+      "focus": "Design / Simulation",
       "problemIds": [
        "zom-sde2-s7-r2-q1"
       ]
      },
      {
       "setId": 8,
-      "title": "Set 8: Snapshot Array With Versioned Cells",
-      "focus": "Binary Search / Design",
+      "title": "Set 8: Bid-Ask Order Matching Counter",
+      "focus": "Heap / Design",
       "problemIds": [
        "zom-sde2-s8-r2-q1"
       ]
      },
      {
       "setId": 9,
-      "title": "Set 9: Mutable Range Sums With Fenwick Tree",
-      "focus": "Binary Indexed Tree",
+      "title": "Set 9: Delivery Partner Leaderboard",
+      "focus": "Design / Heap",
       "problemIds": [
        "zom-sde2-s9-r2-q1"
       ]
      },
      {
       "setId": 10,
-      "title": "Set 10: Min Stack With Constant-Time Minimum",
-      "focus": "Design / Stack",
+      "title": "Set 10: Live Price Fluctuation Tracker",
+      "focus": "Heap / Design",
       "problemIds": [
        "zom-sde2-s10-r2-q1"
       ]
