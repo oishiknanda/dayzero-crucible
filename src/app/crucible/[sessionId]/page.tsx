@@ -1837,7 +1837,6 @@ export default function CrucibleCockpitPage({
                 roundTitle={scorecardRoundTitle}
                 score={scorecardScore}
                 verdict={isRound1 ? roundOneVerdict : scorecardVerdict}
-                sessionId={params.sessionId}
               />
             </div>
           </div>
