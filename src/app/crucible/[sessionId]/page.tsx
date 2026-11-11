@@ -13,6 +13,7 @@ import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTr
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
   decideGate,
+  classifyCandidateMessage,
   buildReaskReply,
   buildClarificationReply,
   NUDGE_REPLIES,
@@ -414,9 +415,9 @@ export default function CrucibleCockpitPage({
     // ANSWER GATE (Rounds 2 and 3 only): arbitrary input never advances the interview.
     // It repeats the same question instead. Fails open: any error means "treat as a normal answer".
     let gateForced = false;
-    if ((isRound2 || isRound3) && vivaPhase !== "VERDICT") {
+    if ((isRound2 || isRound3 || isRound4) && vivaPhase !== "VERDICT") {
       try {
-        const gatePhase: GatePhase = isRound3 && vivaPhase === "INITIAL" ? "DRAFTING" : vivaPhase;
+        const gatePhase: GatePhase = (isRound3 || isRound4) && vivaPhase === "INITIAL" ? "DRAFTING" : vivaPhase;
         const fallbackQuestion = isRound2 && vivaPhase === "INITIAL"
           ? "Walk me through your approach for " + (problem?.title || "this problem") + ": the algorithm, the data structure, and the expected time and space complexity."
           : "Please walk me through your answer to my last question.";
@@ -565,8 +566,10 @@ export default function CrucibleCockpitPage({
     const text = (textToSend !== undefined ? textToSend : candidateInputText).trim();
     if (!text) return;
 
-    const currentCandidateTurns = dialogue.filter(m => m.sender === "candidate").length;
-    const isFourthTurn = isRound4 && (currentCandidateTurns + 1 >= 4);
+    // Round 4: only real answers count toward the 4-turn limit. Rubbish is re-asked by the answer gate.
+    const currentCandidateTurns = dialogue.filter(m => m.sender === "candidate" && !m.kind).length;
+    const thisIsRealAnswer = classifyCandidateMessage(text, { problemTitle: problem?.title }) === "answer";
+    const isFourthTurn = isRound4 && thisIsRealAnswer && (currentCandidateTurns + 1 >= 4);
 
     const candidateMsg = {
       id: Math.random().toString(36).substring(2, 9),
