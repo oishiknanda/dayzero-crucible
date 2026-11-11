@@ -568,7 +568,7 @@ export default function CrucibleCockpitPage({
 
     // Round 4: only real answers count toward the 4-turn limit. Rubbish is re-asked by the answer gate.
     const currentCandidateTurns = dialogue.filter(m => m.sender === "candidate" && !m.kind).length;
-    const thisIsRealAnswer = classifyCandidateMessage(text, { problemTitle: problem?.title }) === "answer";
+    const thisIsRealAnswer = classifyCandidateMessage(text, { round: 3, phase: "DRAFTING", problemTitle: problem?.title }).classification === "answer";
     const isFourthTurn = isRound4 && thisIsRealAnswer && (currentCandidateTurns + 1 >= 4);
 
     const candidateMsg = {
