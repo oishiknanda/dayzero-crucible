@@ -18,7 +18,7 @@ export interface ProblemDefinition {
   id: string;
   title: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  company: "Amazon" | "Google";
+  company: "Amazon" | "Google" | "Accenture" | "Zomato";
   category: string;
   tags: string[];
   paragraphs: string[];

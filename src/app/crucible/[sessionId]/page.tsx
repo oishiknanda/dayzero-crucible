@@ -1,6 +1,6 @@
 "use client";
 
-import { GOOGLE_TRACKS, normalizeGoogleRole, getGoogleQuestionSet } from '@/data/googleTracks';
+import { getTrackCompany } from '@/data/companyTrackRegistry';
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
@@ -98,6 +98,8 @@ export default function CrucibleCockpitPage({
   const searchParams = useSearchParams();
   const companySlug = searchParams.get("company") || "google";
   const isGoogle = (companySlug || "").toLowerCase() === "google";
+  // Generated-track companies (Google, Accenture, Zomato): roles, sets and rounds come from the registry.
+  const trackCo = getTrackCompany(companySlug);
   const roundSlug = searchParams.get("round") || "round-1";
 
   // Check current round stages
@@ -146,10 +148,11 @@ export default function CrucibleCockpitPage({
   const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
     if (override && PROBLEMS_DATABASE && PROBLEMS_DATABASE[override]) return override;
 
-    // Google: resolve from the generated track (role, round, set) and fall back to Set 1.
-    if (c && c.toLowerCase() === "google") {
-      const fallbackId = "goog-" + (normalizeGoogleRole(role) === "swe_intern" ? "intern" : normalizeGoogleRole(role) === "l4_swe" ? "l4" : "l3") + "-s1-r1-q1";
-      const targetSet = getGoogleQuestionSet(role, r, setNum);
+    // Generated tracks (Google, Accenture, Zomato): resolve from the registry and fall back to Set 1.
+    const tc = getTrackCompany(c);
+    if (tc) {
+      const fallbackId = tc.getQuestionSet(role, "round-1", 1).problemIds[0];
+      const targetSet = tc.getQuestionSet(role, r, setNum);
       const trackProblemId = targetSet && targetSet.problemIds ? targetSet.problemIds[0] : "";
       return trackProblemId && PROBLEMS_DATABASE && PROBLEMS_DATABASE[trackProblemId] ? trackProblemId : fallbackId;
     }
@@ -192,14 +195,14 @@ export default function CrucibleCockpitPage({
     return searchParams.get(key) || fallback;
   };
 
-  const roleParam = (isGoogle ? normalizeGoogleRole(getInitialParam("role", "l3_swe")) : getInitialParam("role", "sde_1")) as AmazonRole;
+  const roleParam = (trackCo ? trackCo.normalizeRole(getInitialParam("role", trackCo.defaultRole)) : getInitialParam("role", "sde_1")) as AmazonRole;
   const setParam = parseInt(getInitialParam("set", "1"), 10);
 
   const [selectedRole, setSelectedRole] = useState<AmazonRole>(roleParam);
   const [selectedSetId, setSelectedSetId] = useState<number>(setParam);
   // Google Rounds 2-4 have one problem per set; Round 1 has two tasks.
-  const singleTask = isGoogle && !isRound1;
-  const getQSet = () => (isGoogle ? getGoogleQuestionSet(selectedRole, roundSlug, selectedSetId) : getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId));
+  const singleTask = !!trackCo && !isRound1;
+  const getQSet = () => (trackCo ? trackCo.getQuestionSet(selectedRole, roundSlug, selectedSetId) : getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId));
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [taskScores, setTaskScores] = useState<[number, number]>([0, 0]);
   const [allSetHistory, setAllSetHistory] = useState<any[]>([]);
@@ -255,7 +258,9 @@ export default function CrucibleCockpitPage({
     const compName = isGoogleRound ? "Google" : (companyData?.companyName || "Amazon");
 
     let greet = "";
-    if (isGoogleRound) {
+    if (trackCo && (isRound2 || isRound3 || isRound4)) {
+      greet = trackCo.greet(isRound2 ? 2 : isRound3 ? 3 : 4, pTitle);
+    } else if (isGoogleRound) {
       if (isRound2) {
         greet = "Hello! I am your Google Technical Interviewer for this Data Structures & Algorithms Screen. We will be working on " + pTitle + ". Before writing any code, walk me through your high-level algorithm, invariant guarantees, and expected Big-O time and space complexity.";
       } else if (isRound3) {
@@ -510,8 +515,8 @@ export default function CrucibleCockpitPage({
           isRound3: isRound3,
           isRound4: isRound4,
           roundSlug: roundSlug,
-          category: isRound4 ? (isGoogle ? "Googleyness" : "Behavioral") : (problem.category || "Algorithms"),
-          difficulty: isRound4 ? (isGoogle ? "Googleyness Loop" : "Bar Raiser") : (problem.difficulty || "Medium"),
+          category: isRound4 ? (trackCo ? trackCo.r4Label : "Behavioral") : (problem.category || "Algorithms"),
+          difficulty: isRound4 ? (trackCo ? trackCo.r4Difficulty : "Bar Raiser") : (problem.difficulty || "Medium"),
           candidateMessage: candidateMsg,
           dialogueHistory: modelHistory(dialogue).slice(-6),
           ...(gateForced ? { gateForced: true } : {}),
@@ -1063,7 +1068,7 @@ export default function CrucibleCockpitPage({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-500 font-mono">
-                {isRound4 ? (isGoogle ? "Googleyness & Leadership" : "Behavioral Leadership Principle") : isRound3 ? (isGoogle ? "System Architecture & Algorithms" : "Architecture Specification") : isRound2 ? "Technical Problem & Viva Defense" : (problem?.category || "Problem Description")}
+                {isRound4 ? (trackCo ? trackCo.r4Label : "Behavioral Leadership Principle") : isRound3 ? (trackCo ? trackCo.r3Label : "Architecture Specification") : isRound2 ? "Technical Problem & Viva Defense" : (problem?.category || "Problem Description")}
               </span>
             </div>
             <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
@@ -1748,7 +1753,7 @@ export default function CrucibleCockpitPage({
                     };
                     const prefix = prefixMap[selectedRole] || "sde1";
                     let q2Id = "";
-                    if (isGoogle) {
+                    if (trackCo) {
                       q2Id = getQSet().problemIds[1] || getQSet().problemIds[0];
                     } else if (isRound4) {
                       q2Id = "amz-" + prefix + "-r4-s" + (selectedSetId || 1) + "-q2";

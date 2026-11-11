@@ -8,7 +8,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Button } from "@/components/ui/Button";
 import { getCompanyTrackData } from "@/data/companyTracks";
 import { getAmazonRoleTrack, AmazonRole } from "@/data/amazonTracks";
-import { GOOGLE_ROLE_OPTIONS, normalizeGoogleRole } from "@/data/googleTracks";
+import { getTrackCompany } from "@/data/companyTrackRegistry";
 import { 
   Camera, 
   Mic, 
@@ -62,8 +62,8 @@ export default function PreFlightSetupPage({
   );
 
   const [selectedRole, setSelectedRole] = useState<string>(
-    params.companyId.toLowerCase() === "google"
-      ? normalizeGoogleRole(typeof window !== "undefined" && new URLSearchParams(window.location.search).get("role") ? initialRole : "l3_swe")
+    getTrackCompany(params.companyId)
+      ? getTrackCompany(params.companyId)!.normalizeRole(typeof window !== "undefined" && new URLSearchParams(window.location.search).get("role") ? initialRole : getTrackCompany(params.companyId)!.defaultRole)
       : initialRole
   );
   const [selectedSet, setSelectedSet] = useState<number>(initialSet);
@@ -232,7 +232,7 @@ export default function PreFlightSetupPage({
   const handleStartAssessment = (e: React.MouseEvent) => {
     e.preventDefault();
     stopAllMediaStreams();
-    const isAmz = ["amazon", "google"].includes(params.companyId.toLowerCase());
+    const isAmz = params.companyId.toLowerCase() === "amazon" || !!getTrackCompany(params.companyId);
     const targetUrl = `/crucible/${sessionId}?strict=${proctorStrictMode}&company=${params.companyId}&round=${params.roundId}${
       isAmz ? `&role=${selectedRole}&set=${selectedSet}` : ""
     }`;
@@ -243,13 +243,13 @@ export default function PreFlightSetupPage({
   const handleStartNow = (e: React.MouseEvent) => {
     e.preventDefault();
     stopAllMediaStreams();
-    const isAmz = ["amazon", "google"].includes(params.companyId.toLowerCase());
+    const isAmz = params.companyId.toLowerCase() === "amazon" || !!getTrackCompany(params.companyId);
     const target = "/crucible/" + sessionId + "?strict=" + proctorStrictMode + "&company=" + params.companyId + "&round=" + params.roundId + (isAmz ? ("&role=" + selectedRole + "&set=" + selectedSet) : "");
     window.location.assign(target);
   };
 
   const sessionId = `${params.companyId}-${params.roundId}-${Date.now().toString(36)}`;
-  const isAmazon = ["amazon", "google"].includes(params.companyId.toLowerCase());
+  const isAmazon = params.companyId.toLowerCase() === "amazon" || !!getTrackCompany(params.companyId);
   const cockpitLaunchUrl = `/crucible/${sessionId}?strict=${proctorStrictMode}&company=${params.companyId}&round=${params.roundId}${
     isAmazon ? `&role=${selectedRole}&set=${selectedSet}` : ""
   }`;
@@ -350,14 +350,14 @@ export default function PreFlightSetupPage({
               </div>
             )}
 
-            {/* Google Assessment Preset Selector */}
-            {params.companyId.toLowerCase() === "google" && (
+            {/* Generated-track company preset selector (Google, Accenture, Zomato) */}
+            {getTrackCompany(params.companyId) && (
               <div className="rounded-2xl border-2 border-blue-500 bg-white shadow-[4px_4px_0px_0px_rgba(66,133,244,1)] overflow-hidden p-6 mb-2">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-200">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-ping" />
                     <h3 className="font-mono text-sm font-black text-slate-900 uppercase tracking-wider">
-                      Google Calibration Profile
+                      {getTrackCompany(params.companyId)?.name} Calibration Profile
                     </h3>
                   </div>
                   <span className="text-[10px] font-mono font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-300">
@@ -375,7 +375,7 @@ export default function PreFlightSetupPage({
                       onChange={(e) => handleRoleSelect(e.target.value)}
                       className="w-full bg-slate-50 border-2 border-slate-300 rounded-xl px-3 py-2 text-sm font-semibold text-slate-900 focus:outline-none focus:border-blue-500 cursor-pointer"
                     >
-                      {GOOGLE_ROLE_OPTIONS.map((o) => (
+                      {(getTrackCompany(params.companyId)?.roleOptions || []).map((o) => (
                         <option key={o.value} value={o.value}>{o.label}</option>
                       ))}
                     </select>

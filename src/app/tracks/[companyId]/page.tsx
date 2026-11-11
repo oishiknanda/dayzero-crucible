@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { normalizeGoogleRole } from "@/data/googleTracks";
+import { getTrackCompany } from "@/data/companyTrackRegistry";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -149,7 +149,7 @@ export default function CompanyTrackPage({ params }: { params: { companyId: stri
             // Generate clean URL for round setup
             const roundSlug = `round-${idx + 1}`;
             const roundHref = `/tracks/${params.companyId}/${roundSlug}/setup${
-                params.companyId.toLowerCase() === "amazon" ? `?role=${activeCanonicalRole}` : params.companyId.toLowerCase() === "google" ? `?role=${normalizeGoogleRole(activeCanonicalRole)}` : ""
+                params.companyId.toLowerCase() === "amazon" ? `?role=${activeCanonicalRole}` : getTrackCompany(params.companyId) ? `?role=${getTrackCompany(params.companyId)!.normalizeRole(activeCanonicalRole)}` : ""
               }`;
 
             return (

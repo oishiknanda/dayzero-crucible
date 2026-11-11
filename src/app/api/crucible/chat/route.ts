@@ -68,7 +68,56 @@ export async function POST(req: NextRequest) {
 
     // Google track: Google personas and rubrics (no Amazon Bar Raiser, STAR or Leadership Principles).
     const isGoogle = String(problemId || "").startsWith("goog-");
+    // Accenture and Zomato personas (same architecture as Google, own rubric and tone).
+    const OTHER: Record<string, { name: string; r2: string; r3: string; r2x: string; r3x: string; crit: string; r4: string }> = {
+      "acc-": {
+        name: "Accenture", r2: "an Accenture Technical Interviewer", r3: "an Accenture Technical Lead",
+        r2x: "ACCENTURE STYLE: ask for a plain-language explanation of the logic, simple time and space complexity and edge cases. Prefer fundamentals over tricks. No Amazon Leadership Principle questions.",
+        r3x: "ACCENTURE STYLE: this is a fundamentals round. Probe concepts (OOP, DBMS, SQL, OS, networks, cloud), ask for a concrete example from the candidate's own project, and ask about trade-offs. Ignore any concurrency-specific rule above if it does not fit the topic.",
+        crit: "Accenture's HR criteria (clear communication, adaptability, client focus, teamwork, integrity)",
+        r4: "You are an Accenture HR and delivery lead interviewing a candidate. Assess communication, adaptability (relocation, shifts, new technology), client focus, teamwork and integrity. This is NOT an Amazon Leadership Principles interview."
+      },
+      "zom-": {
+        name: "Zomato", r2: "a Zomato engineer", r3: "a Zomato staff engineer",
+        r2x: "ZOMATO STYLE: be direct and practical. Challenge worst-case complexity, edge cases and how the approach behaves at peak-hour scale. No Amazon Leadership Principle questions.",
+        r3x: "ZOMATO STYLE: this is a food-delivery design round. Push on requirements, peak load (dinner rush, New Year's Eve), failure modes, idempotency and trade-offs. Ignore any rule above that does not fit the topic.",
+        crit: "Zomato's culture criteria (ownership, customer obsession, bias for action, intellectual honesty, teamwork)",
+        r4: "You are a Zomato hiring manager interviewing a candidate. Assess ownership, customer obsession, speed with good judgment, honesty about mistakes and teamwork. This is NOT an Amazon Leadership Principles interview."
+      }
+    };
+    const otherKey = Object.keys(OTHER).find((k) => String(problemId || "").startsWith(k));
+    const other = otherKey ? OTHER[otherKey] : null;
+    const isOther = !!other;
+    const coName = isGoogle ? "Google" : other ? other.name : "";
     const gp = (prompt: string, kind: "r2" | "r3" | "r4" | "eval"): string => {
+      if (other) {
+        if (kind === "r4") {
+          return `${other.r4}
+Scenario: ${problemTitle}
+Description: ${problemDescription}
+
+Candidate Just Said: "${candidateMessage}"
+Recent Conversation History:
+${JSON.stringify((dialogueHistory || []).slice(-6))}
+
+GUIDELINES:
+1. If the candidate asks for clarification or gives a confused or one-word response, briefly clarify the scenario.
+2. Probe what they personally did or would do, how they decide with incomplete information, and the impact on the customer or client.
+3. If they only say "we", ask what they personally did. Do not demand metrics for hypothetical scenarios.
+4. Speak naturally in 1 to 3 sentences. No bullet points or markdown.`;
+        }
+        if (kind === "r2") return prompt.replace("an Amazon SDE-2", other.r2) + "\n4. " + other.r2x;
+        if (kind === "r3") return prompt.replace("an Amazon Bar Raiser", other.r3) + "\n4. " + other.r3x;
+        return prompt
+          .replace(/Amazon Leadership Principles \([^)]*\)/g, other.crit)
+          .replace(/Principal Amazon Bar Raiser|Amazon Principal Bar Raiser/g, other.name + " hiring panel reviewer")
+          .replace(/Amazon SDE bar/g, other.name + " SDE bar")
+          .replace(/Amazon architectural standards/g, other.name + " engineering standards")
+          .replace(/Amazon Round 3 bar/g, other.name + " Round 3 bar")
+          .replace(/assigned 2 algorithmic problems/g, "assigned 1 algorithmic problem")
+          .replace(/across both questions/g, "across the scenario")
+          .replace(/Bar Raiser/g, "interviewer");
+      }
       if (!isGoogle) return prompt;
       if (kind === "r4") {
         return `You are a Googleyness & Leadership Evaluator conducting a behavioral interview.
@@ -243,7 +292,7 @@ RULES:
           });
         } else {
           return NextResponse.json({
-            reply: isGoogle ? "Thank you. You have completed this Googleyness & Leadership scenario! Please click 'Conclude & Score' at the top right to finalize your round and review your evaluation." : "Thank you. You have successfully completed both scenarios of this Bar Raiser session! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive evaluation.",
+            reply: (isGoogle || isOther) ? `Thank you. You have completed this ${coName} scenario! Please click 'Conclude & Score' at the top right to finalize your round and review your evaluation.` : "Thank you. You have successfully completed both scenarios of this Bar Raiser session! Please click 'Conclude & Score' at the top right to finalize your round and review your comprehensive evaluation.",
             questionCompleted: true,
             isSetFinished: true,
             nextQuestionIndex: qIdx
@@ -750,7 +799,7 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
             areasForImprovement: [
               "Provide concrete SLA memory bounds for extreme peak loads."
             ],
-            barRaiserDebriefNote: isGoogle ? "The candidate demonstrated solid architectural reasoning and a clear technical defense, clearing the Google Round 3 bar." : "The candidate demonstrated solid LLD architectural design and clear technical defense, clearing the Amazon Round 3 bar."
+            barRaiserDebriefNote: (isGoogle || isOther) ? `The candidate demonstrated solid architectural reasoning and a clear technical defense, clearing the ${coName} Round 3 bar.` : "The candidate demonstrated solid LLD architectural design and clear technical defense, clearing the Amazon Round 3 bar."
           }
         });
       }
@@ -852,8 +901,8 @@ Respond strictly in valid JSON format with NO markdown fences, no backticks, and
             "Quantify trade-offs and long-term guardrails rather than describing outcomes qualitatively."
           ],
           barRaiserDebriefNote: fallbackScore >= 66
-            ? (isGoogle ? "Candidate showed intellectual humility, bias to action and sound judgment under ambiguity, clearing the Googleyness bar." : "Candidate demonstrated sufficient individual ownership and structured reasoning to clear the Amazon Bar Raiser, with measurable outcomes strengthening the recommendation.")
-            : (isGoogle ? "Candidate fell short of the Googleyness bar: responses lacked clear reasoning under ambiguity, concrete personal actions and ethical judgment." : "Candidate fell short of the Bar Raiser standard: responses lacked concrete metrics and first-person ownership, weakening the case for hire.")
+            ? ((isGoogle || isOther) ? `Candidate showed clear reasoning, ownership and sound judgment, clearing the ${coName} bar.` : "Candidate demonstrated sufficient individual ownership and structured reasoning to clear the Amazon Bar Raiser, with measurable outcomes strengthening the recommendation.")
+            : ((isGoogle || isOther) ? `Candidate fell short of the ${coName} bar: responses lacked clear reasoning, concrete personal actions and sound judgment.` : "Candidate fell short of the Bar Raiser standard: responses lacked concrete metrics and first-person ownership, weakening the case for hire.")
         }
       });
     }
