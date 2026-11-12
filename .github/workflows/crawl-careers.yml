@@ -1,0 +1,54 @@
+name: Crawl career pages
+
+# Runs the career-page agent every 6 hours and publishes the result to the `crawl-data` branch.
+# The website reads crawled-jobs.json from that branch (see CRAWLED_JOBS_URL in .env.example).
+# Note: GitHub only runs scheduled workflows from the default branch.
+on:
+  schedule:
+    - cron: "15 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: crawl-careers
+  cancel-in-progress: true
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright (only for the crawler)
+        run: |
+          cd scripts
+          npm init -y > /dev/null
+          npm i playwright@1.49.0
+          npx playwright install --with-deps chromium
+
+      - name: Load previous results (to remember when each job was first seen)
+        run: |
+          git fetch origin crawl-data:refs/remotes/origin/crawl-data || true
+          git show origin/crawl-data:crawled-jobs.json > prev.json 2>/dev/null || echo '{"jobs":[]}' > prev.json
+
+      - name: Crawl
+        run: node scripts/crawl-careers.mjs --prev prev.json --out out/crawled-jobs.json
+
+      - name: Publish to crawl-data branch
+        run: |
+          mkdir pub && cp out/crawled-jobs.json pub/
+          cd pub
+          git init -q
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q -b crawl-data
+          git add crawled-jobs.json
+          git commit -q -m "Crawl $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" crawl-data

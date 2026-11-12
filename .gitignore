@@ -42,3 +42,10 @@ next-env.d.ts
 .env.production
 .env.staging
 .env.test
+
+# career-page agent (installed only for the crawler)
+scripts/node_modules
+scripts/package.json
+scripts/package-lock.json
+out/
+prev.json

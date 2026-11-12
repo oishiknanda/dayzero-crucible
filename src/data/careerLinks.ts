@@ -1,39 +1,11 @@
-/**
- * Official careers pages for companies whose job lists cannot be read automatically.
- * Any company not listed here gets a web-search link instead, so every company has a working link.
- */
-const LINKS: Record<string, string> = {
-  "Google": "https://www.google.com/about/careers/applications/jobs/results?location=India&q=software",
-  "Microsoft": "https://jobs.careers.microsoft.com/global/en/search?lc=India&q=software",
-  "Apple": "https://jobs.apple.com/en-in/search?location=india-INDC",
-  "Netflix": "https://explore.jobs.netflix.net/careers",
-  "Oracle": "https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?location=India",
-  "Cisco": "https://jobs.cisco.com/jobs/SearchJobs/?21178=%5B169482%5D&21178_format=6020",
-  "IBM": "https://www.ibm.com/in-en/careers/search",
-  "TCS": "https://www.tcs.com/careers",
-  "Infosys": "https://www.infosys.com/careers.html",
-  "Wipro": "https://careers.wipro.com/careers-home/jobs",
-  "Cognizant": "https://careers.cognizant.com/global-en/jobs/",
-  "Accenture": "https://www.accenture.com/in-en/careers/jobsearch",
-  "Capgemini": "https://www.capgemini.com/in-en/careers/",
-  "HCLTech": "https://www.hcltech.com/careers",
-  "Tech Mahindra": "https://careers.techmahindra.com/",
-  "LTIMindtree": "https://www.ltimindtree.com/careers/",
-  "Deloitte": "https://apply.deloitte.com/careers",
-  "PwC": "https://www.pwc.in/careers.html",
-  "EY": "https://www.ey.com/en_in/careers",
-  "KPMG": "https://kpmg.com/in/en/careers.html",
-  "Goldman Sachs": "https://www.goldmansachs.com/careers/",
-  "J.P. Morgan Chase": "https://careers.jpmorgan.com/in/en/home",
-  "Morgan Stanley": "https://www.morganstanley.com/people-opportunities",
-  "Flipkart": "https://www.flipkartcareers.com/",
-  "Zomato": "https://www.zomato.com/careers",
-  "Zoho": "https://www.zoho.com/careers/",
-  "Meta": "https://www.metacareers.com/jobs",
-  "Uber": "https://www.uber.com/in/en/careers/",
-  "Atlassian": "https://www.atlassian.com/company/careers/all-jobs",
-};
+import pages from "./careerPages.json";
 
+/**
+ * Official careers pages. Used for the "Open careers page" button and as the start pages the
+ * career-page agent (scripts/crawl-careers.mjs) scans. Add a company to careerPages.json to include it.
+ * Any company not listed gets a web-search link instead, so every company has a working link.
+ */
 export function careersUrlFor(company: string): string {
-  return LINKS[company] || `https://www.google.com/search?q=${encodeURIComponent(`${company} careers software engineer jobs India`)}`;
+  const url = (pages as Record<string, string>)[company];
+  return url || `https://www.google.com/search?q=${encodeURIComponent(`${company} careers software engineer jobs India`)}`;
 }

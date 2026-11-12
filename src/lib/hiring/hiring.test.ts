@@ -102,3 +102,58 @@ describe("jooble fallback", () => {
     vi.unstubAllEnvs();
   });
 });
+
+import { parseCrawled } from "./crawled";
+import { jobsFromJson, jobsFromJsonLd, jobsFromLinks, keepJob, parseDate } from "../../../scripts/career-extract.mjs";
+
+describe("career-page extractor", () => {
+  const base = "https://careers.example.com/search";
+  it("finds job arrays inside arbitrary JSON", () => {
+    const json = { data: { result: { jobs: [
+      { jobTitle: "Software Engineer II", locationsText: "Bengaluru, India", postedOn: "Posted 3 Days Ago", externalPath: "/job/blr/se2_R1" },
+      { jobTitle: "Sales Manager", locationsText: "Mumbai", postedOn: "Posted Today", externalPath: "/job/mum/sm_R2" },
+    ], facets: [{ name: "India" }, { name: "Pune" }] } } };
+    const jobs = jobsFromJson(json, base, NOW);
+    expect(jobs).toHaveLength(2);
+    expect(jobs[0].url).toBe("https://careers.example.com/job/blr/se2_R1");
+    expect(jobs[0].publishedMs).toBe(NOW - 3 * 86400000);
+    expect(jobs.filter((j) => keepJob(j, base)).map((j) => j.title)).toEqual(["Software Engineer II"]);
+  });
+  it("reads JobPosting markup, including @graph", () => {
+    const block = JSON.stringify({ "@graph": [{ "@type": "JobPosting", title: "Data Engineer", url: "https://x.com/j/1", datePosted: "2026-11-10", jobLocation: { address: { addressLocality: "Pune", addressCountry: "IN" } } }] });
+    const jobs = jobsFromJsonLd([block, "not json"], base, NOW);
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0].location).toContain("Pune");
+  });
+  it("uses links only for job-looking URLs and ignores non-https", () => {
+    const jobs = jobsFromLinks([
+      { href: "https://careers.example.com/jobs/12345", text: "Backend Developer" },
+      { href: "https://careers.example.com/about", text: "About our company" },
+      { href: "http://careers.example.com/jobs/9", text: "Insecure Engineer" },
+    ], base);
+    expect(jobs.map((j) => j.title)).toEqual(["Backend Developer"]);
+  });
+  it("trusts location-less jobs only on India-searched pages", () => {
+    const j = { title: "Software Engineer", url: "https://a.com/1", location: "", publishedMs: null };
+    expect(keepJob(j, "https://x.com/jobs?location=India")).toBe(true);
+    expect(keepJob(j, "https://x.com/jobs")).toBe(false);
+    expect(parseDate("garbage")).toBeNull();
+  });
+});
+
+describe("crawled results", () => {
+  const file = (generatedAt: string) => ({ generatedAt, companies: {}, jobs: [
+    { id: "cr-1", company: "Google", title: "SWE", location: "Bengaluru", publishedAt: recent, jobUrl: "https://www.google.com/x/1" },
+    { id: "cr-2", company: "Unknown Co", title: "SWE", publishedAt: recent, jobUrl: "https://a.com/2" },
+    { id: "cr-3", company: "Google", title: "SWE", publishedAt: recent, jobUrl: "javascript:alert(1)" },
+  ] });
+  it("keeps valid jobs for known companies only", () => {
+    const r = parseCrawled(file("2026-11-12T06:00:00Z"), ["Google"], NOW);
+    expect(r.jobs.map((j) => j.id)).toEqual(["cr-1"]);
+    expect(r.jobs[0].viaAgent).toBe(true);
+    expect(r.companies).toEqual({ Google: 1 });
+  });
+  it("ignores a stale file", () => {
+    expect(parseCrawled(file("2026-11-01T06:00:00Z"), ["Google"], NOW).jobs).toEqual([]);
+  });
+});

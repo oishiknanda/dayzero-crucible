@@ -14,6 +14,7 @@ type HiringAlert = {
   publishedAt: string;
   jobUrl: string;
   aggregated?: boolean;
+  viaAgent?: boolean;
 };
 
 type CoverageRow = {
@@ -267,7 +268,7 @@ export function HiringAlertsFeed() {
                 </p>
                 <h2 className="mt-2 text-lg font-bold leading-snug text-slate-950">{job.title}</h2>
               </div>
-              <span title={job.aggregated ? "Found via a licensed job-data partner" : "Sourced from the employer’s official career board"} className={`mt-0.5 shrink-0 rounded-lg border p-2 ${job.aggregated ? "border-sky-200 bg-sky-50 text-sky-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
+              <span title={job.aggregated ? "Found via a job-data partner" : job.viaAgent ? "Found by scanning the employer’s own careers page" : "Sourced from the employer’s official career board"} className={`mt-0.5 shrink-0 rounded-lg border p-2 ${job.aggregated ? "border-sky-200 bg-sky-50 text-sky-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
                 <BadgeCheck className="h-4 w-4" />
               </span>
             </div>

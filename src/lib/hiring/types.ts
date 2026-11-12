@@ -10,6 +10,8 @@ export type Alert = {
   jobUrl: string;
   /** true when the posting came from a job-data aggregator rather than the employer's own feed */
   aggregated?: boolean;
+  /** true when found by the career-page agent scanning the employer's own careers page */
+  viaAgent?: boolean;
 };
 
 export type SourceSpec =

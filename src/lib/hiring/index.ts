@@ -1,6 +1,7 @@
 import { ALL_COMPANY_NAMES } from "../../data/hiringCompanies";
 import { careersUrlFor } from "../../data/careerLinks";
 import { fetchFromSource } from "./adapters";
+import { fetchCrawled } from "./crawled";
 import { aggregatorEnabled, fetchAggregated } from "./aggregator";
 import { LEGACY_COMPANIES, sourceLabel, sourcesFor } from "./sources";
 import type { Alert, CoverageRow } from "./types";
@@ -48,6 +49,7 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
     .map((name) => ({ name, specs: sourcesFor(name) }));
   const direct = todo.filter((t) => t.specs.length);
 
+  const crawledP = fetchCrawled(ALL_COMPANY_NAMES, now).catch(() => ({ jobs: [] as Alert[], companies: {} as Record<string, number> }));
   const runs = await pool(direct, 12, async (t) => {
     let lastErr: unknown = null;
     for (const spec of t.specs) {
@@ -62,13 +64,19 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
     if (r.status === "fulfilled") okDirect[direct[i].name] = { label: sourceLabel(r.value.spec), jobs: r.value.jobs };
   });
 
-  const needAgg = todo.map((t) => t.name).filter((n) => !okDirect[n]);
+  const crawled = await crawledP;
+  // the career-page agent fills in companies that have no direct feed
+  const crawledJobs = crawled.jobs.filter((j) => !okDirect[j.company] && legacyNames.indexOf(j.company) === -1);
+  const crawledBy: Record<string, number> = {};
+  crawledJobs.forEach((j) => { crawledBy[j.company] = (crawledBy[j.company] || 0) + 1; });
+
+  const needAgg = todo.map((t) => t.name).filter((n) => !okDirect[n] && !crawledBy[n]);
   const aggJobs = await fetchAggregated(needAgg, now).catch(() => [] as Alert[]);
   const aggBy: Record<string, number> = {};
   aggJobs.forEach((j) => { aggBy[j.company] = (aggBy[j.company] || 0) + 1; });
 
   const directJobs = Object.keys(okDirect).reduce((acc, k) => acc.concat(okDirect[k].jobs), [] as Alert[]);
-  const jobs = dedupe(legacyJobs.concat(directJobs, aggJobs))
+  const jobs = dedupe(legacyJobs.concat(directJobs, crawledJobs, aggJobs))
     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
 
   const agg = aggregatorEnabled();
@@ -76,6 +84,7 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
     const lg = legacy.find((l) => l.name === name);
     if (lg) return { company: name, status: lg.ok ? "live" : "pending", source: "Official career feed", jobs: legacyJobs.filter((j) => j.company === name).length, careersUrl: careersUrlFor(name) } as CoverageRow;
     if (okDirect[name]) return { company: name, status: "live", source: okDirect[name].label, jobs: okDirect[name].jobs.length, careersUrl: careersUrlFor(name) } as CoverageRow;
+    if (crawledBy[name]) return { company: name, status: "live", source: "Career-page agent", jobs: crawledBy[name], careersUrl: careersUrlFor(name) } as CoverageRow;
     if (agg) return { company: name, status: "aggregated", source: "Job aggregator", jobs: aggBy[name] || 0, careersUrl: careersUrlFor(name) } as CoverageRow;
     return { company: name, status: "pending", source: "Connecting", jobs: 0, careersUrl: careersUrlFor(name) } as CoverageRow;
   });
