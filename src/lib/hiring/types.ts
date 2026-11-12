@@ -31,4 +31,6 @@ export type CoverageRow = {
   /** human label, e.g. "Greenhouse", "Workday", "Job aggregator" */
   source: string;
   jobs: number;
+  /** where a visitor can browse this company's openings directly */
+  careersUrl: string;
 };

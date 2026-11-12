@@ -21,6 +21,7 @@ type CoverageRow = {
   status: "live" | "aggregated" | "pending";
   source: string;
   jobs: number;
+  careersUrl: string;
 };
 
 type FeedResponse = {
@@ -225,6 +226,21 @@ export function HiringAlertsFeed() {
       {error && (
         <div role="status" className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
           {error} <button type="button" onClick={() => { setLoading(true); void refresh(); }} className="ml-1 font-bold underline">Retry</button>
+        </div>
+      )}
+
+      {selectedCompany !== "All companies" && statusOf[selectedCompany] && (
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
+          <span>
+            {statusOf[selectedCompany].jobs > 0
+              ? `${selectedCompany}: ${statusOf[selectedCompany].jobs} India opening${statusOf[selectedCompany].jobs === 1 ? "" : "s"} found.`
+              : statusOf[selectedCompany].status === "pending"
+                ? `${selectedCompany}: live alerts are not connected yet.`
+                : `${selectedCompany}: no India openings found right now.`}
+          </span>
+          <a href={statusOf[selectedCompany].careersUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-bold text-indigo-700 hover:underline">
+            Open {selectedCompany} careers page <ExternalLink className="h-3.5 w-3.5" />
+          </a>
         </div>
       )}
 
