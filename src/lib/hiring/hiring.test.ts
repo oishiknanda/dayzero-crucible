@@ -86,3 +86,19 @@ describe("dedupe", () => {
     expect(dedupe([a, { ...a, id: "2" }, { ...a, id: "3", location: "Delhi" }])).toHaveLength(2);
   });
 });
+
+describe("jooble fallback", () => {
+  it("returns matched India engineering jobs and ignores other employers", async () => {
+    vi.stubEnv("JOOBLE_API_KEY", "k");
+    const { fetchAggregated } = await import("./aggregator");
+    const updated = new Date(NOW - 86400000).toISOString();
+    mockFetch({ jobs: [
+      { id: "1", title: "Software Engineer", company: "Tata Consultancy Services", location: "Pune", updated, link: "https://in.jooble.org/desc/1" },
+      { id: "2", title: "Software Engineer", company: "Random Co", location: "Pune", updated, link: "https://in.jooble.org/desc/2" },
+    ] });
+    const out = await fetchAggregated(["TCS", "Infosys"], NOW);
+    expect(out.map((a) => a.company)).toEqual(["TCS"]);
+    expect(out[0].aggregated).toBe(true);
+    vi.unstubAllEnvs();
+  });
+});

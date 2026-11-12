@@ -8,7 +8,9 @@ import { buildMatcher } from "./match";
  * optional: set the env vars to switch them on.
  *
  *   ADZUNA_APP_ID, ADZUNA_APP_KEY      https://developer.adzuna.com  (free tier)
- *   JSEARCH_API_KEY                    RapidAPI "JSearch"           (free tier, ~200 calls/month)
+ *   JOOBLE_API_KEY                     https://in.jooble.org/api/about (free, 100 requests/day)
+ *   JOOBLE_API_HOST (default in.jooble.org), HIRING_JOOBLE_MAX (default 20 companies per 6h)
+ *   JSEARCH_API_KEY                    RapidAPI "JSearch"           (limited free plan)
  *   HIRING_ADZUNA_PAGES (default 8)    pages of 50 generic India software jobs
  *   HIRING_JSEARCH_MAX (default 20)    max companies queried on JSearch per refresh
  *
@@ -17,7 +19,7 @@ import { buildMatcher } from "./match";
 const SIX_HOURS = 21_600;
 
 export const aggregatorEnabled = () =>
-  !!((process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY) || process.env.JSEARCH_API_KEY);
+  !!((process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY) || process.env.JSEARCH_API_KEY || process.env.JOOBLE_API_KEY);
 
 async function json(url: string, init?: RequestInit): Promise<Record<string, unknown>> {
   const res = await fetch(url, { ...init, signal: AbortSignal.timeout(12000), next: { revalidate: SIX_HOURS } } as RequestInit);
@@ -106,11 +108,67 @@ async function jsearch(wanted: string[], now: number): Promise<Alert[]> {
   return out;
 }
 
+// Jooble's free key allows 100 calls/day, and POST responses are not reliably cached by Next,
+// so keep our own 6-hour cache and rotate through the companies in small batches.
+let joobleCache: { at: number; jobs: Alert[] } | null = null;
+
+async function jooble(wanted: string[], now: number): Promise<Alert[]> {
+  const key = process.env.JOOBLE_API_KEY;
+  if (!key || !wanted.length) return [];
+  if (joobleCache && now - joobleCache.at < SIX_HOURS * 1000) return joobleCache.jobs;
+  const host = process.env.JOOBLE_API_HOST || "in.jooble.org";
+  const max = Math.max(1, parseInt(process.env.HIRING_JOOBLE_MAX || "20", 10) || 20);
+  const window = Math.floor(now / (SIX_HOURS * 1000));
+  const start = (window * max) % wanted.length;
+  const batch: string[] = [];
+  for (let i = 0; i < Math.min(max, wanted.length); i++) batch.push(wanted[(start + i) % wanted.length]);
+  const match = buildMatcher(batch);
+  const settled = await Promise.allSettled(batch.map((name) =>
+    fetch(`https://${host}/api/${key}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keywords: `${name} software engineer`, location: "India", page: 1, companysearch: false }),
+      signal: AbortSignal.timeout(12000),
+      cache: "no-store",
+    }).then(async (res) => {
+      if (!res.ok) throw new Error(`jooble returned ${res.status}`);
+      return (await res.json()) as Record<string, unknown>;
+    })));
+  const out: Alert[] = [];
+  for (const r of settled) {
+    if (r.status !== "fulfilled") continue;
+    for (const j of list(r.value.jobs)) {
+      const company = match(s(j.company));
+      const title = s(j.title);
+      const location = s(j.location);
+      const published = Date.parse(s(j.updated));
+      const url = s(j.link);
+      if (!company || !title || !Number.isFinite(published) || published < now - MAX_AGE_MS || published > now + DAY) continue;
+      if (!TECHNICAL_ROLE.test(title) || !INDIA_LOCATION.test(location || "India") || !okHttps(url, ["jooble.org"])) continue;
+      const jid = `jb-${s(j.id) || url}`;
+      if (out.some((x) => x.id === jid)) continue;
+      out.push({
+        id: jid, company, title, department: null, location: location || "India",
+        employmentType: s(j.type) || null, workplaceType: null,
+        publishedAt: new Date(Math.min(published, now)).toISOString(), jobUrl: url, aggregated: true,
+      });
+    }
+  }
+  // keep earlier batches' results too, so coverage grows across the day
+  const merged = (joobleCache ? joobleCache.jobs.filter((x) => batch.indexOf(x.company) === -1) : []).concat(out);
+  joobleCache = { at: now, jobs: merged };
+  return merged;
+}
+
 /** names = every directory company without a working direct feed. */
 export async function fetchAggregated(names: string[], now: number): Promise<Alert[]> {
   if (!aggregatorEnabled() || !names.length) return [];
   const priority = ["TCS", "Infosys", "Wipro", "Cognizant", "HCLTech", "Accenture", "Capgemini", "Tech Mahindra", "Deloitte", "PwC", "EY", "KPMG"]
     .filter((n) => names.indexOf(n) !== -1);
-  const [a, j] = await Promise.allSettled([adzuna(names, priority, now), jsearch(names, now)]);
-  return ([] as Alert[]).concat(a.status === "fulfilled" ? a.value : [], j.status === "fulfilled" ? j.value : []);
+  const [a, j, b] = await Promise.allSettled([adzuna(names, priority, now), jsearch(names, now), jooble(names, now)]);
+  return ([] as Alert[]).concat(
+    a.status === "fulfilled" ? a.value : [],
+    j.status === "fulfilled" ? j.value : [],
+    b.status === "fulfilled" ? b.value : [],
+  );
 }
