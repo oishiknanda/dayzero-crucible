@@ -1,1 +1,527 @@
-{"verifiedAt":null,"sources":{},"dead":[]}
+{
+ "verifiedAt": "2026-11-12T10:08:05.709Z",
+ "sources": {
+  "Meta": [
+   {
+    "kind": "recruitee",
+    "slug": "meta"
+   }
+  ],
+  "NVIDIA": [
+   {
+    "kind": "workday",
+    "host": "nvidia.wd5.myworkdayjobs.com",
+    "tenant": "nvidia",
+    "site": "NVIDIAExternalCareerSite"
+   }
+  ],
+  "Salesforce": [
+   {
+    "kind": "workday",
+    "host": "salesforce.wd12.myworkdayjobs.com",
+    "tenant": "salesforce",
+    "site": "External_Career_Site"
+   }
+  ],
+  "Uber": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Uber"
+   }
+  ],
+  "Adobe": [
+   {
+    "kind": "workday",
+    "host": "adobe.wd5.myworkdayjobs.com",
+    "tenant": "adobe",
+    "site": "external_experienced"
+   }
+  ],
+  "Palantir": [
+   {
+    "kind": "lever",
+    "slug": "palantir"
+   }
+  ],
+  "Snowflake": [
+   {
+    "kind": "ashby",
+    "slug": "snowflake"
+   }
+  ],
+  "Spotify": [
+   {
+    "kind": "lever",
+    "slug": "spotify"
+   }
+  ],
+  "ServiceNow": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Servicenow"
+   }
+  ],
+  "DoorDash": [
+   {
+    "kind": "greenhouse",
+    "slug": "doordashusa"
+   }
+  ],
+  "Jane Street": [
+   {
+    "kind": "greenhouse",
+    "slug": "janestreet"
+   }
+  ],
+  "Hudson River Trading": [
+   {
+    "kind": "greenhouse",
+    "slug": "wehrtyou"
+   }
+  ],
+  "Jump Trading": [
+   {
+    "kind": "greenhouse",
+    "slug": "jumptrading"
+   }
+  ],
+  "LinkedIn": [
+   {
+    "kind": "lever",
+    "slug": "linkedin"
+   }
+  ],
+  "ByteDance / TikTok": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Bytedance"
+   }
+  ],
+  "Intel": [
+   {
+    "kind": "workday",
+    "host": "intel.wd1.myworkdayjobs.com",
+    "tenant": "intel",
+    "site": "External"
+   }
+  ],
+  "Broadcom": [
+   {
+    "kind": "workday",
+    "host": "broadcom.wd1.myworkdayjobs.com",
+    "tenant": "broadcom",
+    "site": "External_Career"
+   }
+  ],
+  "CrowdStrike": [
+   {
+    "kind": "workday",
+    "host": "crowdstrike.wd5.myworkdayjobs.com",
+    "tenant": "crowdstrike",
+    "site": "crowdstrikecareers"
+   }
+  ],
+  "Zoom": [
+   {
+    "kind": "workday",
+    "host": "zoom.wd5.myworkdayjobs.com",
+    "tenant": "zoom",
+    "site": "Zoom"
+   }
+  ],
+  "Box": [
+   {
+    "kind": "greenhouse",
+    "slug": "boxinc"
+   }
+  ],
+  "Zscaler": [
+   {
+    "kind": "greenhouse",
+    "slug": "zscaler"
+   }
+  ],
+  "Canva": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Canva"
+   }
+  ],
+  "Square / Block": [
+   {
+    "kind": "greenhouse",
+    "slug": "block"
+   }
+  ],
+  "Affirm": [
+   {
+    "kind": "greenhouse",
+    "slug": "affirm"
+   }
+  ],
+  "SoFi": [
+   {
+    "kind": "greenhouse",
+    "slug": "sofi"
+   }
+  ],
+  "Brex": [
+   {
+    "kind": "greenhouse",
+    "slug": "brex"
+   }
+  ],
+  "Chime": [
+   {
+    "kind": "greenhouse",
+    "slug": "chime"
+   }
+  ],
+  "Lyft": [
+   {
+    "kind": "greenhouse",
+    "slug": "lyft"
+   }
+  ],
+  "Grab": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Grab"
+   }
+  ],
+  "Deliveroo": [
+   {
+    "kind": "greenhouse",
+    "slug": "deliveroo"
+   }
+  ],
+  "Wayfair": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Wayfair"
+   }
+  ],
+  "eBay": [
+   {
+    "kind": "workday",
+    "host": "ebay.wd5.myworkdayjobs.com",
+    "tenant": "ebay",
+    "site": "apply"
+   }
+  ],
+  "Tripadvisor": [
+   {
+    "kind": "greenhouse",
+    "slug": "tripadvisor"
+   }
+  ],
+  "Waymo": [
+   {
+    "kind": "greenhouse",
+    "slug": "waymo"
+   }
+  ],
+  "Scale AI": [
+   {
+    "kind": "greenhouse",
+    "slug": "scaleai"
+   }
+  ],
+  "Anthropic": [
+   {
+    "kind": "greenhouse",
+    "slug": "anthropic"
+   }
+  ],
+  "TCS": [
+   {
+    "kind": "greenhouse",
+    "slug": "tcs"
+   }
+  ],
+  "DXC Technology": [
+   {
+    "kind": "workday",
+    "host": "dxctechnology.wd1.myworkdayjobs.com",
+    "tenant": "dxctechnology",
+    "site": "DXCJobs"
+   }
+  ],
+  "PwC": [
+   {
+    "kind": "workday",
+    "host": "pwc.wd3.myworkdayjobs.com",
+    "tenant": "pwc",
+    "site": "Global_Experienced_Careers"
+   }
+  ],
+  "Thoughtworks": [
+   {
+    "kind": "greenhouse",
+    "slug": "thoughtworks"
+   }
+  ],
+  "Mastercard": [
+   {
+    "kind": "workday",
+    "host": "mastercard.wd1.myworkdayjobs.com",
+    "tenant": "mastercard",
+    "site": "CorporateCareers"
+   }
+  ],
+  "Target": [
+   {
+    "kind": "workday",
+    "host": "target.wd5.myworkdayjobs.com",
+    "tenant": "target",
+    "site": "targetcareers"
+   }
+  ],
+  "HP": [
+   {
+    "kind": "workday",
+    "host": "hp.wd5.myworkdayjobs.com",
+    "tenant": "hp",
+    "site": "ExternalCareerSite"
+   }
+  ],
+  "Micron": [
+   {
+    "kind": "workday",
+    "host": "micron.wd1.myworkdayjobs.com",
+    "tenant": "micron",
+    "site": "External"
+   }
+  ],
+  "Bosch": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "BoschGroup"
+   }
+  ],
+  "Philips": [
+   {
+    "kind": "workday",
+    "host": "philips.wd3.myworkdayjobs.com",
+    "tenant": "philips",
+    "site": "jobs-and-careers"
+   }
+  ],
+  "Wells Fargo": [
+   {
+    "kind": "workday",
+    "host": "wf.wd1.myworkdayjobs.com",
+    "tenant": "wf",
+    "site": "WellsFargoJobs"
+   }
+  ],
+  "Deutsche Bank": [
+   {
+    "kind": "workday",
+    "host": "db.wd3.myworkdayjobs.com",
+    "tenant": "db",
+    "site": "DBWebsite"
+   }
+  ],
+  "Citi": [
+   {
+    "kind": "workday",
+    "host": "citi.wd5.myworkdayjobs.com",
+    "tenant": "citi",
+    "site": "2"
+   }
+  ],
+  "Fidelity Investments": [
+   {
+    "kind": "workday",
+    "host": "fmr.wd1.myworkdayjobs.com",
+    "tenant": "fmr",
+    "site": "FidelityCareers"
+   }
+  ],
+  "State Street": [
+   {
+    "kind": "workday",
+    "host": "statestreet.wd1.myworkdayjobs.com",
+    "tenant": "statestreet",
+    "site": "Global"
+   }
+  ],
+  "Swiggy": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Swiggy"
+   }
+  ],
+  "Paytm": [
+   {
+    "kind": "lever",
+    "slug": "paytm"
+   }
+  ],
+  "Razorpay": [
+   {
+    "kind": "greenhouse",
+    "slug": "razorpaysoftwareprivatelimited"
+   }
+  ],
+  "CRED": [
+   {
+    "kind": "lever",
+    "slug": "cred"
+   }
+  ],
+  "Meesho": [
+   {
+    "kind": "lever",
+    "slug": "meesho"
+   }
+  ],
+  "Freshworks": [
+   {
+    "kind": "smartrecruiters",
+    "slug": "Freshworks"
+   }
+  ],
+  "InMobi": [
+   {
+    "kind": "greenhouse",
+    "slug": "inmobi"
+   }
+  ],
+  "Lenskart": [
+   {
+    "kind": "recruitee",
+    "slug": "lenskartcareers"
+   }
+  ],
+  "Groww": [
+   {
+    "kind": "greenhouse",
+    "slug": "groww"
+   }
+  ],
+  "Slice": [
+   {
+    "kind": "greenhouse",
+    "slug": "slice"
+   }
+  ],
+  "Atlan": [
+   {
+    "kind": "ashby",
+    "slug": "atlan"
+   }
+  ]
+ },
+ "dead": [
+  "Google",
+  "Microsoft",
+  "Apple",
+  "Netflix",
+  "Oracle",
+  "Atlassian",
+  "Cisco",
+  "Intuit",
+  "Goldman Sachs",
+  "Bloomberg",
+  "Shopify",
+  "Qualcomm",
+  "D.E. Shaw",
+  "Citadel",
+  "Optiver",
+  "Tower Research",
+  "Two Sigma",
+  "Morgan Stanley",
+  "J.P. Morgan Chase",
+  "Snapchat",
+  "AMD",
+  "IBM",
+  "VMware",
+  "Palo Alto Networks",
+  "HashiCorp",
+  "GitHub",
+  "Slack",
+  "Splunk",
+  "DocuSign",
+  "HubSpot",
+  "Zendesk",
+  "Monday.com",
+  "Checkout.com",
+  "Revolut",
+  "Klarna",
+  "GoTo",
+  "Etsy",
+  "Booking.com",
+  "Expedia",
+  "Cruise",
+  "Aurora",
+  "Tesla (Autopilot)",
+  "Rivian",
+  "Infosys",
+  "Wipro",
+  "Cognizant",
+  "Accenture",
+  "Capgemini",
+  "HCLTech",
+  "Tech Mahindra",
+  "LTIMindtree",
+  "Mphasis",
+  "Persistent Systems",
+  "Hexaware",
+  "Coforge",
+  "Birlasoft",
+  "Zensar",
+  "NTT Data",
+  "Virtusa",
+  "Sonata Software",
+  "KPIT",
+  "Genpact",
+  "Deloitte",
+  "EY",
+  "KPMG",
+  "Mu Sigma",
+  "Fractal Analytics",
+  "Tredence",
+  "IBM Research",
+  "Visa",
+  "American Express",
+  "Walmart Global Tech",
+  "Dell Technologies",
+  "Texas Instruments",
+  "SAP",
+  "Siemens",
+  "Samsung R&D",
+  "Honeywell",
+  "Thomson Reuters",
+  "Barclays",
+  "HSBC",
+  "Standard Chartered",
+  "BNY",
+  "Zoho",
+  "Flipkart",
+  "Zomato",
+  "PhonePe",
+  "Myntra",
+  "Ola",
+  "Dream11",
+  "MakeMyTrip",
+  "Nykaa",
+  "ShareChat",
+  "JioHotstar",
+  "Reliance Jio",
+  "Bharti Airtel",
+  "Delhivery",
+  "PhysicsWallah",
+  "Zerodha",
+  "Postman",
+  "BrowserStack",
+  "Juspay",
+  "Urban Company",
+  "Zepto",
+  "Rapido",
+  "BharatPe",
+  "Chargebee",
+  "Sprinklr"
+ ]
+}

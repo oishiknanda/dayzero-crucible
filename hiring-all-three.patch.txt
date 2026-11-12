@@ -1,0 +1,934 @@
+From 4331d48096a2053f92fcd05544f58d4db6ffd605 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 20:14:18 +0000
+Subject: [PATCH 1/3] Hiring alerts: add free Jooble fallback source
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01KnLDerGZRMjtWBEQ6y2hHs
+---
+ src/lib/hiring/aggregator.ts  | 66 ++++++++++++++++++++++++++++++++---
+ src/lib/hiring/hiring.test.ts | 16 +++++++++
+ 2 files changed, 78 insertions(+), 4 deletions(-)
+
+diff --git a/src/lib/hiring/aggregator.ts b/src/lib/hiring/aggregator.ts
+index 053851a..2edc54a 100644
+--- a/src/lib/hiring/aggregator.ts
++++ b/src/lib/hiring/aggregator.ts
+@@ -8,7 +8,9 @@ import { buildMatcher } from "./match";
+  * optional: set the env vars to switch them on.
+  *
+  *   ADZUNA_APP_ID, ADZUNA_APP_KEY      https://developer.adzuna.com  (free tier)
+- *   JSEARCH_API_KEY                    RapidAPI "JSearch"           (free tier, ~200 calls/month)
++ *   JOOBLE_API_KEY                     https://in.jooble.org/api/about (free, 100 requests/day)
++ *   JOOBLE_API_HOST (default in.jooble.org), HIRING_JOOBLE_MAX (default 20 companies per 6h)
++ *   JSEARCH_API_KEY                    RapidAPI "JSearch"           (limited free plan)
+  *   HIRING_ADZUNA_PAGES (default 8)    pages of 50 generic India software jobs
+  *   HIRING_JSEARCH_MAX (default 20)    max companies queried on JSearch per refresh
+  *
+@@ -17,7 +19,7 @@ import { buildMatcher } from "./match";
+ const SIX_HOURS = 21_600;
+ 
+ export const aggregatorEnabled = () =>
+-  !!((process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY) || process.env.JSEARCH_API_KEY);
++  !!((process.env.ADZUNA_APP_ID && process.env.ADZUNA_APP_KEY) || process.env.JSEARCH_API_KEY || process.env.JOOBLE_API_KEY);
+ 
+ async function json(url: string, init?: RequestInit): Promise<Record<string, unknown>> {
+   const res = await fetch(url, { ...init, signal: AbortSignal.timeout(12000), next: { revalidate: SIX_HOURS } } as RequestInit);
+@@ -106,11 +108,67 @@ async function jsearch(wanted: string[], now: number): Promise<Alert[]> {
+   return out;
+ }
+ 
++// Jooble's free key allows 100 calls/day, and POST responses are not reliably cached by Next,
++// so keep our own 6-hour cache and rotate through the companies in small batches.
++let joobleCache: { at: number; jobs: Alert[] } | null = null;
++
++async function jooble(wanted: string[], now: number): Promise<Alert[]> {
++  const key = process.env.JOOBLE_API_KEY;
++  if (!key || !wanted.length) return [];
++  if (joobleCache && now - joobleCache.at < SIX_HOURS * 1000) return joobleCache.jobs;
++  const host = process.env.JOOBLE_API_HOST || "in.jooble.org";
++  const max = Math.max(1, parseInt(process.env.HIRING_JOOBLE_MAX || "20", 10) || 20);
++  const window = Math.floor(now / (SIX_HOURS * 1000));
++  const start = (window * max) % wanted.length;
++  const batch: string[] = [];
++  for (let i = 0; i < Math.min(max, wanted.length); i++) batch.push(wanted[(start + i) % wanted.length]);
++  const match = buildMatcher(batch);
++  const settled = await Promise.allSettled(batch.map((name) =>
++    fetch(`https://${host}/api/${key}`, {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify({ keywords: `${name} software engineer`, location: "India", page: 1, companysearch: false }),
++      signal: AbortSignal.timeout(12000),
++      cache: "no-store",
++    }).then(async (res) => {
++      if (!res.ok) throw new Error(`jooble returned ${res.status}`);
++      return (await res.json()) as Record<string, unknown>;
++    })));
++  const out: Alert[] = [];
++  for (const r of settled) {
++    if (r.status !== "fulfilled") continue;
++    for (const j of list(r.value.jobs)) {
++      const company = match(s(j.company));
++      const title = s(j.title);
++      const location = s(j.location);
++      const published = Date.parse(s(j.updated));
++      const url = s(j.link);
++      if (!company || !title || !Number.isFinite(published) || published < now - MAX_AGE_MS || published > now + DAY) continue;
++      if (!TECHNICAL_ROLE.test(title) || !INDIA_LOCATION.test(location || "India") || !okHttps(url, ["jooble.org"])) continue;
++      const jid = `jb-${s(j.id) || url}`;
++      if (out.some((x) => x.id === jid)) continue;
++      out.push({
++        id: jid, company, title, department: null, location: location || "India",
++        employmentType: s(j.type) || null, workplaceType: null,
++        publishedAt: new Date(Math.min(published, now)).toISOString(), jobUrl: url, aggregated: true,
++      });
++    }
++  }
++  // keep earlier batches' results too, so coverage grows across the day
++  const merged = (joobleCache ? joobleCache.jobs.filter((x) => batch.indexOf(x.company) === -1) : []).concat(out);
++  joobleCache = { at: now, jobs: merged };
++  return merged;
++}
++
+ /** names = every directory company without a working direct feed. */
+ export async function fetchAggregated(names: string[], now: number): Promise<Alert[]> {
+   if (!aggregatorEnabled() || !names.length) return [];
+   const priority = ["TCS", "Infosys", "Wipro", "Cognizant", "HCLTech", "Accenture", "Capgemini", "Tech Mahindra", "Deloitte", "PwC", "EY", "KPMG"]
+     .filter((n) => names.indexOf(n) !== -1);
+-  const [a, j] = await Promise.allSettled([adzuna(names, priority, now), jsearch(names, now)]);
+-  return ([] as Alert[]).concat(a.status === "fulfilled" ? a.value : [], j.status === "fulfilled" ? j.value : []);
++  const [a, j, b] = await Promise.allSettled([adzuna(names, priority, now), jsearch(names, now), jooble(names, now)]);
++  return ([] as Alert[]).concat(
++    a.status === "fulfilled" ? a.value : [],
++    j.status === "fulfilled" ? j.value : [],
++    b.status === "fulfilled" ? b.value : [],
++  );
+ }
+diff --git a/src/lib/hiring/hiring.test.ts b/src/lib/hiring/hiring.test.ts
+index 3622d37..4fa8248 100644
+--- a/src/lib/hiring/hiring.test.ts
++++ b/src/lib/hiring/hiring.test.ts
+@@ -86,3 +86,19 @@ describe("dedupe", () => {
+     expect(dedupe([a, { ...a, id: "2" }, { ...a, id: "3", location: "Delhi" }])).toHaveLength(2);
+   });
+ });
++
++describe("jooble fallback", () => {
++  it("returns matched India engineering jobs and ignores other employers", async () => {
++    vi.stubEnv("JOOBLE_API_KEY", "k");
++    const { fetchAggregated } = await import("./aggregator");
++    const updated = new Date(NOW - 86400000).toISOString();
++    mockFetch({ jobs: [
++      { id: "1", title: "Software Engineer", company: "Tata Consultancy Services", location: "Pune", updated, link: "https://in.jooble.org/desc/1" },
++      { id: "2", title: "Software Engineer", company: "Random Co", location: "Pune", updated, link: "https://in.jooble.org/desc/2" },
++    ] });
++    const out = await fetchAggregated(["TCS", "Infosys"], NOW);
++    expect(out.map((a) => a.company)).toEqual(["TCS"]);
++    expect(out[0].aggregated).toBe(true);
++    vi.unstubAllEnvs();
++  });
++});
+-- 
+2.43.0
+
+
+From 3bc21c5a844a06a320fdf932ed99b4a9cd0cd586 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 20:18:41 +0000
+Subject: [PATCH 2/3] Hiring alerts: careers-page link for every company
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01KnLDerGZRMjtWBEQ6y2hHs
+---
+ src/components/landing/HiringAlertsFeed.tsx | 16 +++++++++
+ src/data/careerLinks.ts                     | 39 +++++++++++++++++++++
+ src/lib/hiring/index.ts                     |  9 ++---
+ src/lib/hiring/types.ts                     |  2 ++
+ 4 files changed, 62 insertions(+), 4 deletions(-)
+ create mode 100644 src/data/careerLinks.ts
+
+diff --git a/src/components/landing/HiringAlertsFeed.tsx b/src/components/landing/HiringAlertsFeed.tsx
+index 967bfd7..3315f0c 100644
+--- a/src/components/landing/HiringAlertsFeed.tsx
++++ b/src/components/landing/HiringAlertsFeed.tsx
+@@ -21,6 +21,7 @@ type CoverageRow = {
+   status: "live" | "aggregated" | "pending";
+   source: string;
+   jobs: number;
++  careersUrl: string;
+ };
+ 
+ type FeedResponse = {
+@@ -228,6 +229,21 @@ export function HiringAlertsFeed() {
+         </div>
+       )}
+ 
++      {selectedCompany !== "All companies" && statusOf[selectedCompany] && (
++        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-900">
++          <span>
++            {statusOf[selectedCompany].jobs > 0
++              ? `${selectedCompany}: ${statusOf[selectedCompany].jobs} India opening${statusOf[selectedCompany].jobs === 1 ? "" : "s"} found.`
++              : statusOf[selectedCompany].status === "pending"
++                ? `${selectedCompany}: live alerts are not connected yet.`
++                : `${selectedCompany}: no India openings found right now.`}
++          </span>
++          <a href={statusOf[selectedCompany].careersUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-bold text-indigo-700 hover:underline">
++            Open {selectedCompany} careers page <ExternalLink className="h-3.5 w-3.5" />
++          </a>
++        </div>
++      )}
++
+       {!loading && !error && visibleJobs.length === 0 && (
+         <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+           <BriefcaseBusiness className="mx-auto h-8 w-8 text-slate-400" />
+diff --git a/src/data/careerLinks.ts b/src/data/careerLinks.ts
+new file mode 100644
+index 0000000..5f62b2e
+--- /dev/null
++++ b/src/data/careerLinks.ts
+@@ -0,0 +1,39 @@
++/**
++ * Official careers pages for companies whose job lists cannot be read automatically.
++ * Any company not listed here gets a web-search link instead, so every company has a working link.
++ */
++const LINKS: Record<string, string> = {
++  "Google": "https://www.google.com/about/careers/applications/jobs/results?location=India&q=software",
++  "Microsoft": "https://jobs.careers.microsoft.com/global/en/search?lc=India&q=software",
++  "Apple": "https://jobs.apple.com/en-in/search?location=india-INDC",
++  "Netflix": "https://explore.jobs.netflix.net/careers",
++  "Oracle": "https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?location=India",
++  "Cisco": "https://jobs.cisco.com/jobs/SearchJobs/?21178=%5B169482%5D&21178_format=6020",
++  "IBM": "https://www.ibm.com/in-en/careers/search",
++  "TCS": "https://www.tcs.com/careers",
++  "Infosys": "https://www.infosys.com/careers.html",
++  "Wipro": "https://careers.wipro.com/careers-home/jobs",
++  "Cognizant": "https://careers.cognizant.com/global-en/jobs/",
++  "Accenture": "https://www.accenture.com/in-en/careers/jobsearch",
++  "Capgemini": "https://www.capgemini.com/in-en/careers/",
++  "HCLTech": "https://www.hcltech.com/careers",
++  "Tech Mahindra": "https://careers.techmahindra.com/",
++  "LTIMindtree": "https://www.ltimindtree.com/careers/",
++  "Deloitte": "https://apply.deloitte.com/careers",
++  "PwC": "https://www.pwc.in/careers.html",
++  "EY": "https://www.ey.com/en_in/careers",
++  "KPMG": "https://kpmg.com/in/en/careers.html",
++  "Goldman Sachs": "https://www.goldmansachs.com/careers/",
++  "J.P. Morgan Chase": "https://careers.jpmorgan.com/in/en/home",
++  "Morgan Stanley": "https://www.morganstanley.com/people-opportunities",
++  "Flipkart": "https://www.flipkartcareers.com/",
++  "Zomato": "https://www.zomato.com/careers",
++  "Zoho": "https://www.zoho.com/careers/",
++  "Meta": "https://www.metacareers.com/jobs",
++  "Uber": "https://www.uber.com/in/en/careers/",
++  "Atlassian": "https://www.atlassian.com/company/careers/all-jobs",
++};
++
++export function careersUrlFor(company: string): string {
++  return LINKS[company] || `https://www.google.com/search?q=${encodeURIComponent(`${company} careers software engineer jobs India`)}`;
++}
+diff --git a/src/lib/hiring/index.ts b/src/lib/hiring/index.ts
+index 7c8e096..f3ce32b 100644
+--- a/src/lib/hiring/index.ts
++++ b/src/lib/hiring/index.ts
+@@ -1,4 +1,5 @@
+ import { ALL_COMPANY_NAMES } from "../../data/hiringCompanies";
++import { careersUrlFor } from "../../data/careerLinks";
+ import { fetchFromSource } from "./adapters";
+ import { aggregatorEnabled, fetchAggregated } from "./aggregator";
+ import { LEGACY_COMPANIES, sourceLabel, sourcesFor } from "./sources";
+@@ -73,10 +74,10 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
+   const agg = aggregatorEnabled();
+   const coverage: CoverageRow[] = ALL_COMPANY_NAMES.map((name) => {
+     const lg = legacy.find((l) => l.name === name);
+-    if (lg) return { company: name, status: lg.ok ? "live" : "pending", source: "Official career feed", jobs: legacyJobs.filter((j) => j.company === name).length } as CoverageRow;
+-    if (okDirect[name]) return { company: name, status: "live", source: okDirect[name].label, jobs: okDirect[name].jobs.length } as CoverageRow;
+-    if (agg) return { company: name, status: "aggregated", source: "Job aggregator", jobs: aggBy[name] || 0 } as CoverageRow;
+-    return { company: name, status: "pending", source: "Connecting", jobs: 0 } as CoverageRow;
++    if (lg) return { company: name, status: lg.ok ? "live" : "pending", source: "Official career feed", jobs: legacyJobs.filter((j) => j.company === name).length, careersUrl: careersUrlFor(name) } as CoverageRow;
++    if (okDirect[name]) return { company: name, status: "live", source: okDirect[name].label, jobs: okDirect[name].jobs.length, careersUrl: careersUrlFor(name) } as CoverageRow;
++    if (agg) return { company: name, status: "aggregated", source: "Job aggregator", jobs: aggBy[name] || 0, careersUrl: careersUrlFor(name) } as CoverageRow;
++    return { company: name, status: "pending", source: "Connecting", jobs: 0, careersUrl: careersUrlFor(name) } as CoverageRow;
+   });
+ 
+   return { jobs, coverage, aggregatorEnabled: agg };
+diff --git a/src/lib/hiring/types.ts b/src/lib/hiring/types.ts
+index 1630072..870ea11 100644
+--- a/src/lib/hiring/types.ts
++++ b/src/lib/hiring/types.ts
+@@ -31,4 +31,6 @@ export type CoverageRow = {
+   /** human label, e.g. "Greenhouse", "Workday", "Job aggregator" */
+   source: string;
+   jobs: number;
++  /** where a visitor can browse this company's openings directly */
++  careersUrl: string;
+ };
+-- 
+2.43.0
+
+
+From bd996ee3fcc55bfacfc4262a27682a907a915514 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 12 Nov 2026 20:23:59 +0000
+Subject: [PATCH 3/3] Hiring alerts: career-page agent (Playwright crawler +
+ GitHub Actions) for companies without a direct feed
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01KnLDerGZRMjtWBEQ6y2hHs
+---
+ .env.example                                |   5 +
+ .github/workflows/crawl-careers.yml         |  54 ++++++++
+ .gitignore                                  |   7 ++
+ scripts/career-extract.d.mts                |   8 ++
+ scripts/career-extract.mjs                  | 131 ++++++++++++++++++++
+ scripts/crawl-careers.mjs                   |  96 ++++++++++++++
+ src/components/landing/HiringAlertsFeed.tsx |   3 +-
+ src/data/careerLinks.ts                     |  42 ++-----
+ src/data/careerPages.json                   |  31 +++++
+ src/lib/hiring/crawled.ts                   |  50 ++++++++
+ src/lib/hiring/hiring.test.ts               |  55 ++++++++
+ src/lib/hiring/index.ts                     |  13 +-
+ src/lib/hiring/types.ts                     |   2 +
+ 13 files changed, 459 insertions(+), 38 deletions(-)
+ create mode 100644 .github/workflows/crawl-careers.yml
+ create mode 100644 scripts/career-extract.d.mts
+ create mode 100644 scripts/career-extract.mjs
+ create mode 100644 scripts/crawl-careers.mjs
+ create mode 100644 src/data/careerPages.json
+ create mode 100644 src/lib/hiring/crawled.ts
+
+diff --git a/.env.example b/.env.example
+index 5950fbc..9b6cb0e 100644
+--- a/.env.example
++++ b/.env.example
+@@ -3,3 +3,8 @@
+ # Keep the founder code private and use at least 16 random characters.
+ NEXTAUTH_SECRET=replace-with-a-long-random-secret
+ FOUNDER_CODE=replace-with-your-private-founder-code
++
++# Career-page agent output (published by .github/workflows/crawl-careers.yml)
++# Default is the crawl-data branch of oishiknanda/dayzero-crucible. If the repo is private, also set the token.
++# CRAWLED_JOBS_URL=https://raw.githubusercontent.com/oishiknanda/dayzero-crucible/crawl-data/crawled-jobs.json
++# CRAWLED_JOBS_TOKEN=
+diff --git a/.github/workflows/crawl-careers.yml b/.github/workflows/crawl-careers.yml
+new file mode 100644
+index 0000000..d376247
+--- /dev/null
++++ b/.github/workflows/crawl-careers.yml
+@@ -0,0 +1,54 @@
++name: Crawl career pages
++
++# Runs the career-page agent every 6 hours and publishes the result to the `crawl-data` branch.
++# The website reads crawled-jobs.json from that branch (see CRAWLED_JOBS_URL in .env.example).
++# Note: GitHub only runs scheduled workflows from the default branch.
++on:
++  schedule:
++    - cron: "15 */6 * * *"
++  workflow_dispatch:
++
++permissions:
++  contents: write
++
++concurrency:
++  group: crawl-careers
++  cancel-in-progress: true
++
++jobs:
++  crawl:
++    runs-on: ubuntu-latest
++    timeout-minutes: 40
++    steps:
++      - uses: actions/checkout@v4
++
++      - uses: actions/setup-node@v4
++        with:
++          node-version: 20
++
++      - name: Install Playwright (only for the crawler)
++        run: |
++          cd scripts
++          npm init -y > /dev/null
++          npm i playwright@1.49.0
++          npx playwright install --with-deps chromium
++
++      - name: Load previous results (to remember when each job was first seen)
++        run: |
++          git fetch origin crawl-data:refs/remotes/origin/crawl-data || true
++          git show origin/crawl-data:crawled-jobs.json > prev.json 2>/dev/null || echo '{"jobs":[]}' > prev.json
++
++      - name: Crawl
++        run: node scripts/crawl-careers.mjs --prev prev.json --out out/crawled-jobs.json
++
++      - name: Publish to crawl-data branch
++        run: |
++          mkdir pub && cp out/crawled-jobs.json pub/
++          cd pub
++          git init -q
++          git config user.name "github-actions"
++          git config user.email "github-actions@users.noreply.github.com"
++          git checkout -q -b crawl-data
++          git add crawled-jobs.json
++          git commit -q -m "Crawl $(date -u +%Y-%m-%dT%H:%MZ)"
++          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" crawl-data
+diff --git a/.gitignore b/.gitignore
+index c97d894..90a02bf 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -42,3 +42,10 @@ next-env.d.ts
+ .env.production
+ .env.staging
+ .env.test
++
++# career-page agent (installed only for the crawler)
++scripts/node_modules
++scripts/package.json
++scripts/package-lock.json
++out/
++prev.json
+diff --git a/scripts/career-extract.d.mts b/scripts/career-extract.d.mts
+new file mode 100644
+index 0000000..9887a19
+--- /dev/null
++++ b/scripts/career-extract.d.mts
+@@ -0,0 +1,8 @@
++export type RawJob = { title: string; url: string; location: string; publishedMs: number | null };
++export const INDIA: RegExp;
++export const TECH: RegExp;
++export function parseDate(v: unknown, now?: number): number | null;
++export function jobsFromJson(json: unknown, base: string, now?: number): RawJob[];
++export function jobsFromJsonLd(blocks: string[], base: string, now?: number): RawJob[];
++export function jobsFromLinks(links: Array<{ href: string; text: string }>, base: string): RawJob[];
++export function keepJob(j: RawJob, pageUrl: string): boolean;
+diff --git a/scripts/career-extract.mjs b/scripts/career-extract.mjs
+new file mode 100644
+index 0000000..664b99c
+--- /dev/null
++++ b/scripts/career-extract.mjs
+@@ -0,0 +1,131 @@
++// Turns whatever a careers page loads (JSON responses, JobPosting markup, links) into job records.
++// No AI and no guessing: a job is only returned when the page itself supplied a title and a link.
++
++const TITLE = ["title", "jobTitle", "job_title", "jobName", "position", "name", "text"];
++const URLK = ["absolute_url", "applyUrl", "apply_url", "jobUrl", "job_url", "hostedUrl", "careers_url", "canonicalPositionUrl", "jobPostingUrl", "detailsUrl", "url", "link", "externalPath", "path"];
++const LOCK = ["location", "locations", "locationsText", "primaryLocation", "jobLocation", "locationName", "location_name", "city", "cities", "offices", "office", "country"];
++const DATEK = ["postedDate", "datePosted", "posted_date", "postedOn", "posted", "publishedAt", "published_at", "publish_date", "published", "postingDate", "postDate", "createdAt", "created_at", "created", "releasedDate", "updated_at", "startDate", "date"];
++
++export const INDIA = /\b(india|bengaluru|bangalore|hyderabad|pune|mumbai|gurugram|gurgaon|new delhi|delhi|chennai|noida|kolkata|ahmedabad|kochi|coimbatore|thiruvananthapuram|jaipur|chandigarh|indore|nagpur|mysuru|mysore)\b/i;
++export const TECH = /software|engineer|engineering|developer|development|frontend|front-end|back.?end|full.?stack|mobile|machine learning|\bml\b|\bai\b|data science|data scientist|data engineer|analyst|site reliability|\bsre\b|devops|cloud|security|\bqa\b|quality|programmer|technology|\bsde\b|intern|graduate|trainee|architect/i;
++
++const isObj = (v) => v && typeof v === "object" && !Array.isArray(v);
++
++function pick(o, keys) {
++  for (const k of keys) {
++    const v = o[k];
++    if (v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && !v.length)) return v;
++  }
++  return undefined;
++}
++
++function text(v) {
++  if (v == null) return "";
++  if (typeof v === "string") return v.trim();
++  if (typeof v === "number") return "";
++  if (Array.isArray(v)) return v.map(text).filter(Boolean).join(", ");
++  if (isObj(v)) {
++    const parts = [v.display, v.name, v.city, v.addressLocality, v.region, v.addressRegion, v.state, v.country, v.addressCountry]
++      .map((x) => (isObj(x) ? text(x) : typeof x === "string" ? x : "")).filter(Boolean);
++    if (parts.length) return Array.from(new Set(parts)).join(", ");
++    if (isObj(v.address)) return text(v.address);
++  }
++  return "";
++}
++
++export function parseDate(v, now = Date.now()) {
++  if (v == null || v === "") return null;
++  if (typeof v === "number") {
++    const ms = v > 1e12 ? v : v > 1e9 ? v * 1000 : NaN;
++    return Number.isFinite(ms) ? ms : null;
++  }
++  if (typeof v !== "string") return null;
++  const t = v.toLowerCase();
++  if (t.includes("today")) return now;
++  if (t.includes("yesterday")) return now - 86400000;
++  const ago = /(\d+)\s*\+?\s*(day|week|hour)s?\s+ago/.exec(t);
++  if (ago) return now - parseInt(ago[1], 10) * (ago[2] === "week" ? 7 : ago[2] === "hour" ? 1 / 24 : 1) * 86400000;
++  const ms = Date.parse(v);
++  return Number.isFinite(ms) ? ms : null;
++}
++
++function absolute(u, base) {
++  try {
++    const x = new URL(u, base);
++    return x.protocol === "https:" ? x.toString() : null;
++  } catch {
++    return null;
++  }
++}
++
++function toJob(o, base, now) {
++  const title = text(pick(o, TITLE));
++  const rawUrl = pick(o, URLK);
++  if (!title || title.length < 3 || title.length > 160 || typeof rawUrl !== "string") return null;
++  const url = absolute(rawUrl, base);
++  if (!url) return null;
++  return { title, url, location: text(pick(o, LOCK)), publishedMs: parseDate(pick(o, DATEK), now) };
++}
++
++/** Finds arrays of job-like objects anywhere inside a JSON response. */
++export function jobsFromJson(json, base, now = Date.now()) {
++  const out = [];
++  const seen = new Set();
++  (function walk(node, depth) {
++    if (depth > 9 || node == null || typeof node !== "object") return;
++    if (Array.isArray(node)) {
++      const objs = node.filter(isObj);
++      if (objs.length >= 2) {
++        const jobs = objs.map((o) => toJob(o, base, now)).filter(Boolean);
++        if (jobs.length >= 2 && jobs.length >= objs.length * 0.6) {
++          for (const j of jobs) if (!seen.has(j.url)) { seen.add(j.url); out.push(j); }
++          return;
++        }
++      }
++      for (const v of node) walk(v, depth + 1);
++      return;
++    }
++    for (const k of Object.keys(node)) walk(node[k], depth + 1);
++  })(json, 0);
++  return out;
++}
++
++/** schema.org JobPosting markup (script type="application/ld+json"). */
++export function jobsFromJsonLd(blocks, base, now = Date.now()) {
++  const out = [];
++  const visit = (n) => {
++    if (Array.isArray(n)) return n.forEach(visit);
++    if (!isObj(n)) return;
++    if (n["@graph"]) visit(n["@graph"]);
++    const type = n["@type"];
++    if (type === "JobPosting" || (Array.isArray(type) && type.includes("JobPosting"))) {
++      const url = absolute(typeof n.url === "string" ? n.url : typeof n.sameAs === "string" ? n.sameAs : base, base);
++      const title = text(n.title);
++      if (title && url) out.push({ title, url, location: text(n.jobLocation), publishedMs: parseDate(n.datePosted, now) });
++    }
++  };
++  for (const b of blocks) { try { visit(JSON.parse(b)); } catch { /* ignore bad markup */ } }
++  return out;
++}
++
++/** Last resort: links that look like individual job pages. Undated. */
++export function jobsFromLinks(links, base) {
++  const out = [];
++  const seen = new Set();
++  for (const l of links) {
++    const url = absolute(l.href, base);
++    const title = (l.text || "").replace(/\s+/g, " ").trim();
++    if (!url || seen.has(url) || title.length < 6 || title.length > 120) continue;
++    if (!/\/(job|jobs|position|positions|requisition|opening|openings|vacancy)\b|\/careers\/.+\d/i.test(new URL(url).pathname)) continue;
++    seen.add(url);
++    out.push({ title, url, location: "", publishedMs: null });
++  }
++  return out;
++}
++
++/** Keep technical roles in India; when a job has no location, trust a page that was searched for India. */
++export function keepJob(j, pageUrl) {
++  if (!TECH.test(j.title)) return false;
++  if (j.location) return INDIA.test(j.location);
++  return /india|en-in|in-en|\blc=in/i.test(pageUrl);
++}
+diff --git a/scripts/crawl-careers.mjs b/scripts/crawl-careers.mjs
+new file mode 100644
+index 0000000..93392a0
+--- /dev/null
++++ b/scripts/crawl-careers.mjs
+@@ -0,0 +1,96 @@
++// Career-page agent: opens each company's careers page in a real (headless) browser, captures the job data
++// the page loads, and writes the recent India tech openings to a JSON file the site reads.
++//
++//   node scripts/crawl-careers.mjs [--out out/crawled-jobs.json] [--prev prev.json] [--only Google,Microsoft]
++//
++// Needs Playwright:  cd scripts && npm init -y && npm i playwright && npx playwright install chromium
++// No AI, no paid services. It only visits public careers pages, once per run, one company at a time,
++// and does not try to get around logins, CAPTCHAs or blocks: a blocked page is simply recorded as not ok.
++import fs from "node:fs";
++import path from "node:path";
++import crypto from "node:crypto";
++import { fileURLToPath } from "node:url";
++import { jobsFromJson, jobsFromJsonLd, jobsFromLinks, keepJob } from "./career-extract.mjs";
++
++const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
++const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > -1 ? process.argv[i + 1] : dflt; };
++const outPath = path.resolve(arg("--out", path.join(root, "out/crawled-jobs.json")));
++const prevPath = arg("--prev", "");
++const only = (arg("--only", "") || "").split(",").map((s) => s.trim()).filter(Boolean);
++
++const pages = JSON.parse(fs.readFileSync(arg("--pages", path.join(root, "src/data/careerPages.json")), "utf8"));
++let prev = { jobs: [] };
++try { if (prevPath) prev = JSON.parse(fs.readFileSync(prevPath, "utf8")); } catch { /* first run */ }
++const firstSeen = new Map((prev.jobs || []).map((j) => [j.id, j.firstSeen || j.publishedAt]));
++
++const { chromium } = await import("playwright");
++const browser = await chromium.launch({ headless: true });
++const context = await browser.newContext({
++  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
++  locale: "en-IN", viewport: { width: 1366, height: 900 },
++});
++
++const now = Date.now();
++const MAX_AGE = 30 * 86400000;
++const companies = {};
++const jobs = [];
++
++for (const [company, url] of Object.entries(pages)) {
++  if (only.length && !only.includes(company)) continue;
++  const page = await context.newPage();
++  const payloads = [];
++  page.on("response", async (res) => {
++    try {
++      if (!(res.headers()["content-type"] || "").includes("json")) return;
++      const body = await res.text();
++      if (body.length > 3_000_000) return;
++      payloads.push({ json: JSON.parse(body), base: res.url() });
++    } catch { /* not json / already closed */ }
++  });
++  let method = "none";
++  let error = "";
++  let found = [];
++  try {
++    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
++    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
++    for (let i = 0; i < 3; i++) { await page.mouse.wheel(0, 2500); await page.waitForTimeout(1500); }
++
++    const fromJson = payloads.flatMap((p) => jobsFromJson(p.json, new URL(url).origin, now));
++    const ld = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => e.textContent || ""));
++    const fromLd = jobsFromJsonLd(ld, url, now);
++    found = fromJson.concat(fromLd);
++    method = fromJson.length ? "network-json" : fromLd.length ? "json-ld" : "none";
++    if (!found.length) {
++      const links = await page.$$eval("a[href]", (els) => els.map((a) => ({ href: a.href, text: a.textContent || "" })));
++      found = jobsFromLinks(links, url);
++      if (found.length) method = "links";
++    }
++  } catch (e) {
++    error = String(e && e.message ? e.message : e).split("\n")[0].slice(0, 160);
++  } finally {
++    await page.close().catch(() => {});
++  }
++
++  const seen = new Set();
++  const kept = found.filter((j) => keepJob(j, url) && !seen.has(j.url) && seen.add(j.url)).slice(0, 60);
++  let count = 0;
++  for (const j of kept) {
++    const id = "cr-" + crypto.createHash("sha1").update(j.url).digest("hex").slice(0, 12);
++    const seenAt = firstSeen.get(id) || new Date(now).toISOString();
++    const dateKnown = j.publishedMs != null && j.publishedMs <= now + 86400000;
++    if (dateKnown && j.publishedMs < now - MAX_AGE) continue;
++    jobs.push({
++      id, company, title: j.title, department: null, location: j.location || "India", employmentType: null, workplaceType: null,
++      publishedAt: dateKnown ? new Date(Math.min(j.publishedMs, now)).toISOString() : seenAt,
++      firstSeen: seenAt, dateKnown, jobUrl: j.url, viaAgent: true,
++    });
++    count++;
++  }
++  companies[company] = { ok: count > 0, count, method, ...(error ? { error } : {}) };
++  console.log(`${count > 0 ? "OK  " : "--  "} ${company}: ${count} jobs (${method})${error ? " - " + error : ""}`);
++}
++
++await browser.close();
++fs.mkdirSync(path.dirname(outPath), { recursive: true });
++fs.writeFileSync(outPath, JSON.stringify({ generatedAt: new Date(now).toISOString(), companies, jobs }, null, 1));
++console.log(`\nWrote ${jobs.length} jobs for ${Object.values(companies).filter((c) => c.ok).length}/${Object.keys(companies).length} companies -> ${outPath}`);
+diff --git a/src/components/landing/HiringAlertsFeed.tsx b/src/components/landing/HiringAlertsFeed.tsx
+index 3315f0c..4782d4d 100644
+--- a/src/components/landing/HiringAlertsFeed.tsx
++++ b/src/components/landing/HiringAlertsFeed.tsx
+@@ -14,6 +14,7 @@ type HiringAlert = {
+   publishedAt: string;
+   jobUrl: string;
+   aggregated?: boolean;
++  viaAgent?: boolean;
+ };
+ 
+ type CoverageRow = {
+@@ -267,7 +268,7 @@ export function HiringAlertsFeed() {
+                 </p>
+                 <h2 className="mt-2 text-lg font-bold leading-snug text-slate-950">{job.title}</h2>
+               </div>
+-              <span title={job.aggregated ? "Found via a licensed job-data partner" : "Sourced from the employer’s official career board"} className={`mt-0.5 shrink-0 rounded-lg border p-2 ${job.aggregated ? "border-sky-200 bg-sky-50 text-sky-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
++              <span title={job.aggregated ? "Found via a job-data partner" : job.viaAgent ? "Found by scanning the employer’s own careers page" : "Sourced from the employer’s official career board"} className={`mt-0.5 shrink-0 rounded-lg border p-2 ${job.aggregated ? "border-sky-200 bg-sky-50 text-sky-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
+                 <BadgeCheck className="h-4 w-4" />
+               </span>
+             </div>
+diff --git a/src/data/careerLinks.ts b/src/data/careerLinks.ts
+index 5f62b2e..791b519 100644
+--- a/src/data/careerLinks.ts
++++ b/src/data/careerLinks.ts
+@@ -1,39 +1,11 @@
++import pages from "./careerPages.json";
++
+ /**
+- * Official careers pages for companies whose job lists cannot be read automatically.
+- * Any company not listed here gets a web-search link instead, so every company has a working link.
++ * Official careers pages. Used for the "Open careers page" button and as the start pages the
++ * career-page agent (scripts/crawl-careers.mjs) scans. Add a company to careerPages.json to include it.
++ * Any company not listed gets a web-search link instead, so every company has a working link.
+  */
+-const LINKS: Record<string, string> = {
+-  "Google": "https://www.google.com/about/careers/applications/jobs/results?location=India&q=software",
+-  "Microsoft": "https://jobs.careers.microsoft.com/global/en/search?lc=India&q=software",
+-  "Apple": "https://jobs.apple.com/en-in/search?location=india-INDC",
+-  "Netflix": "https://explore.jobs.netflix.net/careers",
+-  "Oracle": "https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?location=India",
+-  "Cisco": "https://jobs.cisco.com/jobs/SearchJobs/?21178=%5B169482%5D&21178_format=6020",
+-  "IBM": "https://www.ibm.com/in-en/careers/search",
+-  "TCS": "https://www.tcs.com/careers",
+-  "Infosys": "https://www.infosys.com/careers.html",
+-  "Wipro": "https://careers.wipro.com/careers-home/jobs",
+-  "Cognizant": "https://careers.cognizant.com/global-en/jobs/",
+-  "Accenture": "https://www.accenture.com/in-en/careers/jobsearch",
+-  "Capgemini": "https://www.capgemini.com/in-en/careers/",
+-  "HCLTech": "https://www.hcltech.com/careers",
+-  "Tech Mahindra": "https://careers.techmahindra.com/",
+-  "LTIMindtree": "https://www.ltimindtree.com/careers/",
+-  "Deloitte": "https://apply.deloitte.com/careers",
+-  "PwC": "https://www.pwc.in/careers.html",
+-  "EY": "https://www.ey.com/en_in/careers",
+-  "KPMG": "https://kpmg.com/in/en/careers.html",
+-  "Goldman Sachs": "https://www.goldmansachs.com/careers/",
+-  "J.P. Morgan Chase": "https://careers.jpmorgan.com/in/en/home",
+-  "Morgan Stanley": "https://www.morganstanley.com/people-opportunities",
+-  "Flipkart": "https://www.flipkartcareers.com/",
+-  "Zomato": "https://www.zomato.com/careers",
+-  "Zoho": "https://www.zoho.com/careers/",
+-  "Meta": "https://www.metacareers.com/jobs",
+-  "Uber": "https://www.uber.com/in/en/careers/",
+-  "Atlassian": "https://www.atlassian.com/company/careers/all-jobs",
+-};
+-
+ export function careersUrlFor(company: string): string {
+-  return LINKS[company] || `https://www.google.com/search?q=${encodeURIComponent(`${company} careers software engineer jobs India`)}`;
++  const url = (pages as Record<string, string>)[company];
++  return url || `https://www.google.com/search?q=${encodeURIComponent(`${company} careers software engineer jobs India`)}`;
+ }
+diff --git a/src/data/careerPages.json b/src/data/careerPages.json
+new file mode 100644
+index 0000000..8940c61
+--- /dev/null
++++ b/src/data/careerPages.json
+@@ -0,0 +1,31 @@
++{
++ "Google": "https://www.google.com/about/careers/applications/jobs/results?location=India&q=software",
++ "Microsoft": "https://jobs.careers.microsoft.com/global/en/search?lc=India&q=software",
++ "Apple": "https://jobs.apple.com/en-in/search?location=india-INDC",
++ "Netflix": "https://explore.jobs.netflix.net/careers",
++ "Oracle": "https://careers.oracle.com/jobs/#en/sites/jobsearch/requisitions?location=India",
++ "Cisco": "https://jobs.cisco.com/jobs/SearchJobs/?21178=%5B169482%5D&21178_format=6020",
++ "IBM": "https://www.ibm.com/in-en/careers/search",
++ "TCS": "https://www.tcs.com/careers",
++ "Infosys": "https://www.infosys.com/careers.html",
++ "Wipro": "https://careers.wipro.com/careers-home/jobs",
++ "Cognizant": "https://careers.cognizant.com/global-en/jobs/",
++ "Accenture": "https://www.accenture.com/in-en/careers/jobsearch",
++ "Capgemini": "https://www.capgemini.com/in-en/careers/",
++ "HCLTech": "https://www.hcltech.com/careers",
++ "Tech Mahindra": "https://careers.techmahindra.com/",
++ "LTIMindtree": "https://www.ltimindtree.com/careers/",
++ "Deloitte": "https://apply.deloitte.com/careers",
++ "PwC": "https://www.pwc.in/careers.html",
++ "EY": "https://www.ey.com/en_in/careers",
++ "KPMG": "https://kpmg.com/in/en/careers.html",
++ "Goldman Sachs": "https://www.goldmansachs.com/careers/",
++ "J.P. Morgan Chase": "https://careers.jpmorgan.com/in/en/home",
++ "Morgan Stanley": "https://www.morganstanley.com/people-opportunities",
++ "Flipkart": "https://www.flipkartcareers.com/",
++ "Zomato": "https://www.zomato.com/careers",
++ "Zoho": "https://www.zoho.com/careers/",
++ "Meta": "https://www.metacareers.com/jobs",
++ "Uber": "https://www.uber.com/in/en/careers/",
++ "Atlassian": "https://www.atlassian.com/company/careers/all-jobs"
++}
+\ No newline at end of file
+diff --git a/src/lib/hiring/crawled.ts b/src/lib/hiring/crawled.ts
+new file mode 100644
+index 0000000..1ca6bfd
+--- /dev/null
++++ b/src/lib/hiring/crawled.ts
+@@ -0,0 +1,50 @@
++import { DAY, MAX_AGE_MS } from "./adapters";
++import type { Alert } from "./types";
++
++/**
++ * Jobs found by the career-page agent (scripts/crawl-careers.mjs, run by .github/workflows/crawl-careers.yml).
++ * The agent publishes crawled-jobs.json; the site only reads it, so no browser runs on the web host.
++ */
++export type CrawledResult = { jobs: Alert[]; companies: Record<string, number> };
++
++const STALE_AFTER_MS = 3 * DAY;
++
++export function crawledUrl(): string {
++  return process.env.CRAWLED_JOBS_URL ||
++    "https://raw.githubusercontent.com/oishiknanda/dayzero-crucible/crawl-data/crawled-jobs.json";
++}
++
++export function parseCrawled(file: unknown, names: string[], now: number): CrawledResult {
++  const empty: CrawledResult = { jobs: [], companies: {} };
++  if (!file || typeof file !== "object") return empty;
++  const f = file as { generatedAt?: unknown; companies?: Record<string, { ok?: boolean }>; jobs?: unknown };
++  const generated = typeof f.generatedAt === "string" ? Date.parse(f.generatedAt) : NaN;
++  if (!Number.isFinite(generated) || now - generated > STALE_AFTER_MS) return empty;
++  const jobs: Alert[] = [];
++  const companies: Record<string, number> = {};
++  for (const raw of Array.isArray(f.jobs) ? f.jobs : []) {
++    const j = raw as Record<string, unknown>;
++    const company = typeof j.company === "string" ? j.company : "";
++    const published = typeof j.publishedAt === "string" ? Date.parse(j.publishedAt) : NaN;
++    const url = typeof j.jobUrl === "string" ? j.jobUrl : "";
++    if (names.indexOf(company) === -1 || typeof j.title !== "string" || typeof j.id !== "string") continue;
++    if (!Number.isFinite(published) || published < now - MAX_AGE_MS || published > now + DAY) continue;
++    if (!/^https:\/\//i.test(url)) continue;
++    jobs.push({
++      id: j.id, company, title: j.title, department: null,
++      location: typeof j.location === "string" && j.location ? j.location : "India",
++      employmentType: null, workplaceType: null,
++      publishedAt: new Date(published).toISOString(), jobUrl: url, viaAgent: true,
++    });
++    companies[company] = (companies[company] || 0) + 1;
++  }
++  return { jobs, companies };
++}
++
++export async function fetchCrawled(names: string[], now: number): Promise<CrawledResult> {
++  const headers: Record<string, string> = { Accept: "application/json" };
++  if (process.env.CRAWLED_JOBS_TOKEN) headers.Authorization = `token ${process.env.CRAWLED_JOBS_TOKEN}`;
++  const res = await fetch(crawledUrl(), { headers, signal: AbortSignal.timeout(10000), next: { revalidate: 300 } } as RequestInit);
++  if (!res.ok) throw new Error(`crawled jobs returned ${res.status}`);
++  return parseCrawled(await res.json(), names, now);
++}
+diff --git a/src/lib/hiring/hiring.test.ts b/src/lib/hiring/hiring.test.ts
+index 4fa8248..f7beec4 100644
+--- a/src/lib/hiring/hiring.test.ts
++++ b/src/lib/hiring/hiring.test.ts
+@@ -102,3 +102,58 @@ describe("jooble fallback", () => {
+     vi.unstubAllEnvs();
+   });
+ });
++
++import { parseCrawled } from "./crawled";
++import { jobsFromJson, jobsFromJsonLd, jobsFromLinks, keepJob, parseDate } from "../../../scripts/career-extract.mjs";
++
++describe("career-page extractor", () => {
++  const base = "https://careers.example.com/search";
++  it("finds job arrays inside arbitrary JSON", () => {
++    const json = { data: { result: { jobs: [
++      { jobTitle: "Software Engineer II", locationsText: "Bengaluru, India", postedOn: "Posted 3 Days Ago", externalPath: "/job/blr/se2_R1" },
++      { jobTitle: "Sales Manager", locationsText: "Mumbai", postedOn: "Posted Today", externalPath: "/job/mum/sm_R2" },
++    ], facets: [{ name: "India" }, { name: "Pune" }] } } };
++    const jobs = jobsFromJson(json, base, NOW);
++    expect(jobs).toHaveLength(2);
++    expect(jobs[0].url).toBe("https://careers.example.com/job/blr/se2_R1");
++    expect(jobs[0].publishedMs).toBe(NOW - 3 * 86400000);
++    expect(jobs.filter((j) => keepJob(j, base)).map((j) => j.title)).toEqual(["Software Engineer II"]);
++  });
++  it("reads JobPosting markup, including @graph", () => {
++    const block = JSON.stringify({ "@graph": [{ "@type": "JobPosting", title: "Data Engineer", url: "https://x.com/j/1", datePosted: "2026-11-10", jobLocation: { address: { addressLocality: "Pune", addressCountry: "IN" } } }] });
++    const jobs = jobsFromJsonLd([block, "not json"], base, NOW);
++    expect(jobs).toHaveLength(1);
++    expect(jobs[0].location).toContain("Pune");
++  });
++  it("uses links only for job-looking URLs and ignores non-https", () => {
++    const jobs = jobsFromLinks([
++      { href: "https://careers.example.com/jobs/12345", text: "Backend Developer" },
++      { href: "https://careers.example.com/about", text: "About our company" },
++      { href: "http://careers.example.com/jobs/9", text: "Insecure Engineer" },
++    ], base);
++    expect(jobs.map((j) => j.title)).toEqual(["Backend Developer"]);
++  });
++  it("trusts location-less jobs only on India-searched pages", () => {
++    const j = { title: "Software Engineer", url: "https://a.com/1", location: "", publishedMs: null };
++    expect(keepJob(j, "https://x.com/jobs?location=India")).toBe(true);
++    expect(keepJob(j, "https://x.com/jobs")).toBe(false);
++    expect(parseDate("garbage")).toBeNull();
++  });
++});
++
++describe("crawled results", () => {
++  const file = (generatedAt: string) => ({ generatedAt, companies: {}, jobs: [
++    { id: "cr-1", company: "Google", title: "SWE", location: "Bengaluru", publishedAt: recent, jobUrl: "https://www.google.com/x/1" },
++    { id: "cr-2", company: "Unknown Co", title: "SWE", publishedAt: recent, jobUrl: "https://a.com/2" },
++    { id: "cr-3", company: "Google", title: "SWE", publishedAt: recent, jobUrl: "javascript:alert(1)" },
++  ] });
++  it("keeps valid jobs for known companies only", () => {
++    const r = parseCrawled(file("2026-11-12T06:00:00Z"), ["Google"], NOW);
++    expect(r.jobs.map((j) => j.id)).toEqual(["cr-1"]);
++    expect(r.jobs[0].viaAgent).toBe(true);
++    expect(r.companies).toEqual({ Google: 1 });
++  });
++  it("ignores a stale file", () => {
++    expect(parseCrawled(file("2026-11-01T06:00:00Z"), ["Google"], NOW).jobs).toEqual([]);
++  });
++});
+diff --git a/src/lib/hiring/index.ts b/src/lib/hiring/index.ts
+index f3ce32b..e8d13c5 100644
+--- a/src/lib/hiring/index.ts
++++ b/src/lib/hiring/index.ts
+@@ -1,6 +1,7 @@
+ import { ALL_COMPANY_NAMES } from "../../data/hiringCompanies";
+ import { careersUrlFor } from "../../data/careerLinks";
+ import { fetchFromSource } from "./adapters";
++import { fetchCrawled } from "./crawled";
+ import { aggregatorEnabled, fetchAggregated } from "./aggregator";
+ import { LEGACY_COMPANIES, sourceLabel, sourcesFor } from "./sources";
+ import type { Alert, CoverageRow } from "./types";
+@@ -48,6 +49,7 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
+     .map((name) => ({ name, specs: sourcesFor(name) }));
+   const direct = todo.filter((t) => t.specs.length);
+ 
++  const crawledP = fetchCrawled(ALL_COMPANY_NAMES, now).catch(() => ({ jobs: [] as Alert[], companies: {} as Record<string, number> }));
+   const runs = await pool(direct, 12, async (t) => {
+     let lastErr: unknown = null;
+     for (const spec of t.specs) {
+@@ -62,13 +64,19 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
+     if (r.status === "fulfilled") okDirect[direct[i].name] = { label: sourceLabel(r.value.spec), jobs: r.value.jobs };
+   });
+ 
+-  const needAgg = todo.map((t) => t.name).filter((n) => !okDirect[n]);
++  const crawled = await crawledP;
++  // the career-page agent fills in companies that have no direct feed
++  const crawledJobs = crawled.jobs.filter((j) => !okDirect[j.company] && legacyNames.indexOf(j.company) === -1);
++  const crawledBy: Record<string, number> = {};
++  crawledJobs.forEach((j) => { crawledBy[j.company] = (crawledBy[j.company] || 0) + 1; });
++
++  const needAgg = todo.map((t) => t.name).filter((n) => !okDirect[n] && !crawledBy[n]);
+   const aggJobs = await fetchAggregated(needAgg, now).catch(() => [] as Alert[]);
+   const aggBy: Record<string, number> = {};
+   aggJobs.forEach((j) => { aggBy[j.company] = (aggBy[j.company] || 0) + 1; });
+ 
+   const directJobs = Object.keys(okDirect).reduce((acc, k) => acc.concat(okDirect[k].jobs), [] as Alert[]);
+-  const jobs = dedupe(legacyJobs.concat(directJobs, aggJobs))
++  const jobs = dedupe(legacyJobs.concat(directJobs, crawledJobs, aggJobs))
+     .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+ 
+   const agg = aggregatorEnabled();
+@@ -76,6 +84,7 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
+     const lg = legacy.find((l) => l.name === name);
+     if (lg) return { company: name, status: lg.ok ? "live" : "pending", source: "Official career feed", jobs: legacyJobs.filter((j) => j.company === name).length, careersUrl: careersUrlFor(name) } as CoverageRow;
+     if (okDirect[name]) return { company: name, status: "live", source: okDirect[name].label, jobs: okDirect[name].jobs.length, careersUrl: careersUrlFor(name) } as CoverageRow;
++    if (crawledBy[name]) return { company: name, status: "live", source: "Career-page agent", jobs: crawledBy[name], careersUrl: careersUrlFor(name) } as CoverageRow;
+     if (agg) return { company: name, status: "aggregated", source: "Job aggregator", jobs: aggBy[name] || 0, careersUrl: careersUrlFor(name) } as CoverageRow;
+     return { company: name, status: "pending", source: "Connecting", jobs: 0, careersUrl: careersUrlFor(name) } as CoverageRow;
+   });
+diff --git a/src/lib/hiring/types.ts b/src/lib/hiring/types.ts
+index 870ea11..d87154b 100644
+--- a/src/lib/hiring/types.ts
++++ b/src/lib/hiring/types.ts
+@@ -10,6 +10,8 @@ export type Alert = {
+   jobUrl: string;
+   /** true when the posting came from a job-data aggregator rather than the employer's own feed */
+   aggregated?: boolean;
++  /** true when found by the career-page agent scanning the employer's own careers page */
++  viaAgent?: boolean;
+ };
+ 
+ export type SourceSpec =
+-- 
+2.43.0
+

@@ -1,0 +1,173 @@
+Connected directly: 62 / 170
+  OK   Meta  ->  recruitee (guess)
+  OK   NVIDIA  ->  workday (seed)
+  OK   Salesforce  ->  workday (seed)
+  OK   Uber  ->  smartrecruiters (guess)
+  OK   Adobe  ->  workday (seed)
+  OK   Palantir  ->  lever (seed)
+  OK   Snowflake  ->  ashby (guess)
+  OK   Spotify  ->  lever (seed)
+  OK   ServiceNow  ->  smartrecruiters (guess)
+  OK   DoorDash  ->  greenhouse (seed)
+  OK   Jane Street  ->  greenhouse (guess)
+  OK   Hudson River Trading  ->  greenhouse (seed)
+  OK   Jump Trading  ->  greenhouse (guess)
+  OK   LinkedIn  ->  lever (guess)
+  OK   ByteDance / TikTok  ->  smartrecruiters (guess)
+  OK   Intel  ->  workday (seed)
+  OK   Broadcom  ->  workday (seed)
+  OK   CrowdStrike  ->  workday (seed)
+  OK   Zoom  ->  workday (seed)
+  OK   Box  ->  greenhouse (seed)
+  OK   Zscaler  ->  greenhouse (seed)
+  OK   Canva  ->  smartrecruiters (guess)
+  OK   Square / Block  ->  greenhouse (seed)
+  OK   Affirm  ->  greenhouse (seed)
+  OK   SoFi  ->  greenhouse (guess)
+  OK   Brex  ->  greenhouse (seed)
+  OK   Chime  ->  greenhouse (seed)
+  OK   Lyft  ->  greenhouse (seed)
+  OK   Grab  ->  smartrecruiters (guess)
+  OK   Deliveroo  ->  greenhouse (guess)
+  OK   Wayfair  ->  smartrecruiters (guess)
+  OK   eBay  ->  workday (seed)
+  OK   Tripadvisor  ->  greenhouse (guess)
+  OK   Waymo  ->  greenhouse (guess)
+  OK   Scale AI  ->  greenhouse (seed)
+  OK   Anthropic  ->  greenhouse (seed)
+  OK   TCS  ->  greenhouse (guess)
+  OK   DXC Technology  ->  workday (seed)
+  OK   PwC  ->  workday (seed)
+  OK   Thoughtworks  ->  greenhouse (seed)
+  OK   Mastercard  ->  workday (seed)
+  OK   Target  ->  workday (seed)
+  OK   HP  ->  workday (seed)
+  OK   Micron  ->  workday (seed)
+  OK   Bosch  ->  smartrecruiters (seed)
+  OK   Philips  ->  workday (seed)
+  OK   Wells Fargo  ->  workday (seed)
+  OK   Deutsche Bank  ->  workday (seed)
+  OK   Citi  ->  workday (seed)
+  OK   Fidelity Investments  ->  workday (seed)
+  OK   State Street  ->  workday (seed)
+  OK   Swiggy  ->  smartrecruiters (guess)
+  OK   Paytm  ->  lever (guess)
+  OK   Razorpay  ->  greenhouse (seed)
+  OK   CRED  ->  lever (seed)
+  OK   Meesho  ->  lever (seed)
+  OK   Freshworks  ->  smartrecruiters (guess)
+  OK   InMobi  ->  greenhouse (guess)
+  OK   Lenskart  ->  recruitee (guess)
+  OK   Groww  ->  greenhouse (guess)
+  OK   Slice  ->  greenhouse (guess)
+  OK   Atlan  ->  ashby (guess)
+
+No free direct feed found (will use the aggregator fallback): 108
+  --   Google
+  --   Microsoft
+  --   Apple
+  --   Netflix
+  --   Oracle
+  --   Atlassian
+  --   Cisco
+  --   Intuit
+  --   Goldman Sachs
+  --   Bloomberg
+  --   Shopify
+  --   Qualcomm
+  --   D.E. Shaw
+  --   Citadel
+  --   Optiver
+  --   Tower Research
+  --   Two Sigma
+  --   Morgan Stanley
+  --   J.P. Morgan Chase
+  --   Snapchat
+  --   AMD
+  --   IBM
+  --   VMware
+  --   Palo Alto Networks
+  --   HashiCorp
+  --   GitHub
+  --   Slack
+  --   Splunk
+  --   DocuSign
+  --   HubSpot
+  --   Zendesk
+  --   Monday.com
+  --   Checkout.com
+  --   Revolut
+  --   Klarna
+  --   GoTo
+  --   Etsy
+  --   Booking.com
+  --   Expedia
+  --   Cruise
+  --   Aurora
+  --   Tesla (Autopilot)
+  --   Rivian
+  --   Infosys
+  --   Wipro
+  --   Cognizant
+  --   Accenture
+  --   Capgemini
+  --   HCLTech
+  --   Tech Mahindra
+  --   LTIMindtree
+  --   Mphasis
+  --   Persistent Systems
+  --   Hexaware
+  --   Coforge
+  --   Birlasoft
+  --   Zensar
+  --   NTT Data
+  --   Virtusa
+  --   Sonata Software
+  --   KPIT
+  --   Genpact
+  --   Deloitte
+  --   EY
+  --   KPMG
+  --   Mu Sigma
+  --   Fractal Analytics
+  --   Tredence
+  --   IBM Research
+  --   Visa
+  --   American Express
+  --   Walmart Global Tech
+  --   Dell Technologies
+  --   Texas Instruments
+  --   SAP
+  --   Siemens
+  --   Samsung R&D
+  --   Honeywell
+  --   Thomson Reuters
+  --   Barclays
+  --   HSBC
+  --   Standard Chartered
+  --   BNY
+  --   Zoho
+  --   Flipkart
+  --   Zomato
+  --   PhonePe
+  --   Myntra
+  --   Ola
+  --   Dream11
+  --   MakeMyTrip
+  --   Nykaa
+  --   ShareChat
+  --   JioHotstar
+  --   Reliance Jio
+  --   Bharti Airtel
+  --   Delhivery
+  --   PhysicsWallah
+  --   Zerodha
+  --   Postman
+  --   BrowserStack
+  --   Juspay
+  --   Urban Company
+  --   Zepto
+  --   Rapido
+  --   BharatPe
+  --   Chargebee
+  --   Sprinklr
