@@ -244,19 +244,19 @@ export const Navbar = () => {
           <a href="#pricing" className="whitespace-nowrap hover:text-slate-950 transition-colors">
             Access & Pricing
           </a>
-        </nav>
+                  </nav>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3.5 shrink-0">
           <UserMenu />
-          <Link href="#tracks">
+          <Link href="/hiring-alerts">
             <Button variant="outline" size="md" className="hidden sm:inline-flex font-semibold border-slate-300 text-slate-800 text-sm shadow-sm hover:border-slate-900">
-              Launch Diagnostic
+              Hiring Alerts
             </Button>
           </Link>
-          <Link href="#tracks">
-            <Button variant="primary" size="md" className="font-semibold text-sm px-5 shadow-sm">
-              Enter Cockpit →
+          <Link href="/resume-score">
+            <Button variant="primary" size="md" className="font-semibold text-sm px-5 shadow-sm bg-indigo-600 hover:bg-indigo-500 text-white border-none">
+              Resume Score
             </Button>
           </Link>
         </div>
