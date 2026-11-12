@@ -13,6 +13,14 @@ type HiringAlert = {
   workplaceType: string | null;
   publishedAt: string;
   jobUrl: string;
+  aggregated?: boolean;
+};
+
+type CoverageRow = {
+  company: string;
+  status: "live" | "aggregated" | "pending";
+  source: string;
+  jobs: number;
 };
 
 type FeedResponse = {
@@ -21,7 +29,21 @@ type FeedResponse = {
   updatedAt: string;
   sourcesAvailable: number;
   sourcesChecked: number;
+  coverage?: CoverageRow[];
+  aggregatorEnabled?: boolean;
 };
+
+const SEEN_KEY = "dz_hiring_seen";
+
+function loadSeen(): string[] {
+  try {
+    const raw = window.localStorage.getItem(SEEN_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 function formatAge(date: string) {
   const days = Math.max(0, Math.floor((Date.now() - Date.parse(date)) / 86_400_000));
@@ -40,6 +62,8 @@ export function HiringAlertsFeed() {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedCompany, setSelectedCompany] = useState("All companies");
+  const [showCoverage, setShowCoverage] = useState(false);
+  const [seen, setSeen] = useState<string[] | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -56,6 +80,22 @@ export function HiringAlertsFeed() {
   }, []);
 
   useEffect(() => {
+    setSeen(loadSeen());
+  }, []);
+
+  // Remember what the visitor has already been shown, so the next visit can flag NEW openings.
+  useEffect(() => {
+    if (!data || seen === null) return;
+    const timer = window.setTimeout(() => {
+      try {
+        const ids = data.jobs.map((job) => job.id).concat(seen).slice(0, 3000);
+        window.localStorage.setItem(SEEN_KEY, JSON.stringify(Array.from(new Set(ids))));
+      } catch { /* storage unavailable */ }
+    }, 4000);
+    return () => window.clearTimeout(timer);
+  }, [data, seen]);
+
+  useEffect(() => {
     void refresh();
     const timer = window.setInterval(() => void refresh(), 5 * 60 * 1000);
     return () => window.clearInterval(timer);
@@ -63,8 +103,25 @@ export function HiringAlertsFeed() {
 
   const monitoredCompanies = useMemo(() => Array.from(new Set([
     ...(data?.companySources ?? []),
+    ...(data?.coverage?.map((row) => row.company) ?? []),
     ...(data?.jobs.map((job) => job.company) ?? []),
-  ])).sort(), [data?.companySources, data?.jobs]);
+  ])).sort(), [data?.companySources, data?.coverage, data?.jobs]);
+
+  const coverageSummary = useMemo(() => {
+    const rows = data?.coverage ?? [];
+    return {
+      total: rows.length,
+      live: rows.filter((row) => row.status === "live").length,
+      aggregated: rows.filter((row) => row.status === "aggregated").length,
+      pending: rows.filter((row) => row.status === "pending").length,
+    };
+  }, [data?.coverage]);
+
+  const statusOf = useMemo(() => {
+    const map: Record<string, CoverageRow> = {};
+    (data?.coverage ?? []).forEach((row) => { map[row.company] = row; });
+    return map;
+  }, [data?.coverage]);
 
   const visibleJobs = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -115,10 +172,12 @@ export function HiringAlertsFeed() {
             className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
           >
             <option>All companies</option>
-            <optgroup label="Official India feeds">
+            <optgroup label="All companies">
               {monitoredCompanies.map((company) => {
                 const count = data?.jobs.filter((job) => job.company === company).length ?? 0;
-                return <option key={company} value={company}>{company} · {count} live</option>;
+                const row = statusOf[company];
+                const tag = count > 0 ? `${count} open` : row?.status === "pending" ? "connecting" : "no India openings now";
+                return <option key={company} value={company}>{company} · {tag}</option>;
               })}
             </optgroup>
           </select>
@@ -129,6 +188,39 @@ export function HiringAlertsFeed() {
         <span>{loading && !data ? "Checking official career feeds…" : `${visibleJobs.length} India-based opening${visibleJobs.length === 1 ? "" : "s"}`}</span>
         {data?.updatedAt && <span>Feed checked {formatTime(data.updatedAt)} · refreshes every 5 minutes</span>}
       </div>
+
+      {coverageSummary.total > 0 && (
+        <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600 sm:px-5">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span>
+              <strong className="text-slate-900">{coverageSummary.live + coverageSummary.aggregated}</strong> of {coverageSummary.total} companies monitored
+              {" "}({coverageSummary.live} official feeds{coverageSummary.aggregated ? `, ${coverageSummary.aggregated} via job-data partners` : ""}
+              {coverageSummary.pending ? `, ${coverageSummary.pending} connecting` : ""})
+            </span>
+            <button type="button" onClick={() => setShowCoverage((v) => !v)} className="font-bold text-indigo-700 hover:underline">
+              {showCoverage ? "Hide coverage" : "See coverage"}
+            </button>
+          </div>
+          {showCoverage && (
+            <div className="mt-3 flex flex-wrap gap-1.5 border-t border-slate-100 pt-3">
+              {(data?.coverage ?? []).map((row) => (
+                <button
+                  key={row.company}
+                  type="button"
+                  onClick={() => setSelectedCompany(row.company)}
+                  title={`${row.source} - ${row.jobs} India opening${row.jobs === 1 ? "" : "s"}`}
+                  className={`rounded-full border px-2.5 py-1 font-semibold transition hover:border-indigo-400 ${
+                    row.status === "live" ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : row.status === "aggregated" ? "border-sky-200 bg-sky-50 text-sky-800"
+                    : "border-slate-200 bg-slate-50 text-slate-500"}`}
+                >
+                  {row.company}{row.jobs ? ` · ${row.jobs}` : ""}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {error && (
         <div role="status" className="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
@@ -151,10 +243,15 @@ export function HiringAlertsFeed() {
           <article key={job.id} className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-extrabold uppercase tracking-wider text-indigo-700">{job.company}</p>
+                <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-indigo-700">
+                  {job.company}
+                  {seen !== null && seen.length > 0 && seen.indexOf(job.id) === -1 && (
+                    <span className="rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-black text-amber-800">NEW</span>
+                  )}
+                </p>
                 <h2 className="mt-2 text-lg font-bold leading-snug text-slate-950">{job.title}</h2>
               </div>
-              <span title="Sourced from the employer’s official career board" className="mt-0.5 shrink-0 rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-emerald-700">
+              <span title={job.aggregated ? "Found via a licensed job-data partner" : "Sourced from the employer’s official career board"} className={`mt-0.5 shrink-0 rounded-lg border p-2 ${job.aggregated ? "border-sky-200 bg-sky-50 text-sky-700" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
                 <BadgeCheck className="h-4 w-4" />
               </span>
             </div>
@@ -171,7 +268,7 @@ export function HiringAlertsFeed() {
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
             >
-              View official job post <ExternalLink className="h-4 w-4" />
+              {job.aggregated ? "View job post" : "View official job post"} <ExternalLink className="h-4 w-4" />
             </a>
           </article>
         ))}

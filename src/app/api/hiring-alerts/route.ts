@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { collectAllCompanies } from "../../../lib/hiring";
 
 export const revalidate = 300;
+export const maxDuration = 60;
 
 const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const INDIA_LOCATION = /\b(india|bengaluru|bangalore|hyderabad|pune|mumbai|gurugram|gurgaon|new delhi|delhi|chennai|noida|kolkata)\b/i;
@@ -297,21 +299,34 @@ async function fetchWorkday(board: (typeof WORKDAY_BOARDS)[number], now: number)
 
 export async function GET() {
   const now = Date.now();
-  const results = await Promise.allSettled([
-    fetchAmazon(now),
-    ...ASHBY_BOARDS.map((board) => fetchAshby(board, now)),
-    ...GREENHOUSE_BOARDS.map((board) => fetchGreenhouse(board, now)),
-    ...WORKDAY_BOARDS.map((board) => fetchWorkday(board, now)),
-  ]);
-  const jobs = results.flatMap((result) => result.status === "fulfilled" ? result.value : []);
-  jobs.sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+  // Original hand-wired feeds (unchanged), now tracked per company so coverage can be reported.
+  const legacy: Array<{ name: string; run: Promise<Alert[]> }> = [
+    { name: "Amazon", run: fetchAmazon(now) },
+    ...ASHBY_BOARDS.map((board) => ({ name: board.name, run: fetchAshby(board, now) })),
+    ...GREENHOUSE_BOARDS.map((board) => ({ name: board.name, run: fetchGreenhouse(board, now) })),
+    ...WORKDAY_BOARDS.map((board) => ({ name: board.name, run: fetchWorkday(board, now) })),
+  ];
+  const results = await Promise.allSettled(legacy.map((item) => item.run));
+  const legacyJobs = results.flatMap((result) => result.status === "fulfilled" ? result.value : []);
+
+  // Every other company in the directory: registry feeds + aggregator fallback.
+  const extra = await collectAllCompanies(
+    now,
+    legacy.map((item, index) => ({ name: item.name, ok: results[index].status === "fulfilled" })),
+    legacyJobs,
+  ).catch(() => null);
+
+  const jobs = extra ? extra.jobs : legacyJobs.sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+  const coverage = extra ? extra.coverage : [];
 
   return NextResponse.json({
     jobs,
     companySources: COMPANY_SOURCES,
+    coverage,
+    aggregatorEnabled: extra ? extra.aggregatorEnabled : false,
     updatedAt: new Date(now).toISOString(),
-    sourcesAvailable: results.filter((result) => result.status === "fulfilled").length,
-    sourcesChecked: results.length,
+    sourcesAvailable: coverage.length ? coverage.filter((row) => row.status === "live").length : results.filter((result) => result.status === "fulfilled").length,
+    sourcesChecked: coverage.length || results.length,
   }, {
     headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60" },
   });

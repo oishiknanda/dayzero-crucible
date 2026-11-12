@@ -1,0 +1,568 @@
+{
+ "Salesforce": [
+  {
+   "kind": "workday",
+   "host": "salesforce.wd12.myworkdayjobs.com",
+   "tenant": "salesforce",
+   "site": "External_Career_Site"
+  }
+ ],
+ "Adobe": [
+  {
+   "kind": "workday",
+   "host": "adobe.wd5.myworkdayjobs.com",
+   "tenant": "adobe",
+   "site": "external_experienced"
+  }
+ ],
+ "NVIDIA": [
+  {
+   "kind": "workday",
+   "host": "nvidia.wd5.myworkdayjobs.com",
+   "tenant": "nvidia",
+   "site": "NVIDIAExternalCareerSite"
+  }
+ ],
+ "Intel": [
+  {
+   "kind": "workday",
+   "host": "intel.wd1.myworkdayjobs.com",
+   "tenant": "intel",
+   "site": "External"
+  }
+ ],
+ "Mastercard": [
+  {
+   "kind": "workday",
+   "host": "mastercard.wd1.myworkdayjobs.com",
+   "tenant": "mastercard",
+   "site": "CorporateCareers"
+  }
+ ],
+ "Wells Fargo": [
+  {
+   "kind": "workday",
+   "host": "wf.wd1.myworkdayjobs.com",
+   "tenant": "wf",
+   "site": "WellsFargoJobs"
+  }
+ ],
+ "Dell Technologies": [
+  {
+   "kind": "workday",
+   "host": "dell.wd1.myworkdayjobs.com",
+   "tenant": "dell",
+   "site": "External"
+  }
+ ],
+ "HP": [
+  {
+   "kind": "workday",
+   "host": "hp.wd5.myworkdayjobs.com",
+   "tenant": "hp",
+   "site": "ExternalCareerSite"
+  }
+ ],
+ "Walmart Global Tech": [
+  {
+   "kind": "workday",
+   "host": "walmart.wd5.myworkdayjobs.com",
+   "tenant": "walmart",
+   "site": "WalmartExternal"
+  }
+ ],
+ "Target": [
+  {
+   "kind": "workday",
+   "host": "target.wd5.myworkdayjobs.com",
+   "tenant": "target",
+   "site": "targetcareers"
+  }
+ ],
+ "Micron": [
+  {
+   "kind": "workday",
+   "host": "micron.wd1.myworkdayjobs.com",
+   "tenant": "micron",
+   "site": "External"
+  }
+ ],
+ "PwC": [
+  {
+   "kind": "workday",
+   "host": "pwc.wd3.myworkdayjobs.com",
+   "tenant": "pwc",
+   "site": "Global_Experienced_Careers"
+  }
+ ],
+ "Thomson Reuters": [
+  {
+   "kind": "workday",
+   "host": "tr.wd5.myworkdayjobs.com",
+   "tenant": "tr",
+   "site": "External_Career_Site"
+  }
+ ],
+ "Fidelity Investments": [
+  {
+   "kind": "workday",
+   "host": "fmr.wd1.myworkdayjobs.com",
+   "tenant": "fmr",
+   "site": "FidelityCareers"
+  }
+ ],
+ "State Street": [
+  {
+   "kind": "workday",
+   "host": "statestreet.wd1.myworkdayjobs.com",
+   "tenant": "statestreet",
+   "site": "Global"
+  }
+ ],
+ "Citi": [
+  {
+   "kind": "workday",
+   "host": "citi.wd5.myworkdayjobs.com",
+   "tenant": "citi",
+   "site": "2"
+  }
+ ],
+ "Deutsche Bank": [
+  {
+   "kind": "workday",
+   "host": "db.wd3.myworkdayjobs.com",
+   "tenant": "db",
+   "site": "DBWebsite"
+  }
+ ],
+ "Barclays": [
+  {
+   "kind": "workday",
+   "host": "barclays.wd3.myworkdayjobs.com",
+   "tenant": "barclays",
+   "site": "External_Career_Site"
+  }
+ ],
+ "Zoom": [
+  {
+   "kind": "workday",
+   "host": "zoom.wd5.myworkdayjobs.com",
+   "tenant": "zoom",
+   "site": "Zoom"
+  }
+ ],
+ "VMware": [
+  {
+   "kind": "workday",
+   "host": "vmware.wd1.myworkdayjobs.com",
+   "tenant": "vmware",
+   "site": "VMware"
+  }
+ ],
+ "CrowdStrike": [
+  {
+   "kind": "workday",
+   "host": "crowdstrike.wd5.myworkdayjobs.com",
+   "tenant": "crowdstrike",
+   "site": "crowdstrikecareers"
+  }
+ ],
+ "Intuit": [
+  {
+   "kind": "workday",
+   "host": "intuit.wd1.myworkdayjobs.com",
+   "tenant": "intuit",
+   "site": "IntuitCareers"
+  }
+ ],
+ "Qualcomm": [
+  {
+   "kind": "workday",
+   "host": "qualcomm.wd5.myworkdayjobs.com",
+   "tenant": "qualcomm",
+   "site": "External"
+  }
+ ],
+ "AMD": [
+  {
+   "kind": "workday",
+   "host": "amd.wd1.myworkdayjobs.com",
+   "tenant": "amd",
+   "site": "External"
+  }
+ ],
+ "Broadcom": [
+  {
+   "kind": "workday",
+   "host": "broadcom.wd1.myworkdayjobs.com",
+   "tenant": "broadcom",
+   "site": "External_Career"
+  }
+ ],
+ "Philips": [
+  {
+   "kind": "workday",
+   "host": "philips.wd3.myworkdayjobs.com",
+   "tenant": "philips",
+   "site": "jobs-and-careers"
+  }
+ ],
+ "DXC Technology": [
+  {
+   "kind": "workday",
+   "host": "dxctechnology.wd1.myworkdayjobs.com",
+   "tenant": "dxctechnology",
+   "site": "DXCJobs"
+  }
+ ],
+ "Snowflake": [
+  {
+   "kind": "workday",
+   "host": "snowflake.wd1.myworkdayjobs.com",
+   "tenant": "snowflake",
+   "site": "Snowflake"
+  }
+ ],
+ "eBay": [
+  {
+   "kind": "workday",
+   "host": "ebay.wd5.myworkdayjobs.com",
+   "tenant": "ebay",
+   "site": "apply"
+  }
+ ],
+ "Honeywell": [
+  {
+   "kind": "workday",
+   "host": "honeywell.wd5.myworkdayjobs.com",
+   "tenant": "honeywell",
+   "site": "Honeywell"
+  }
+ ],
+ "Rivian": [
+  {
+   "kind": "workday",
+   "host": "rivian.wd5.myworkdayjobs.com",
+   "tenant": "rivian",
+   "site": "careers"
+  }
+ ],
+ "Capgemini": [
+  {
+   "kind": "workday",
+   "host": "capgemini.wd3.myworkdayjobs.com",
+   "tenant": "capgemini",
+   "site": "Capgemini_Careers_India"
+  }
+ ],
+ "Genpact": [
+  {
+   "kind": "workday",
+   "host": "genpact.wd1.myworkdayjobs.com",
+   "tenant": "genpact",
+   "site": "genpact"
+  }
+ ],
+ "NTT Data": [
+  {
+   "kind": "workday",
+   "host": "nttdata.wd1.myworkdayjobs.com",
+   "tenant": "nttdata",
+   "site": "nttdata-careers"
+  }
+ ],
+ "Cognizant": [
+  {
+   "kind": "workday",
+   "host": "cognizant.wd1.myworkdayjobs.com",
+   "tenant": "cognizant",
+   "site": "Careers"
+  }
+ ],
+ "Postman": [
+  {
+   "kind": "greenhouse",
+   "slug": "postman"
+  }
+ ],
+ "Razorpay": [
+  {
+   "kind": "greenhouse",
+   "slug": "razorpaysoftwareprivatelimited"
+  }
+ ],
+ "Chargebee": [
+  {
+   "kind": "greenhouse",
+   "slug": "chargebee"
+  }
+ ],
+ "Zscaler": [
+  {
+   "kind": "greenhouse",
+   "slug": "zscaler"
+  }
+ ],
+ "Square / Block": [
+  {
+   "kind": "greenhouse",
+   "slug": "block"
+  }
+ ],
+ "Affirm": [
+  {
+   "kind": "greenhouse",
+   "slug": "affirm"
+  }
+ ],
+ "Brex": [
+  {
+   "kind": "greenhouse",
+   "slug": "brex"
+  }
+ ],
+ "Checkout.com": [
+  {
+   "kind": "greenhouse",
+   "slug": "checkoutcom"
+  }
+ ],
+ "Chime": [
+  {
+   "kind": "greenhouse",
+   "slug": "chime"
+  }
+ ],
+ "Lyft": [
+  {
+   "kind": "greenhouse",
+   "slug": "lyft"
+  }
+ ],
+ "Grab": [
+  {
+   "kind": "greenhouse",
+   "slug": "grab"
+  }
+ ],
+ "Wayfair": [
+  {
+   "kind": "greenhouse",
+   "slug": "wayfair"
+  }
+ ],
+ "Zendesk": [
+  {
+   "kind": "greenhouse",
+   "slug": "zendesk"
+  }
+ ],
+ "Box": [
+  {
+   "kind": "greenhouse",
+   "slug": "boxinc"
+  }
+ ],
+ "Scale AI": [
+  {
+   "kind": "greenhouse",
+   "slug": "scaleai"
+  }
+ ],
+ "Anthropic": [
+  {
+   "kind": "greenhouse",
+   "slug": "anthropic"
+  }
+ ],
+ "DoorDash": [
+  {
+   "kind": "greenhouse",
+   "slug": "doordashusa"
+  }
+ ],
+ "GitHub": [
+  {
+   "kind": "greenhouse",
+   "slug": "github"
+  }
+ ],
+ "Two Sigma": [
+  {
+   "kind": "greenhouse",
+   "slug": "twosigma"
+  }
+ ],
+ "Hudson River Trading": [
+  {
+   "kind": "greenhouse",
+   "slug": "wehrtyou"
+  }
+ ],
+ "Cruise": [
+  {
+   "kind": "greenhouse",
+   "slug": "cruise"
+  }
+ ],
+ "Sprinklr": [
+  {
+   "kind": "greenhouse",
+   "slug": "sprinklr"
+  }
+ ],
+ "BrowserStack": [
+  {
+   "kind": "greenhouse",
+   "slug": "browserstack"
+  }
+ ],
+ "Thoughtworks": [
+  {
+   "kind": "greenhouse",
+   "slug": "thoughtworks"
+  }
+ ],
+ "Etsy": [
+  {
+   "kind": "greenhouse",
+   "slug": "etsy"
+  }
+ ],
+ "Klarna": [
+  {
+   "kind": "greenhouse",
+   "slug": "klarna"
+  }
+ ],
+ "Optiver": [
+  {
+   "kind": "greenhouse",
+   "slug": "optiver"
+  }
+ ],
+ "Freshworks": [
+  {
+   "kind": "greenhouse",
+   "slug": "freshworks"
+  }
+ ],
+ "Atlan": [
+  {
+   "kind": "greenhouse",
+   "slug": "atlan"
+  }
+ ],
+ "Spotify": [
+  {
+   "kind": "lever",
+   "slug": "spotify"
+  }
+ ],
+ "Palantir": [
+  {
+   "kind": "lever",
+   "slug": "palantir"
+  }
+ ],
+ "Meesho": [
+  {
+   "kind": "lever",
+   "slug": "meesho"
+  }
+ ],
+ "CRED": [
+  {
+   "kind": "lever",
+   "slug": "cred"
+  }
+ ],
+ "Groww": [
+  {
+   "kind": "lever",
+   "slug": "groww"
+  }
+ ],
+ "PhonePe": [
+  {
+   "kind": "lever",
+   "slug": "phonepe"
+  }
+ ],
+ "Zepto": [
+  {
+   "kind": "lever",
+   "slug": "zepto"
+  }
+ ],
+ "Juspay": [
+  {
+   "kind": "lever",
+   "slug": "juspay"
+  }
+ ],
+ "Rapido": [
+  {
+   "kind": "lever",
+   "slug": "rapido"
+  }
+ ],
+ "Slice": [
+  {
+   "kind": "lever",
+   "slug": "sliceit"
+  }
+ ],
+ "Canva": [
+  {
+   "kind": "lever",
+   "slug": "canva"
+  }
+ ],
+ "Urban Company": [
+  {
+   "kind": "lever",
+   "slug": "urbancompany"
+  }
+ ],
+ "BharatPe": [
+  {
+   "kind": "lever",
+   "slug": "bharatpe"
+  }
+ ],
+ "Mu Sigma": [
+  {
+   "kind": "lever",
+   "slug": "mu-sigma"
+  }
+ ],
+ "Tredence": [
+  {
+   "kind": "lever",
+   "slug": "tredence"
+  }
+ ],
+ "Visa": [
+  {
+   "kind": "smartrecruiters",
+   "slug": "Visa"
+  }
+ ],
+ "Bosch": [
+  {
+   "kind": "smartrecruiters",
+   "slug": "BoschGroup"
+  }
+ ],
+ "Microsoft": [
+  {
+   "kind": "microsoft"
+  }
+ ],
+ "Google": [
+  {
+   "kind": "google"
+  }
+ ]
+}
