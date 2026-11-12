@@ -41,6 +41,14 @@ jobs:
       - name: Crawl
         run: node scripts/crawl-careers.mjs --prev prev.json --out out/crawled-jobs.json
 
+      - name: Save screenshots of pages that returned nothing
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crawl-screenshots
+          path: out/shots
+          if-no-files-found: ignore
+
       - name: Publish to crawl-data branch
         run: |
           mkdir pub && cp out/crawled-jobs.json pub/
