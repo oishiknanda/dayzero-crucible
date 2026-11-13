@@ -10,7 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { INDIA, TECH, jobsFromJson, jobsFromJsonLd, jobsFromLinks, keepJob } from "./career-extract.mjs";
+import { INDIA, TECH, jobsFromJson, jobsFromJsonLd, jobsFromLinks, keepJob, shapeOf } from "./career-extract.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > -1 ? process.argv[i + 1] : dflt; };
@@ -34,6 +34,7 @@ const now = Date.now();
 const MAX_AGE = 30 * 86400000;
 const companies = {};
 const jobs = [];
+const discovery = {}; // what each page loads, so per-company readers can be written from real data
 
 for (const [company, url] of Object.entries(pages)) {
   if (only.length && !only.includes(company)) continue;
@@ -44,7 +45,10 @@ for (const [company, url] of Object.entries(pages)) {
       if (!(res.headers()["content-type"] || "").includes("json")) return;
       const body = await res.text();
       if (body.length > 3_000_000) return;
-      payloads.push({ json: JSON.parse(body), base: res.url() });
+      const json = JSON.parse(body);
+      payloads.push({ json, base: res.url() });
+      const shape = shapeOf(json);
+      if (shape) (discovery[company] = discovery[company] || []).push({ url: res.url().slice(0, 300), method: res.request().method(), post: (res.request().postData() || "").slice(0, 300), bytes: body.length, list: shape });
     } catch { /* not json / already closed */ }
   });
   let method = "none";
@@ -85,7 +89,7 @@ for (const [company, url] of Object.entries(pages)) {
   }
 
   const seen = new Set();
-  const kept = found.filter((j) => keepJob(j, url) && !seen.has(j.url) && seen.add(j.url)).slice(0, 60);
+  const kept = found.filter((j) => keepJob(j) && !seen.has(j.url) && seen.add(j.url)).slice(0, 60);
   let count = 0;
   for (const j of kept) {
     const id = "cr-" + crypto.createHash("sha1").update(j.url).digest("hex").slice(0, 12);
@@ -108,5 +112,7 @@ for (const [company, url] of Object.entries(pages)) {
 
 await browser.close();
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
+for (const c of Object.keys(discovery)) discovery[c] = discovery[c].sort((a, b) => b.list.len - a.list.len).slice(0, 8);
+fs.writeFileSync(path.join(path.dirname(outPath), "discovery.json"), JSON.stringify({ generatedAt: new Date(now).toISOString(), discovery }, null, 1));
 fs.writeFileSync(outPath, JSON.stringify({ generatedAt: new Date(now).toISOString(), companies, jobs }, null, 1));
 console.log(`\nWrote ${jobs.length} jobs for ${Object.values(companies).filter((c) => c.ok).length}/${Object.keys(companies).length} companies -> ${outPath}`);

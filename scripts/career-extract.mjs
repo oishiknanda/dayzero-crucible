@@ -123,9 +123,35 @@ export function jobsFromLinks(links, base) {
   return out;
 }
 
-/** Keep technical roles in India; when a job has no location, trust a page that was searched for India. */
-export function keepJob(j, pageUrl) {
-  if (!TECH.test(j.title)) return false;
-  if (j.location) return INDIA.test(j.location);
-  return /india|en-in|in-en|\blc=in/i.test(pageUrl);
+/**
+ * Keep technical roles that say they are in India. A job with no location is dropped: menu links and
+ * product pages ("iCloud+", "IBM Cloud platform") also have titles and URLs, and only a real
+ * location tells a job apart from them.
+ */
+export function keepJob(j) {
+  return TECH.test(j.title) && !!j.location && INDIA.test(j.location);
+}
+
+/** What a JSON response looks like: its biggest list of objects, the keys, and one trimmed sample. */
+export function shapeOf(json) {
+  let best = null;
+  (function walk(node, p, depth) {
+    if (depth > 9 || node == null || typeof node !== "object") return;
+    if (Array.isArray(node)) {
+      const objs = node.filter(isObj);
+      if (objs.length >= 2 && (!best || objs.length > best.len)) {
+        const first = objs[0];
+        const sample = {};
+        for (const k of Object.keys(first).slice(0, 25)) {
+          const v = first[k];
+          sample[k] = typeof v === "string" ? v.slice(0, 70) : typeof v === "object" ? JSON.stringify(v).slice(0, 90) : v;
+        }
+        best = { path: p, len: objs.length, sample };
+      }
+      node.slice(0, 3).forEach((v, i) => walk(v, p + "[" + i + "]", depth + 1));
+      return;
+    }
+    for (const k of Object.keys(node)) walk(node[k], p ? p + "." + k : k, depth + 1);
+  })(json, "", 0);
+  return best;
 }
