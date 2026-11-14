@@ -1,0 +1,154 @@
+{
+ "generatedAt": "2026-11-14T13:28:38.120Z",
+ "companies": {
+  "Google": {
+   "ok": false,
+   "count": 0,
+   "method": "links"
+  },
+  "Microsoft": {
+   "ok": false,
+   "count": 0,
+   "method": "network-json"
+  },
+  "Apple": {
+   "ok": false,
+   "count": 0,
+   "method": "network-json"
+  },
+  "Netflix": {
+   "ok": false,
+   "count": 0,
+   "method": "network-json"
+  },
+  "Oracle": {
+   "ok": false,
+   "count": 0,
+   "method": "links"
+  },
+  "Cisco": {
+   "ok": false,
+   "count": 0,
+   "method": "network-json"
+  },
+  "IBM": {
+   "ok": false,
+   "count": 0,
+   "method": "network-json"
+  },
+  "TCS": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Infosys": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Wipro": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Cognizant": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Accenture": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Capgemini": {
+   "ok": false,
+   "count": 0,
+   "method": "links"
+  },
+  "HCLTech": {
+   "ok": false,
+   "count": 0,
+   "method": "none",
+   "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.hcltech.com/careers"
+  },
+  "Tech Mahindra": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "LTIMindtree": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Deloitte": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "PwC": {
+   "ok": false,
+   "count": 0,
+   "method": "links"
+  },
+  "EY": {
+   "ok": false,
+   "count": 0,
+   "method": "links"
+  },
+  "KPMG": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Goldman Sachs": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "J.P. Morgan Chase": {
+   "ok": false,
+   "count": 0,
+   "method": "network-json"
+  },
+  "Morgan Stanley": {
+   "ok": false,
+   "count": 0,
+   "method": "none",
+   "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.morganstanley.com/people-opportunities"
+  },
+  "Flipkart": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Zomato": {
+   "ok": false,
+   "count": 0,
+   "method": "none",
+   "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://www.zomato.com/careers"
+  },
+  "Zoho": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Meta": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Uber": {
+   "ok": false,
+   "count": 0,
+   "method": "none"
+  },
+  "Atlassian": {
+   "ok": false,
+   "count": 0,
+   "method": "links"
+  }
+ },
+ "jobs": []
+}

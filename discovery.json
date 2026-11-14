@@ -1,0 +1,1410 @@
+{
+ "generatedAt": "2026-11-14T13:28:38.120Z",
+ "discovery": {
+  "Microsoft": [
+   {
+    "url": "https://apply.careers.microsoft.com/api/pcsx/search?domain=microsoft.com&query=&location=&start=0&",
+    "method": "GET",
+    "post": "",
+    "bytes": 21741,
+    "list": {
+     "path": "data.filterDef.allFilters[2].options",
+     "len": 50,
+     "sample": {
+      "label": "PROBLEM SOLVING",
+      "value": "Problem Solving"
+     }
+    }
+   },
+   {
+    "url": "https://apply.careers.microsoft.com/api/pcsx/similar_positions?domain=microsoft.com&position_id=1970393557070807",
+    "method": "GET",
+    "post": "",
+    "bytes": 5163,
+    "list": {
+     "path": "data.positions",
+     "len": 10,
+     "sample": {
+      "id": 1970393557014477,
+      "displayJobId": "200058423",
+      "name": "Customer Success Account Manager (CSAM)",
+      "locations": "[\"Australia, Victoria, Melbourne\",\"Australia, New South Wales, Sydney\",\"Australia, Queensl",
+      "standardizedLocations": "[\"Melbourne, VIC, AU\",\"Sydney, NSW, AU\",\"Brisbane, QLD, AU\"]",
+      "postedTs": 1792414800,
+      "solrScore": "null",
+      "stars": 0,
+      "department": "Customer Success Account Mgmt",
+      "creationTs": 1790560103,
+      "isHot": 0,
+      "workLocationOption": "onsite",
+      "locationFlexibility": "null",
+      "atsJobId": "200058423",
+      "positionUrl": "/careers/job/1970393557014477"
+     }
+    }
+   },
+   {
+    "url": "https://apply.careers.microsoft.com/api/pcsx/position_details?position_id=1970393557070807&domain=microsoft.com&hl=en",
+    "method": "GET",
+    "post": "",
+    "bytes": 14321,
+    "list": {
+     "path": "data.positionExtraDetails.perks",
+     "len": 4,
+     "sample": {
+      "title": "Flexibility",
+      "description": "Balance what matters—your work, your life, and your team—through trust",
+      "image": "https://static.vscdn.net/images/careers/demo/microsoft/1761075555::fle",
+      "imageAlt": "null",
+      "icon": "null",
+      "isFavicon": "null"
+     }
+    }
+   }
+  ],
+  "Apple": [
+   {
+    "url": "https://www.apple.com/api-www/global-elements/global-header/v1/flyouts?locale=en_IN",
+    "method": "GET",
+    "post": "",
+    "bytes": 36251,
+    "list": {
+     "path": "",
+     "len": 11,
+     "sample": {
+      "name": "apple",
+      "analyticsAttributes": "[{\"name\":\"data-analytics-title\",\"value\":\"apple home\"}]",
+      "id": "3d39a8ff"
+     }
+    }
+   }
+  ],
+  "Netflix": [
+   {
+    "url": "https://explore.jobs.netflix.net/api/apply/v2/jobs/790298014263/jobs?domain=netflix.com",
+    "method": "GET",
+    "post": "",
+    "bytes": 7577,
+    "list": {
+     "path": "positions",
+     "len": 10,
+     "sample": {
+      "id": 790316811164,
+      "name": "Staff/ Principal Software Engineer (L6/L7): AI Platform Model Serving",
+      "posting_name": "Staff/ Principal Software Engineer (L6/L7): AI Platform Model Serving",
+      "location": "Remote, United States",
+      "locations": "[\"Remote, United States\"]",
+      "hot": 0,
+      "department": "Data & Insights",
+      "business_unit": "Streaming",
+      "t_update": 1793059200,
+      "t_create": 1793059200,
+      "ats_job_id": "JR41408",
+      "display_job_id": "JR41408",
+      "type": "ATS",
+      "id_locale": "JR41408-en-US",
+      "job_description": "",
+      "locale": "en-US",
+      "stars": 0,
+      "medallionProgram": "null",
+      "location_flexibility": "null",
+      "work_location_option": "onsite",
+      "canonicalPositionUrl": "https://explore.jobs.netflix.net/careers/job/790316811164",
+      "isPrivate": false
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/0192709e-c1c0-7346-a007-a921a0b713d4/0192709e-c1c0-7346-a007-a921a0b713d4.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 7489,
+    "list": {
+     "path": "RuleSet",
+     "len": 6,
+     "sample": {
+      "Id": "0198cd00-a6e4-7c67-8d03-9aade265c22b",
+      "Name": "US State Cookie banner",
+      "Countries": "[]",
+      "States": "{\"us\":[\"il\",\"pa\"]}",
+      "LanguageSwitcherPlaceholder": "{\"hi\":\"hi\",\"default\":\"en\",\"ru\":\"ru\",\"ko\":\"ko\",\"pt-br\":\"pt-br\",\"ms\":\"ms\",\"ja\":\"ja\",\"es-mx\":",
+      "BannerPushesDown": false,
+      "Default": false,
+      "Global": false,
+      "Type": "GDPR",
+      "UseGoogleVendors": false,
+      "VariantEnabled": false,
+      "TestEndTime": "null",
+      "Variants": "[]",
+      "TemplateName": "Jobs/candidate/research/Eightfold (Wiretap)",
+      "Conditions": "[]",
+      "GCEnable": false,
+      "IsGPPEnabled": false,
+      "EnableJWTAuthForKnownUsers": false
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/0192709e-c1c0-7346-a007-a921a0b713d4/0198cd00-9eda-7d95-9ee4-d63dc4a948ce/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 46787,
+    "list": {
+     "path": "DomainData.Groups",
+     "len": 5,
+     "sample": {
+      "ShowInPopup": true,
+      "ShowInPopupNonIAB": true,
+      "ShowSDKListLink": true,
+      "Order": "1",
+      "OptanonGroupId": "C0001",
+      "Parent": "",
+      "ShowSubgroup": true,
+      "ShowSubGroupDescription": true,
+      "ShowSubgroupToggle": false,
+      "AlwaysShowCategory": false,
+      "GroupDescription": "These cookies are strictly necessary to provide our website. For examp",
+      "GroupDescriptionOTT": "These cookies are strictly necessary to provide our website. For examp",
+      "GroupNameMobile": "Essential Cookies",
+      "GroupNameOTT": "Essential Cookies",
+      "GroupName": "Essential Cookies",
+      "IsIabPurpose": false,
+      "GeneralVendorsIds": "[]",
+      "FirstPartyCookies": "[{\"id\":\"019270a3-c82b-7eb1-8c94-ccb05e33a241\",\"Name\":\"_vs\",\"Host\":\"explore.jobs.netflix.ne",
+      "Hosts": "[{\"HostName\":\"jobs.netflix.com\",\"DisplayName\":\"jobs.netflix.com\",\"HostId\":\"H52\",\"Descripti",
+      "PurposeId": "CDD55579-D46C-4AB2-9C4C-A1463DD02C41",
+      "CustomGroupId": "C0001",
+      "GroupId": "bdc0233b-168a-4dc4-a19e-6aea0ed59b05",
+      "Status": "always active",
+      "IsDntEnabled": false,
+      "Type": "COOKIE"
+     }
+    }
+   },
+   {
+    "url": "https://explore.jobs.netflix.net/api/apply/v2/jobs/790298014263?domain=netflix.com",
+    "method": "GET",
+    "post": "",
+    "bytes": 9410,
+    "list": {
+     "path": "custom_JD.display",
+     "len": 5,
+     "sample": {
+      "label": "Job Posting Date",
+      "value": "posting_date"
+     }
+    }
+   },
+   {
+    "url": "https://explore.jobs.netflix.net/api/apply/v2/branding?pid=790298014263&domain=netflix.com&hl=en",
+    "method": "GET",
+    "post": "",
+    "bytes": 11114,
+    "list": {
+     "path": "customNavbarItems",
+     "len": 4,
+     "sample": {
+      "hasSubItems": false,
+      "label": "CAREERS",
+      "openInNewTab": true,
+      "path": "https://jobs.netflix.com/"
+     }
+    }
+   }
+  ],
+  "Oracle": [
+   {
+    "url": "https://eeho.fa.us2.oraclecloud.com/hcmRestApi/CandidateExperience/globalSettings",
+    "method": "GET",
+    "post": "",
+    "bytes": 10087,
+    "list": {
+     "path": "settings",
+     "len": 66,
+     "sample": {
+      "settingValue": "ORA_IRC_BLOCK_NONE",
+      "settingKey": "ORA_IRC_EX_EMP_ADDRESS_UPDATE_BLOCK"
+     }
+    }
+   },
+   {
+    "url": "https://eeho.fa.us2.oraclecloud.com/hcmRestApi/CandidateExperience/en/sites/CX_45001/page/125001?statusCode=ORA_ACTIVE&onlyData=true",
+    "method": "GET",
+    "post": "",
+    "bytes": 38647,
+    "list": {
+     "path": "sections[1].rows[0].columns[0].components[0].componentParams",
+     "len": 43,
+     "sample": {
+      "paramValue": "{\"color\":\"rgb(0, 104, 140)\",\"fontFamily\":\"\",\"fontSize\":\"\",\"fontStyle\":",
+      "paramKey": "clearFiltersTypography"
+     }
+    }
+   },
+   {
+    "url": "https://idcs-oda-39a950328f304af59ad5f425d86984a2-da3.data.digitalassistant.oci.oraclecloud.com/tts/voices?channelId=38eba1f7-1cd8-4692-8e25-391f95d409a4&userId=user-1794662952902-76888",
+    "method": "GET",
+    "post": "",
+    "bytes": 3601,
+    "list": {
+     "path": "voices",
+     "len": 39,
+     "sample": {
+      "name": "Georg",
+      "freq": 22050,
+      "culture": "de-DE",
+      "gender": "male",
+      "age": "adult",
+      "default": 0
+     }
+    }
+   },
+   {
+    "url": "https://eeho.fa.us2.oraclecloud.com/hcmRestApi/CandidateExperience/en/siteSettings/CX_45001",
+    "method": "GET",
+    "post": "",
+    "bytes": 6159,
+    "list": {
+     "path": "app.settings",
+     "len": 18,
+     "sample": {
+      "settingValue": "ORA_CAREER_COACH",
+      "settingKey": "CAREER_COACH_AGENT_CODE"
+     }
+    }
+   },
+   {
+    "url": "https://eeho.fa.us2.oraclecloud.com/hcmRestApi/resources/latest/recruitingCEEvents?onlyData=true&finder=findEvents;siteNumber=CX_45001,limit=14,facetsList=START_DATES%3BLOCATIONS%3BEVENT_CATEGORIES%3BEVENT_FORMATS,sortBy=EVENT_DATE_DESC",
+    "method": "GET",
+    "post": "",
+    "bytes": 13129,
+    "list": {
+     "path": "items[0].locationsFacet",
+     "len": 18,
+     "sample": {
+      "Id": 300000000106800,
+      "Name": "Czech Republic",
+      "TotalCount": 4
+     }
+    }
+   },
+   {
+    "url": "https://eeho.fa.us2.oraclecloud.com/hcmRestApi/resources/latest/recruitingCEJobRequisitions?onlyData=true&expand=requisitionList.workLocation,requisitionList.otherWorkLocations,requisitionList.secondaryLocations,flexFieldsFacet.values,requisitionList.requisitionFlexFields&finder=findReqs;siteNumber=",
+    "method": "GET",
+    "post": "",
+    "bytes": 41185,
+    "list": {
+     "path": "items[0].locationsFacet",
+     "len": 18,
+     "sample": {
+      "Id": 300000000106947,
+      "Name": "India",
+      "TotalCount": 342
+     }
+    }
+   },
+   {
+    "url": "https://eeho.fa.us2.oraclecloud.com/hcmRestApi/resources/latest/recruitingCEUserSettings/f631843f-0e00-4f27-b4d7-bbf090a3b97a",
+    "method": "GET",
+    "post": "",
+    "bytes": 630,
+    "list": {
+     "path": "links",
+     "len": 2,
+     "sample": {
+      "rel": "self",
+      "href": "https://eeho.fa.us2.oraclecloud.com:443/hcmRestApi/resources/11.13.18.",
+      "name": "recruitingCEUserSettings",
+      "kind": "item"
+     }
+    }
+   }
+  ],
+  "Cisco": [
+   {
+    "url": "https://careers.cisco.com/widgets",
+    "method": "POST",
+    "post": "{\"field\":\"category\",\"sub_field\":\"internalCategoryId\",\"ddoKey\":\"categories\",\"lang\":\"en_global\",\"deviceType\":\"desktop\",\"country\":\"global\",\"pageName\":\"home\",\"refNum\":\"CISCISGLOBAL\",\"siteType\":\"external\",\"pageId\":\"page12\"}",
+    "bytes": 2735,
+    "list": {
+     "path": "categories.data.category",
+     "len": 14,
+     "sample": {
+      "internalId": "CISCISGLOBAL_Product_and_Engineering",
+      "total_count": 740,
+      "new_count": 0,
+      "display_name": "Product-and-Engineering",
+      "category": "Product and Engineering",
+      "key": "Product and Engineering"
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/23bf898e-0ec5-40f7-9f8e-1d55fadea7c9/019f8e56-ebcc-7d3b-8bd4-47bffe6863cb/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 82533,
+    "list": {
+     "path": "DomainData.Groups[1].FirstPartyCookies",
+     "len": 14,
+     "sample": {
+      "id": "c070e747-270e-4b57-9bd3-8501ad41608a",
+      "Name": "RT",
+      "Host": "www.cisco.com",
+      "IsSession": false,
+      "Length": "6",
+      "description": "The roundtrip (RT) Boomerang \ncookie is used by Akamai to measure page",
+      "thirdPartyDescription": "null",
+      "patternKey": "null",
+      "thirdPartyKey": "",
+      "firstPartyKey": "CookieRT",
+      "DurationType": 1,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   },
+   {
+    "url": "https://careers.cisco.com/widgets",
+    "method": "POST",
+    "post": "{\"eagerLoadParamsFromUI\":{},\"lang\":\"en_global\",\"deviceType\":\"desktop\",\"country\":\"global\",\"pageName\":\"home\",\"refNum\":\"CISCISGLOBAL\",\"siteType\":\"external\",\"pageId\":\"page12\",\"ddoKey\":\"canvasPxPageWidgetConfig\"}",
+    "bytes": 7852,
+    "list": {
+     "path": "canvasPxPageWidgetConfig.data.pageLevelWidget.stranger.widgetList",
+     "len": 11,
+     "sample": {
+      "widgetId": "vP2Utb",
+      "widgetName": "Phw-Apw-Default-Default-V1",
+      "displayName": "Px container",
+      "px-block": "block-2",
+      "ignoreSlider": true,
+      "widgetConfigMode": "type3",
+      "ignoreWidgetTitle": true,
+      "enabled": true
+     }
+    }
+   },
+   {
+    "url": "https://content-ir.phenompeople.com/api/CISCISGLOBAL/categoryMasterDataV2?locale=en_global&siteType=external&deviceType=desktop&payload=%7B%22ddoKey%22%3A%22categoryMasterDataV2%22%7D",
+    "method": "GET",
+    "post": "",
+    "bytes": 3466,
+    "list": {
+     "path": "categoryMasterDataV2.data.categories",
+     "len": 11,
+     "sample": {
+      "categoryInternalId": "CISCISGLOBAL_Human_Resources",
+      "category": "Human Resources",
+      "display_name": "Human Resources",
+      "url": "c/human-resources-jobs",
+      "normalizedCategoryId": "human-resources",
+      "internalId": "CISCISGLOBAL_Human_Resources",
+      "key": "Human Resources",
+      "device": "desktop"
+     }
+    }
+   },
+   {
+    "url": "https://careers.cisco.com/widgets",
+    "method": "POST",
+    "post": "{\"data\":{\"x1dmAw\":\"zk5Thu\",\"hf-header-with-search-icon\":\"RbI51S\",\"hf-header-with-search-icon$$z4HDz3vS\":\"gbobHe\",\"hf-header-with-search-icon$$svglobde\":\"88wGuc\",\"hf-header-with-search-icon$$Ahl5Fa2\":\"hl5Fa2\",\"hf-header-with-search-icon$$Aq1abxJ\":\"q1abxJ\",\"hf-header-with-search-icon$$4HDz3vS\":\"fmAme4",
+    "bytes": 103526,
+    "list": {
+     "path": "canvasGetWidgetContent.data.contentData.hf-mock-footer$$gtwyhs.contentMap.menuBlock",
+     "len": 7,
+     "sample": {
+      "_cid": "VLsYKiPr-g75RRvGG",
+      "link": "{\"linkType\":\"innerpage\",\"href\":\"https://careers.cisco.com/global/en/help-page\",\"text\":\"Hel",
+      "position": 1,
+      "title": "Help"
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/23bf898e-0ec5-40f7-9f8e-1d55fadea7c9/23bf898e-0ec5-40f7-9f8e-1d55fadea7c9.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 9159,
+    "list": {
+     "path": "RuleSet",
+     "len": 7,
+     "sample": {
+      "Id": "019f8e57-018c-7006-b61f-61917c44488a",
+      "Name": "IND Only",
+      "Countries": "[\"in\"]",
+      "States": "{}",
+      "LanguageSwitcherPlaceholder": "{\"no\":\"no\",\"de\":\"de\",\"ru\":\"ru\",\"pt\":\"pt\",\"ar-ae\":\"ar-ae\",\"fr\":\"fr\",\"hu\":\"hu\",\"zh-cn\":\"zh-c",
+      "BannerPushesDown": false,
+      "Default": false,
+      "Global": false,
+      "Type": "GDPR",
+      "UseGoogleVendors": false,
+      "VariantEnabled": false,
+      "TestEndTime": "null",
+      "Variants": "[]",
+      "TemplateName": "cisco.com (EU) (CL){CBS}",
+      "Conditions": "[]",
+      "GCEnable": false,
+      "IsGPPEnabled": false,
+      "EnableJWTAuthForKnownUsers": false
+     }
+    }
+   },
+   {
+    "url": "https://careers.cisco.com/widgets",
+    "method": "POST",
+    "post": "{\"isEagerLoad\":true,\"lang\":\"en_global\",\"deviceType\":\"desktop\",\"country\":\"global\",\"pageName\":\"home\",\"refNum\":\"CISCISGLOBAL\",\"siteType\":\"external\",\"pageId\":\"page12\",\"ddoKey\":\"canvasAudiencePxWidgetConfig\"}",
+    "bytes": 4722,
+    "list": {
+     "path": "canvasAudiencePxWidgetConfig.data.visitor",
+     "len": 6,
+     "sample": {
+      "widgetName": "phw-profile-recommendations",
+      "contentName": "profileRecomJobs"
+     }
+    }
+   },
+   {
+    "url": "https://content-ir.phenompeople.com/api/CISCISGLOBAL/fyfConfig?locale=en_global&siteType=external&deviceType=desktop&payload=%7B%22ddoKey%22%3A%22fyfConfig%22%7D",
+    "method": "GET",
+    "post": "",
+    "bytes": 871,
+    "list": {
+     "path": "fyfConfig.data.steps",
+     "len": 5,
+     "sample": {
+      "orderType": "default",
+      "stepType": "categories",
+      "displayName": "categories",
+      "order": "0"
+     }
+    }
+   }
+  ],
+  "IBM": [
+   {
+    "url": "https://cm-api-v4.contact-module.ibm.com/api/v4/client-info/lookup",
+    "method": "POST",
+    "post": "{\"contactInformationBundleKey\":{\"languageCode\":\"en\",\"regionCode\":\"US\",\"focusArea\":\"Miscellaneous - Careers\"},\"textTranslationBundleKey\":{\"languageCode\":\"en\",\"regionCode\":\"IN\",\"focusArea\":\"Miscellaneous - Careers\",\"variation\":\"Miscellaneous - Careers\"},\"regionsAndLanguagesForLocale\":{\"languageCode\":\"",
+    "bytes": 110280,
+    "list": {
+     "path": "regionsAndLanguages.data",
+     "len": 380,
+     "sample": {
+      "isSelectable": false,
+      "languageCode": "en",
+      "languageNameDefault": "English",
+      "languageNameTranslation": "English",
+      "regionCode": "AD",
+      "regionNameDefault": "Andorra",
+      "regionNameTranslation": "Andorra"
+     }
+    }
+   },
+   {
+    "url": "https://www-api.ibm.com/search/api/v2",
+    "method": "POST",
+    "post": "{\"appId\":\"careers\",\"scopes\":[\"careers2\"],\"query\":{\"bool\":{\"must\":[]}},\"aggs\":{\"field_keyword_172\":{\"filter\":{\"match_all\":{}},\"aggs\":{\"field_keyword_17\":{\"terms\":{\"field\":\"field_keyword_17\",\"size\":6}},\"field_keyword_17_count\":{\"cardinality\":{\"field\":\"field_keyword_17\"}}}},\"field_keyword_083\":{\"filter",
+    "bytes": 23549,
+    "list": {
+     "path": "aggregations.field_keyword_055.field_keyword_05.buckets",
+     "len": 44,
+     "sample": {
+      "key": "India",
+      "doc_count": 2518
+     }
+    }
+   },
+   {
+    "url": "https://1.www.s81c.com/common/js/dynamicnav/www/countrylist/jsononly/usen-utf8.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 14884,
+    "list": {
+     "path": "regionList[2].countryList",
+     "len": 36,
+     "sample": {
+      "name": "Austria (Österreich)",
+      "locale": "[[\"de-at\",\"German (Deutsch)\"]]"
+     }
+    }
+   },
+   {
+    "url": "https://assets.ibm.com/is/image/ibm/search_leadspace?req=set,json",
+    "method": "GET",
+    "post": "",
+    "bytes": 1572,
+    "list": {
+     "path": "items",
+     "len": 9,
+     "sample": {
+      "name": "16x9",
+      "aspectRatio": "{\"width\":16,\"height\":9}",
+      "cropType": "image",
+      "defaultDimensions": "{\"width\":3200,\"height\":1800}",
+      "dimensions": "{\"width\":3200,\"height\":1800}"
+     }
+    }
+   },
+   {
+    "url": "https://www.ibm.com/services/tco/navigation/submenu?pagePath=%2Fcontent%2Fadobe-cms%2Fin%2Fen%2Fcareers%2Fsearch",
+    "method": "GET",
+    "post": "",
+    "bytes": 1643,
+    "list": {
+     "path": "categories[0].submenus[0].linkItems",
+     "len": 8,
+     "sample": {
+      "title": "Overview",
+      "description": "Resolve product issues with self-service tools",
+      "link": "https://www.ibm.com/mysupport/s/?language=en_US&lnk=L0G"
+     }
+    }
+   },
+   {
+    "url": "https://edgedc.ibm.com/ee/va6/v1/interact?configId=fbb11371-aad0-401e-b8b4-a7e14ea160da&requestId=bfdd3465-ada3-4bc2-ad75-3b978f1f04b6",
+    "method": "POST",
+    "post": "{\"meta\":{\"configOverrides\":{\"com_adobe_target\":{\"propertyToken\":\"2f60dcb4-3521-365c-2540-cd40553c138f\"}},\"queueTimeMillis\":39,\"state\":{\"domain\":\"ibm.com\",\"cookiesEnabled\":true}},\"events\":[{\"xdm\":{\"eventType\":\"decisioning.propositionFetch\",\"web\":{\"webPageDetails\":{\"URL\":\"https://www.ibm.com/in-en/car",
+    "bytes": 517,
+    "list": {
+     "path": "handle",
+     "len": 4,
+     "sample": {
+      "payload": "[{\"id\":\"10184214645886331954408670989615793097\",\"namespace\":{\"code\":\"ECID\"}}]",
+      "type": "identity:result"
+     }
+    }
+   },
+   {
+    "url": "https://edgedc.ibm.com/ee/v1/privacy/set-consent?configId=fbb11371-aad0-401e-b8b4-a7e14ea160da&requestId=68e63c77-4c54-4c8b-aa2e-2d2ac9c3e3a2",
+    "method": "POST",
+    "post": "{\"consent\":[{\"value\":{\"general\":\"pending\"},\"version\":\"1.0\",\"standard\":\"Adobe\"}],\"query\":{\"identity\":{\"fetch\":[\"ECID\"]}},\"meta\":{\"state\":{\"domain\":\"ibm.com\",\"cookiesEnabled\":true}}}",
+    "bytes": 454,
+    "list": {
+     "path": "handle",
+     "len": 3,
+     "sample": {
+      "payload": "[{\"id\":\"10184214645886331954408670989615793097\",\"namespace\":{\"code\":\"ECID\"}}]",
+      "type": "identity:result"
+     }
+    }
+   },
+   {
+    "url": "https://edgedc.ibm.com/ee/va6/v1/privacy/set-consent?configId=fbb11371-aad0-401e-b8b4-a7e14ea160da&requestId=89d5ea46-0b9e-4358-b830-35a9194c587f",
+    "method": "POST",
+    "post": "{\"consent\":[{\"value\":{\"general\":\"in\"},\"version\":\"1.0\",\"standard\":\"Adobe\"}],\"query\":{\"identity\":{\"fetch\":[\"ECID\"]}},\"meta\":{\"state\":{\"domain\":\"ibm.com\",\"cookiesEnabled\":true}}}",
+    "bytes": 454,
+    "list": {
+     "path": "handle",
+     "len": 3,
+     "sample": {
+      "payload": "[{\"id\":\"10184214645886331954408670989615793097\",\"namespace\":{\"code\":\"ECID\"}}]",
+      "type": "identity:result"
+     }
+    }
+   }
+  ],
+  "Accenture": [
+   {
+    "url": "https://cdn.cookielaw.org/consent/d6e38d3c-2419-4258-8e8d-d1a7d3972604/019ae6ea-ce25-7746-8b84-75b3bc6d6f77/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 145420,
+    "list": {
+     "path": "DomainData.Groups[1].FirstPartyCookies",
+     "len": 46,
+     "sample": {
+      "id": "018fe60e-d0cf-7685-991b-43f847e49570",
+      "Name": "kndctr_AAB73BC75245B44A0A490D4D_AdobeOrg_identity",
+      "Host": "accenture.com",
+      "IsSession": false,
+      "Length": "394",
+      "description": "This cookie stores the Experience Cloud ID (ECID) along with other rel",
+      "thirdPartyDescription": "null",
+      "patternKey": "null",
+      "thirdPartyKey": "",
+      "firstPartyKey": "",
+      "DurationType": 1,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   },
+   {
+    "url": "https://www.accenture.com/content/dam/accenture/final/images/lottie/No%20result%20animation_transparent.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 80756,
+    "list": {
+     "path": "assets",
+     "len": 27,
+     "sample": {
+      "id": "image_0",
+      "w": 8,
+      "h": 8,
+      "u": "",
+      "p": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAA",
+      "e": 1
+     }
+    }
+   },
+   {
+    "url": "https://www.accenture.com/content/dam/accenture/final/images/lottie/No%20result%20animation_transparent.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 80756,
+    "list": {
+     "path": "assets",
+     "len": 27,
+     "sample": {
+      "id": "image_0",
+      "w": 8,
+      "h": 8,
+      "u": "",
+      "p": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAA",
+      "e": 1
+     }
+    }
+   },
+   {
+    "url": "https://www.accenture.com/api/accenture/elastic/findjobs",
+    "method": "POST",
+    "post": "------WebKitFormBoundarydZrEUiKaH38gflEp\r\nContent-Disposition: form-data; name=\"startIndex\"\r\n\r\n0\r\n------WebKitFormBoundarydZrEUiKaH38gflEp\r\nContent-Disposition: form-data; name=\"maxResultSize\"\r\n\r\n12\r\n------WebKitFormBoundarydZrEUiKaH38gflEp\r\nContent-Disposition: form-data; name=\"jobKeyword\"\r\n\r\n\r\n---",
+    "bytes": 208555,
+    "list": {
+     "path": "aggregations[0].items",
+     "len": 22,
+     "sample": {
+      "term": "Ahmedabad",
+      "count": 54
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/d6e38d3c-2419-4258-8e8d-d1a7d3972604/d6e38d3c-2419-4258-8e8d-d1a7d3972604.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 7259,
+    "list": {
+     "path": "RuleSet",
+     "len": 5,
+     "sample": {
+      "Id": "019ae6ea-ce25-7746-8b84-75b3bc6d6f77",
+      "Name": "All Implied Consent (accenture.com)",
+      "Countries": "[\"pr\",\"vi\",\"us\"]",
+      "States": "{\"us\":[\"vi\"]}",
+      "LanguageSwitcherPlaceholder": "{\"de\":\"de\",\"default\":\"en\",\"es-ar\":\"es-ar\",\"pt\":\"pt\",\"pt-br\":\"pt-br\",\"ja\":\"ja\",\"it\":\"it\",\"p",
+      "BannerPushesDown": false,
+      "Default": false,
+      "Global": false,
+      "Type": "GDPR",
+      "UseGoogleVendors": false,
+      "VariantEnabled": false,
+      "TestEndTime": "null",
+      "Variants": "[]",
+      "TemplateName": "Accenture.com Non-EU",
+      "Conditions": "[]",
+      "GCEnable": true,
+      "IsGPPEnabled": false,
+      "EnableJWTAuthForKnownUsers": false
+     }
+    }
+   },
+   {
+    "url": "https://adobedc.demdex.net/ee/v1/identity/acquire?configId=e1031b55-1dab-4294-8913-431165158736&requestId=fd0dd408-0c44-4e45-8582-c0246d1f2ae4",
+    "method": "POST",
+    "post": "{\"query\":{\"identity\":{\"fetch\":[\"ECID\"]}},\"meta\":{\"configOverrides\":{},\"state\":{\"domain\":\"accenture.com\",\"cookiesEnabled\":true}}}",
+    "bytes": 742,
+    "list": {
+     "path": "handle",
+     "len": 3,
+     "sample": {
+      "payload": "[{\"id\":\"29825513542813599534741567978562876109\",\"namespace\":{\"code\":\"ECID\"}}]",
+      "type": "identity:result"
+     }
+    }
+   },
+   {
+    "url": "https://somni.accenture.com/ee/va6/v1/interact?configId=e1031b55-1dab-4294-8913-431165158736&requestId=27768447-722f-4a87-9c74-c15a519a8c5d",
+    "method": "POST",
+    "post": "{\"meta\":{\"configOverrides\":{},\"state\":{\"domain\":\"accenture.com\",\"cookiesEnabled\":true}},\"events\":[{\"xdm\":{\"eventType\":\"decisioning.propositionDisplay\",\"web\":{\"webPageDetails\":{\"URL\":\"https://www.accenture.com/in-en/careers/jobsearch\"},\"webReferrer\":{\"URL\":\"\"}},\"device\":{\"screenHeight\":900,\"screenWid",
+    "bytes": 452,
+    "list": {
+     "path": "handle",
+     "len": 3,
+     "sample": {
+      "payload": "[{\"id\":\"29825513542813599534741567978562876109\",\"namespace\":{\"code\":\"ECID\"}}]",
+      "type": "identity:result"
+     }
+    }
+   },
+   {
+    "url": "https://somni.accenture.com/ee/va6/v1/interact?configId=e1031b55-1dab-4294-8913-431165158736&requestId=fef2199e-c5c4-4241-9dea-ada91f821991",
+    "method": "POST",
+    "post": "{\"meta\":{\"configOverrides\":{},\"state\":{\"domain\":\"accenture.com\",\"cookiesEnabled\":true}},\"events\":[{\"xdm\":{\"eventType\":\"web.webpagedetails.pageViews\",\"web\":{\"webPageDetails\":{\"URL\":\"https://www.accenture.com/in-en/careers/jobsearch\",\"name\":\"car:job-search:jobsearch\",\"server\":\"www.accenture.com\",\"page",
+    "bytes": 387,
+    "list": {
+     "path": "handle[1].payload",
+     "len": 3,
+     "sample": {
+      "scope": "Target",
+      "hint": "34",
+      "ttlSeconds": 1800
+     }
+    }
+   }
+  ],
+  "Capgemini": [
+   {
+    "url": "https://cg-jobstream-api.azurewebsites.net/api/job-search?page=1&size=11&country_code=in-en",
+    "method": "GET",
+    "post": "",
+    "bytes": 112536,
+    "list": {
+     "path": "data",
+     "len": 11,
+     "sample": {
+      "id": "569641-en_GB_SAPBTP",
+      "aws_id": "",
+      "brand": "Capgemini",
+      "contract_type": "Permanent",
+      "country_code": "en-in",
+      "country_name": "",
+      "custom_criteria_value": "",
+      "deleted_at": "",
+      "description": "<p><span style='font-family:verdana, geneva, sans-serif'>Choosing Capg",
+      "description_stripped": "Choosing Capgemini means choosing a company where you will be empowere",
+      "education_level": "",
+      "experience_level": "Experienced Professionals",
+      "hash": "e3659269f17ba52f06250e473b1a0b1b",
+      "indexed_at": "2026-09-30T14:37:37.000Z",
+      "location": "Mumbai (ex Bombay), Pune, Gandhinagar, Bangalore",
+      "ref": "569641-en_GB",
+      "sbu": "Other Delivery units",
+      "source": "SAP_BTP",
+      "source_ref": "en-in:569641-en_GB",
+      "status": "1",
+      "title": "SAP MM Functional Consultant",
+      "updated_at": "2026-11-14T12:35:07.000Z",
+      "apply_job_url": "https://careers.capgemini.com/job/Bangalore-SAP-MM-Functional-Consulta",
+      "department": "",
+      "site": ""
+     }
+    }
+   }
+  ],
+  "LTIMindtree": [
+   {
+    "url": "https://cdn.cookielaw.org/consent/019c4b01-e93a-704c-b2ac-327da006772f/01a1cfa4-916b-7712-9a1b-c45f7f9fc9d4/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 93712,
+    "list": {
+     "path": "DomainData.Groups[1].FirstPartyCookies",
+     "len": 26,
+     "sample": {
+      "id": "019c4b04-0f95-7aff-a951-04ab7b535de4",
+      "Name": "_ga_xxxxxxxxxx",
+      "Host": "ltm.com",
+      "IsSession": false,
+      "Length": "399",
+      "description": "Used by Google Analytics to identify and track an individual session w",
+      "thirdPartyDescription": "Used by Google Analytics to identify and track an individual session w",
+      "patternKey": "_ga_",
+      "thirdPartyKey": "Pattern|_ga_",
+      "firstPartyKey": "Cookie_ga_xxxxxxxxxx,Pattern|_ga_",
+      "DurationType": 1,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/019c4b01-e93a-704c-b2ac-327da006772f/019c4b01-e93a-704c-b2ac-327da006772f.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 5648,
+    "list": {
+     "path": "RuleSet",
+     "len": 3,
+     "sample": {
+      "Id": "01a1cfa4-93a9-785e-9360-6f7c0d2a3761",
+      "Name": "EU-EEA",
+      "Countries": "[\"no\",\"be\",\"fi\",\"pt\",\"bg\",\"dk\",\"lt\",\"lu\",\"hr\",\"lv\",\"hu\",\"se\",\"si\",\"mc\",\"sk\",\"mf\",\"sm\",\"gb\"",
+      "States": "{}",
+      "LanguageSwitcherPlaceholder": "{\"default\":\"en\"}",
+      "BannerPushesDown": false,
+      "Default": false,
+      "Global": false,
+      "Type": "GDPR",
+      "UseGoogleVendors": false,
+      "VariantEnabled": false,
+      "TestEndTime": "null",
+      "Variants": "[]",
+      "TemplateName": "Cookie banner for European union",
+      "Conditions": "[]",
+      "GCEnable": true,
+      "IsGPPEnabled": false,
+      "EnableJWTAuthForKnownUsers": false
+     }
+    }
+   },
+   {
+    "url": "https://adobedc.demdex.net/ee/v1/interact?configId=2029edeb-26cc-4b1c-a85a-e3bb5e0b9b56&requestId=daa130ab-e230-4403-9719-554a6a9334c4",
+    "method": "POST",
+    "post": "{\"events\":[{\"xdm\":{\"web\":{\"webPageDetails\":{\"URL\":\"https://www.ltm.com/careers\"},\"webReferrer\":{\"URL\":\"\"}},\"device\":{\"screenHeight\":900,\"screenWidth\":1366,\"screenOrientation\":\"landscape\"},\"environment\":{\"type\":\"browser\",\"browserDetails\":{\"viewportWidth\":1366,\"viewportHeight\":900}},\"placeContext\":{\"l",
+    "bytes": 818,
+    "list": {
+     "path": "handle",
+     "len": 3,
+     "sample": {
+      "payload": "[{\"id\":\"29545187729845394184731532203704508806\",\"namespace\":{\"code\":\"ECID\"}},{\"id\":\"295437",
+      "type": "identity:result"
+     }
+    }
+   }
+  ],
+  "Deloitte": [
+   {
+    "url": "https://dpm.demdex.net/id?d_visid_ver=5.5.0&d_fieldgroup=MC&d_rtbd=json&d_ver=2&d_verify=1&d_orgid=5742550D515CABFF0A490D44%40AdobeOrg&d_nsid=0&ts=1794663069591",
+    "method": "GET",
+    "post": "",
+    "bytes": 2311,
+    "list": {
+     "path": "ibs",
+     "len": 9,
+     "sample": {
+      "id": "411",
+      "ttl": 10080,
+      "tag": "img",
+      "fireURLSync": 1,
+      "syncOnPage": 1,
+      "url": "[\"//cm.everesttech.net/cm/dd?d_uuid=29543724971866798274731385940657398927\"]"
+     }
+    }
+   },
+   {
+    "url": "https://deloitte.demdex.net/event?d_dil_ver=9.5&_ts=1794663070487",
+    "method": "POST",
+    "post": "d_mid=29766724184404973834748495608011997307&d_nsid=0&d_ld=_ts%3D1794663070487&d_rtbd=json&d_jsonv=1&d_dst=1&h_referer=https%3A%2F%2Fapply.deloitte.com%2Fen_US%2Fcareers",
+    "bytes": 2212,
+    "list": {
+     "path": "ibs",
+     "len": 9,
+     "sample": {
+      "id": "411",
+      "ttl": 10080,
+      "tag": "img",
+      "fireURLSync": 1,
+      "syncOnPage": 1,
+      "url": "[\"//cm.everesttech.net/cm/dd?d_uuid=29543724971866798274731385940657398927\"]"
+     }
+    }
+   }
+  ],
+  "PwC": [
+   {
+    "url": "https://www.pwc.in/careers/_jcr_content.dynamic.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 19783,
+    "list": {
+     "path": "territorySelectorData",
+     "len": 192,
+     "sample": {
+      "code": "af",
+      "domain": "https://www.pwc.com/af/en.html",
+      "name": "Afghanistan",
+      "territoryFinder": false
+     }
+    }
+   },
+   {
+    "url": "https://www.pwc.in/content/pwc/script/network/recruitment/workday/gx-territories.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 75518,
+    "list": {
+     "path": "data",
+     "len": 145,
+     "sample": {
+      "country_name": "Albania",
+      "country_code": "AL",
+      "job_links": "{\"territory_landing\":\"\",\"strategyand\":\"\",\"experienced\":\"https://jobs-cee.pwc.com/ce/en/alb"
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/16aae46b-924a-4c1e-b54d-b38bd88f654a/4ea34762-7d64-409c-b0dd-b6c1d1c29c32/en-in.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 128199,
+    "list": {
+     "path": "DomainData.Groups[1].FirstPartyCookies",
+     "len": 37,
+     "sample": {
+      "id": "aef78571-147e-4a14-b165-224c09303eee",
+      "Name": "s_ppv",
+      "Host": "pwc.in",
+      "IsSession": true,
+      "Length": "0",
+      "description": "Adobe Site Catalyst cookie.",
+      "thirdPartyDescription": "null",
+      "patternKey": "null",
+      "thirdPartyKey": "",
+      "firstPartyKey": "Cookies_ppv",
+      "DurationType": 1,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   }
+  ],
+  "EY": [
+   {
+    "url": "https://www.ey.com/content/dam/ey-unified-site/site-resources/ey-com/countrylanguageswitcher.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 38728,
+    "list": {
+     "path": "",
+     "len": 200,
+     "sample": {
+      "countryUrl": "/en_gl",
+      "top": "true",
+      "synonyms": "",
+      "countryName": "Global",
+      "languageName": "English",
+      "selected": "true",
+      "isHidden": "false"
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/2b8fbcf2-c8f8-48b8-bf66-aa2750188925/019368c6-180d-7967-99dc-b909654f968f/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 187807,
+    "list": {
+     "path": "DomainData.Groups[2].FirstPartyCookies",
+     "len": 34,
+     "sample": {
+      "id": "6c754208-cd27-456e-8c0d-da308909db99",
+      "Name": "AA",
+      "Host": "ey.com",
+      "IsSession": false,
+      "Length": "1825",
+      "description": "Contains numeric identifier that is used for proprietary data onboardi",
+      "thirdPartyDescription": "null",
+      "patternKey": "null",
+      "thirdPartyKey": "",
+      "firstPartyKey": "",
+      "DurationType": 365,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   }
+  ],
+  "KPMG": [
+   {
+    "url": "https://collection.kpmg.com/consent/01930293-6577-7b99-8657-8b8e72667104/2d92bf4a-9724-4044-a26e-90e624aa8476/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 142346,
+    "list": {
+     "path": "DomainData.Groups[2].FirstPartyCookies",
+     "len": 31,
+     "sample": {
+      "id": "ddd7baef-a778-41cd-807e-68eba1404f68",
+      "Name": "s_ips",
+      "Host": "kpmg.com",
+      "IsSession": true,
+      "Length": "0",
+      "description": "This cookie is associated with Adobe Analytics. The cookie is used for",
+      "thirdPartyDescription": "This cookie is associated with Adobe Analytics. The cookie is used for",
+      "patternKey": "null",
+      "thirdPartyKey": "",
+      "firstPartyKey": "Cookies_ips",
+      "DurationType": 1,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   }
+  ],
+  "Goldman Sachs": [
+   {
+    "url": "https://edge.adobedc.net/ee/va6/v1/interact?configId=f82e1a4e-9d26-4420-8648-1d3444ffec34&requestId=a6918b25-2815-4ea9-b3f3-201397405ab3",
+    "method": "POST",
+    "post": "{\"events\":[{\"xdm\":{\"eventType\":\"decisioning.propositionFetch\",\"web\":{\"webPageDetails\":{\"URL\":\"https://www.goldmansachs.com/careers/\"},\"webReferrer\":{\"URL\":\"\"}},\"device\":{\"screenHeight\":900,\"screenWidth\":1366,\"screenOrientation\":\"landscape\"},\"environment\":{\"type\":\"browser\",\"browserDetails\":{\"viewport",
+    "bytes": 602,
+    "list": {
+     "path": "handle",
+     "len": 4,
+     "sample": {
+      "payload": "[{\"id\":\"28307747897151575955756065416003578567\",\"namespace\":{\"code\":\"ECID\"}}]",
+      "type": "identity:result"
+     }
+    }
+   },
+   {
+    "url": "https://adobedc.demdex.net/ee/v1/identity/acquire?configId=f82e1a4e-9d26-4420-8648-1d3444ffec34&requestId=d06df0d5-9077-45de-bd52-fc92bbfb6f96",
+    "method": "POST",
+    "post": "{\"query\":{\"identity\":{\"fetch\":[\"ECID\",\"CORE\"]}},\"meta\":{\"state\":{\"domain\":\"goldmansachs.com\",\"cookiesEnabled\":true}}}",
+    "bytes": 818,
+    "list": {
+     "path": "handle",
+     "len": 3,
+     "sample": {
+      "payload": "[{\"id\":\"28307747897151575955756065416003578567\",\"namespace\":{\"code\":\"ECID\"}},{\"id\":\"295437",
+      "type": "identity:result"
+     }
+    }
+   },
+   {
+    "url": "https://edge.adobedc.net/ee/va6/v1/interact?configId=f82e1a4e-9d26-4420-8648-1d3444ffec34&requestId=ab862c4a-6989-4954-8372-b432042a4070",
+    "method": "POST",
+    "post": "{\"events\":[{\"xdm\":{\"eventType\":\"web.webpagedetails.pageViews\",\"web\":{\"webPageDetails\":{\"URL\":\"https://www.goldmansachs.com/careers\",\"name\":\"gs>gscom>careers\",\"server\":\"www.goldmansachs.com\",\"viewName\":\"careers\",\"pageViews\":{\"value\":1}},\"webReferrer\":{\"URL\":null}},\"device\":{\"screenHeight\":900,\"screen",
+    "bytes": 537,
+    "list": {
+     "path": "handle",
+     "len": 3,
+     "sample": {
+      "payload": "[{\"id\":\"28307747897151575955756065416003578567\",\"namespace\":{\"code\":\"ECID\"}}]",
+      "type": "identity:result"
+     }
+    }
+   }
+  ],
+  "J.P. Morgan Chase": [
+   {
+    "url": "https://www.jpmorganchase.com/services/json/v1/dynamic-grid.service/parent=jpmorganchase/global/US/en/home/careers&comp=root/content-parsys/dynamic_grid&page=p1.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 95343,
+    "list": {
+     "path": "items",
+     "len": 60,
+     "sample": {
+      "title": "Workforce is Infrastructure: Building an employer-driven workforce sys",
+      "date": "October 27, 2026",
+      "hideDate": false,
+      "description": "",
+      "type": "default",
+      "editorialType": "Stories",
+      "link": "/newsroom/stories/philadelphia-workforce-is-infrastructure",
+      "linkText": "Learn more",
+      "image": "/content/dam/jpmorganchase/images/newsroom/stories/philadelphia-workfo",
+      "imageAlt": "Philadelphia downtown skyline with blue sky and white cloud",
+      "dataLayerJson": "{&quot;event&quot;:&quot;cmp:click&quot;,&quot;webInteraction&quot;:{&",
+      "titledataLayerJson": "{&quot;event&quot;:&quot;cmp:click&quot;,&quot;webInteraction&quot;:{&",
+      "dataLayerEnabled": true
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/b62660ac-2329-4408-bebc-07282ed0f7c6/a2382e3f-5314-4dd4-9ec5-49341c4f356b/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 71737,
+    "list": {
+     "path": "DomainData.Groups[0].FirstPartyCookies",
+     "len": 11,
+     "sample": {
+      "id": "535f4696-fb78-454e-9530-14cad30061e7",
+      "Name": "geo_country",
+      "Host": "www.jpmorganchase.com",
+      "IsSession": true,
+      "Length": "0",
+      "description": "Stores the geographical location of browsers and targets ads.\n",
+      "thirdPartyDescription": "null",
+      "patternKey": "null",
+      "thirdPartyKey": "",
+      "firstPartyKey": "Cookiegeo_country",
+      "DurationType": 1,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   },
+   {
+    "url": "https://c.go-mpulse.net/api/config.json?key=UHSCG-Y4KQ5-SP9XE-NL9A2-SWWAW&d=www.jpmorganchase.com&t=5982210&v=1.720.0&sl=0&si=2ac6fce7-7536-4ab7-b00d-1a83972643fd-tohux9&plugins=AK,ConfigOverride,Continuity,PageParams,IFrameDelay,AutoXHR,SPA,History,Angular,Backbone,Ember,RT,CrossDomain,BW,PaintTimi",
+    "method": "GET",
+    "post": "",
+    "bytes": 1282,
+    "list": {
+     "path": "PageParams.pageGroups",
+     "len": 6,
+     "sample": {
+      "type": "Regexp",
+      "parameter1": "https://www.jpmorganchase.com/",
+      "parameter2": "JPMORGAN",
+      "on": "[\"navigation\"]"
+     }
+    }
+   },
+   {
+    "url": "https://edge.api.brightcove.com/playback/v1/accounts/1911170250001/videos/6384917264112",
+    "method": "GET",
+    "post": "",
+    "bytes": 7245,
+    "list": {
+     "path": "sources",
+     "len": 6,
+     "sample": {
+      "codecs": "avc1,mp4a",
+      "ext_x_version": "4",
+      "src": "http://manifest.prod.boltdns.net/manifest/v1/hls/v4/clear/191117025000",
+      "type": "application/x-mpegURL"
+     }
+    }
+   },
+   {
+    "url": "https://edge.api.brightcove.com/playback/v1/accounts/1911170250001/videos/6379749012112",
+    "method": "GET",
+    "post": "",
+    "bytes": 7307,
+    "list": {
+     "path": "sources",
+     "len": 6,
+     "sample": {
+      "codecs": "avc1,mp4a",
+      "ext_x_version": "4",
+      "src": "http://manifest.prod.boltdns.net/manifest/v1/hls/v4/clear/191117025000",
+      "type": "application/x-mpegURL"
+     }
+    }
+   },
+   {
+    "url": "https://edge.api.brightcove.com/playback/v1/accounts/1911170250001/videos/6384914313112",
+    "method": "GET",
+    "post": "",
+    "bytes": 7303,
+    "list": {
+     "path": "sources",
+     "len": 6,
+     "sample": {
+      "codecs": "avc1,mp4a",
+      "ext_x_version": "4",
+      "src": "http://manifest.prod.boltdns.net/manifest/v1/hls/v4/clear/191117025000",
+      "type": "application/x-mpegURL"
+     }
+    }
+   },
+   {
+    "url": "https://edge.api.brightcove.com/playback/v1/accounts/1911170250001/videos/6384916763112",
+    "method": "GET",
+    "post": "",
+    "bytes": 5440,
+    "list": {
+     "path": "sources",
+     "len": 6,
+     "sample": {
+      "codecs": "avc1,mp4a",
+      "ext_x_version": "4",
+      "src": "http://manifest.prod.boltdns.net/manifest/v1/hls/v4/clear/191117025000",
+      "type": "application/x-mpegURL"
+     }
+    }
+   },
+   {
+    "url": "https://edge.api.brightcove.com/playback/v1/accounts/1911170250001/videos/6384917654112",
+    "method": "GET",
+    "post": "",
+    "bytes": 5449,
+    "list": {
+     "path": "sources",
+     "len": 6,
+     "sample": {
+      "codecs": "avc1,mp4a",
+      "ext_x_version": "4",
+      "src": "http://manifest.prod.boltdns.net/manifest/v1/hls/v4/clear/191117025000",
+      "type": "application/x-mpegURL"
+     }
+    }
+   }
+  ],
+  "Zoho": [
+   {
+    "url": "https://salesiq.zohopublic.in/visitor/v2/channels/website?widgetcode=zsiqf0663970d29dfe81874d8995cf2645043184f67071caf7a006dbb2c58830a99e20a1d6b6f5d52bacce2a74f28e087413c2ca5c&pagetitle=Zoho+Corporation+%7C+Careers&current_domain=zoho.com&browser_language=en&is_signaturechat=false&internal_channel_r",
+    "method": "GET",
+    "post": "",
+    "bytes": 56342,
+    "list": {
+     "path": "data.call.departments",
+     "len": 483,
+     "sample": {
+      "180095000000018618": "Zoho Cares"
+     }
+    }
+   },
+   {
+    "url": "https://www.zohowebstatic.com/sites/zweb/json/dynamicemail.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 39551,
+    "list": {
+     "path": "runningText",
+     "len": 103,
+     "sample": {
+      "Default": "support@zohomail.com",
+      "Folder": "{\"pt-br/mail\":\"suporte@zohocorp.com\"}",
+      "Region": "{\"EU\":\"support@eu.zohomail.com\"}"
+     }
+    }
+   },
+   {
+    "url": "https://www.zohowebstatic.com/sites/zweb/json/dynamicemail.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 39551,
+    "list": {
+     "path": "runningText",
+     "len": 103,
+     "sample": {
+      "Default": "support@zohomail.com",
+      "Folder": "{\"pt-br/mail\":\"suporte@zohocorp.com\"}",
+      "Region": "{\"EU\":\"support@eu.zohomail.com\"}"
+     }
+    }
+   },
+   {
+    "url": "https://www.zoho.com/sites/zweb/images/humans-of-zoho/hoz-portfolio.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 33114,
+    "list": {
+     "path": "portfolio",
+     "len": 62,
+     "sample": {
+      "id": "kuppulakshmi",
+      "href": "kuppulakshmi.html",
+      "bgClassName": "kuppu kuppu_bg_shape",
+      "eoExp": "2010",
+      "name": "Kuppulakshmi K",
+      "designation": "Global Head, Zoho for Startups",
+      "desc": "Don’t take yourself too seriously—have fun asking silly questions.",
+      "doj": "01-02-2010",
+      "usrImg": "/sites/zweb/images/humans-of-zoho/hoz_kuppulakshmi_web.png",
+      "usrImgCS": "/sites/zweb/images/humans-of-zoho/01-cs-kuppulakshmi.png",
+      "proID": 1,
+      "gender": "female"
+     }
+    }
+   },
+   {
+    "url": "https://www.zohowebstatic.com/sites/zweb/json/allproduct-competitor-lists.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 288060,
+    "list": {
+     "path": "",
+     "len": 17,
+     "sample": {
+      "BusinessIntelligence": "[{\"productName\":\"Zoho Analytics\",\"keywordList\":[\"Analytics\",\"Business Intelligence\",\"Marke"
+     }
+    }
+   },
+   {
+    "url": "https://us-careers.zohorecruit.in/recruit/v2/public/Job_Openings?pagename=Careers&source=CareerSite&extra_fields=%5B%22Remote_Job%22%2C%22Job_Description%22%5D",
+    "method": "GET",
+    "post": "",
+    "bytes": 27199,
+    "list": {
+     "path": "info.fields",
+     "len": 12,
+     "sample": {
+      "api_name": "Job_Opening_Name",
+      "field_label": "Posting Title"
+     }
+    }
+   },
+   {
+    "url": "https://www.zohowebstatic.com/sites/zweb/json/global-menu-v2.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 268701,
+    "list": {
+     "path": "globalMenuData.otherDetails.recentLaunches.logic",
+     "len": 10,
+     "sample": {
+      "regions": "[\"IN\"]",
+      "products": "[\"chemstudio\",\"ziachat\",\"cpaas\",\"voice\",\"touchpoint\",\"fortify\",\"ziaagents\",\"classes\",\"comm"
+     }
+    }
+   },
+   {
+    "url": "https://mx-careers.zohorecruit.in/recruit/v2/public/Job_Openings?pagename=Careers&source=CareerSite&extra_fields=%5B%22Remote_Job%22%2C%22Job_Description%22%5D",
+    "method": "GET",
+    "post": "",
+    "bytes": 1457,
+    "list": {
+     "path": "info.fields",
+     "len": 7,
+     "sample": {
+      "api_name": "Job_Opening_Name",
+      "field_label": "Posting Title"
+     }
+    }
+   }
+  ],
+  "Atlassian": [
+   {
+    "url": "https://cdn.cookielaw.org/consent/1ef16389-2e72-4349-ad86-ea904db9373b/019e74ba-0d4f-74d3-bc43-296d65ab200f/en.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 185325,
+    "list": {
+     "path": "DomainData.Groups[1].FirstPartyCookies",
+     "len": 55,
+     "sample": {
+      "id": "019e604c-f6d6-79ae-99dc-ed3d3a0925ef",
+      "Name": "atlCohort",
+      "Host": "www.atlassian.com",
+      "IsSession": true,
+      "Length": "0",
+      "description": "This cookie name is associated with Atlassian which is used to track u",
+      "thirdPartyDescription": "null",
+      "patternKey": "null",
+      "thirdPartyKey": "",
+      "firstPartyKey": "CookieatlCohort",
+      "DurationType": 1,
+      "category": "null",
+      "isThirdParty": false
+     }
+    }
+   },
+   {
+    "url": "https://cdn.cookielaw.org/consent/1ef16389-2e72-4349-ad86-ea904db9373b/1ef16389-2e72-4349-ad86-ea904db9373b.json",
+    "method": "GET",
+    "post": "",
+    "bytes": 6223,
+    "list": {
+     "path": "RuleSet",
+     "len": 4,
+     "sample": {
+      "Id": "019e74ba-11c5-7aeb-90df-1e86ee7c823f",
+      "Name": "GDPR",
+      "Countries": "[\"de\",\"hk\",\"tw\",\"pt\",\"dk\",\"lt\",\"lu\",\"hr\",\"lv\",\"hu\",\"qa\",\"mc\",\"mf\",\"yt\",\"ie\",\"ee\",\"il\",\"mq\"",
+      "States": "{}",
+      "LanguageSwitcherPlaceholder": "{\"de\":\"de\",\"default\":\"en\",\"ko\":\"ko\",\"pt-br\":\"pt-br\",\"ja\":\"ja\",\"it\":\"it\",\"pl\":\"pl\",\"fr\":\"fr",
+      "BannerPushesDown": false,
+      "Default": false,
+      "Global": false,
+      "Type": "GDPR",
+      "UseGoogleVendors": false,
+      "VariantEnabled": false,
+      "TestEndTime": "null",
+      "Variants": "[]",
+      "TemplateName": "GDPR Template",
+      "Conditions": "[]",
+      "GCEnable": false,
+      "IsGPPEnabled": false,
+      "EnableJWTAuthForKnownUsers": false
+     }
+    }
+   }
+  ]
+ }
+}
