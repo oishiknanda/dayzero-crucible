@@ -1,12 +1,6 @@
 {
- "verifiedAt": "2026-11-12T10:08:05.709Z",
+ "verifiedAt": "2026-11-14T18:45:59.254Z",
  "sources": {
-  "Meta": [
-   {
-    "kind": "recruitee",
-    "slug": "meta"
-   }
-  ],
   "NVIDIA": [
    {
     "kind": "workday",
@@ -39,14 +33,8 @@
   ],
   "Palantir": [
    {
-    "kind": "lever",
-    "slug": "palantir"
-   }
-  ],
-  "Snowflake": [
-   {
-    "kind": "ashby",
-    "slug": "snowflake"
+    "kind": "smartrecruiters",
+    "slug": "Palantir"
    }
   ],
   "Spotify": [
@@ -85,24 +73,10 @@
     "slug": "jumptrading"
    }
   ],
-  "LinkedIn": [
-   {
-    "kind": "lever",
-    "slug": "linkedin"
-   }
-  ],
   "ByteDance / TikTok": [
    {
     "kind": "smartrecruiters",
     "slug": "Bytedance"
-   }
-  ],
-  "Intel": [
-   {
-    "kind": "workday",
-    "host": "intel.wd1.myworkdayjobs.com",
-    "tenant": "intel",
-    "site": "External"
    }
   ],
   "Broadcom": [
@@ -233,12 +207,6 @@
     "slug": "anthropic"
    }
   ],
-  "TCS": [
-   {
-    "kind": "greenhouse",
-    "slug": "tcs"
-   }
-  ],
   "DXC Technology": [
    {
     "kind": "workday",
@@ -267,14 +235,6 @@
     "host": "mastercard.wd1.myworkdayjobs.com",
     "tenant": "mastercard",
     "site": "CorporateCareers"
-   }
-  ],
-  "Target": [
-   {
-    "kind": "workday",
-    "host": "target.wd5.myworkdayjobs.com",
-    "tenant": "target",
-    "site": "targetcareers"
    }
   ],
   "HP": [
@@ -353,12 +313,6 @@
     "slug": "Swiggy"
    }
   ],
-  "Paytm": [
-   {
-    "kind": "lever",
-    "slug": "paytm"
-   }
-  ],
   "Razorpay": [
    {
     "kind": "greenhouse",
@@ -406,17 +360,12 @@
     "kind": "greenhouse",
     "slug": "slice"
    }
-  ],
-  "Atlan": [
-   {
-    "kind": "ashby",
-    "slug": "atlan"
-   }
   ]
  },
  "dead": [
   "Google",
   "Microsoft",
+  "Meta",
   "Apple",
   "Netflix",
   "Oracle",
@@ -426,6 +375,7 @@
   "Goldman Sachs",
   "Bloomberg",
   "Shopify",
+  "Snowflake",
   "Qualcomm",
   "D.E. Shaw",
   "Citadel",
@@ -434,8 +384,10 @@
   "Two Sigma",
   "Morgan Stanley",
   "J.P. Morgan Chase",
+  "LinkedIn",
   "Snapchat",
   "AMD",
+  "Intel",
   "IBM",
   "VMware",
   "Palo Alto Networks",
@@ -458,6 +410,7 @@
   "Aurora",
   "Tesla (Autopilot)",
   "Rivian",
+  "TCS",
   "Infosys",
   "Wipro",
   "Cognizant",
@@ -487,6 +440,7 @@
   "Visa",
   "American Express",
   "Walmart Global Tech",
+  "Target",
   "Dell Technologies",
   "Texas Instruments",
   "SAP",
@@ -501,6 +455,7 @@
   "Zoho",
   "Flipkart",
   "Zomato",
+  "Paytm",
   "PhonePe",
   "Myntra",
   "Ola",
@@ -521,6 +476,7 @@
   "Zepto",
   "Rapido",
   "BharatPe",
+  "Atlan",
   "Chargebee",
   "Sprinklr"
  ]

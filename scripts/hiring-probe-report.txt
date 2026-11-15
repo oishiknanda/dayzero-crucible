@@ -1,46 +1,40 @@
-Connected directly: 62 / 170
-  OK   Meta  ->  recruitee (guess)
+Connected directly: 54 / 170
   OK   NVIDIA  ->  workday (seed)
   OK   Salesforce  ->  workday (seed)
-  OK   Uber  ->  smartrecruiters (guess)
+  OK   Uber  ->  smartrecruiters (guess (name matched))
   OK   Adobe  ->  workday (seed)
-  OK   Palantir  ->  lever (seed)
-  OK   Snowflake  ->  ashby (guess)
+  OK   Palantir  ->  smartrecruiters (guess (name matched))
   OK   Spotify  ->  lever (seed)
-  OK   ServiceNow  ->  smartrecruiters (guess)
+  OK   ServiceNow  ->  smartrecruiters (guess (name matched))
   OK   DoorDash  ->  greenhouse (seed)
-  OK   Jane Street  ->  greenhouse (guess)
+  OK   Jane Street  ->  greenhouse (guess (name matched))
   OK   Hudson River Trading  ->  greenhouse (seed)
-  OK   Jump Trading  ->  greenhouse (guess)
-  OK   LinkedIn  ->  lever (guess)
-  OK   ByteDance / TikTok  ->  smartrecruiters (guess)
-  OK   Intel  ->  workday (seed)
+  OK   Jump Trading  ->  greenhouse (guess (name matched))
+  OK   ByteDance / TikTok  ->  smartrecruiters (guess (name matched))
   OK   Broadcom  ->  workday (seed)
   OK   CrowdStrike  ->  workday (seed)
   OK   Zoom  ->  workday (seed)
   OK   Box  ->  greenhouse (seed)
   OK   Zscaler  ->  greenhouse (seed)
-  OK   Canva  ->  smartrecruiters (guess)
+  OK   Canva  ->  smartrecruiters (guess (name matched))
   OK   Square / Block  ->  greenhouse (seed)
   OK   Affirm  ->  greenhouse (seed)
-  OK   SoFi  ->  greenhouse (guess)
+  OK   SoFi  ->  greenhouse (guess (name matched))
   OK   Brex  ->  greenhouse (seed)
   OK   Chime  ->  greenhouse (seed)
-  OK   Lyft  ->  greenhouse (seed)
-  OK   Grab  ->  smartrecruiters (guess)
-  OK   Deliveroo  ->  greenhouse (guess)
-  OK   Wayfair  ->  smartrecruiters (guess)
+  OK   Lyft  ->  greenhouse (guess (name matched))
+  OK   Grab  ->  smartrecruiters (guess (name matched))
+  OK   Deliveroo  ->  greenhouse (guess (name matched))
+  OK   Wayfair  ->  smartrecruiters (guess (name matched))
   OK   eBay  ->  workday (seed)
-  OK   Tripadvisor  ->  greenhouse (guess)
-  OK   Waymo  ->  greenhouse (guess)
+  OK   Tripadvisor  ->  greenhouse (guess (name matched))
+  OK   Waymo  ->  greenhouse (guess (name matched))
   OK   Scale AI  ->  greenhouse (seed)
   OK   Anthropic  ->  greenhouse (seed)
-  OK   TCS  ->  greenhouse (guess)
   OK   DXC Technology  ->  workday (seed)
   OK   PwC  ->  workday (seed)
   OK   Thoughtworks  ->  greenhouse (seed)
   OK   Mastercard  ->  workday (seed)
-  OK   Target  ->  workday (seed)
   OK   HP  ->  workday (seed)
   OK   Micron  ->  workday (seed)
   OK   Bosch  ->  smartrecruiters (seed)
@@ -50,21 +44,20 @@ Connected directly: 62 / 170
   OK   Citi  ->  workday (seed)
   OK   Fidelity Investments  ->  workday (seed)
   OK   State Street  ->  workday (seed)
-  OK   Swiggy  ->  smartrecruiters (guess)
-  OK   Paytm  ->  lever (guess)
+  OK   Swiggy  ->  smartrecruiters (guess (name matched))
   OK   Razorpay  ->  greenhouse (seed)
   OK   CRED  ->  lever (seed)
   OK   Meesho  ->  lever (seed)
-  OK   Freshworks  ->  smartrecruiters (guess)
-  OK   InMobi  ->  greenhouse (guess)
-  OK   Lenskart  ->  recruitee (guess)
-  OK   Groww  ->  greenhouse (guess)
-  OK   Slice  ->  greenhouse (guess)
-  OK   Atlan  ->  ashby (guess)
+  OK   Freshworks  ->  smartrecruiters (guess (name matched))
+  OK   InMobi  ->  greenhouse (guess (name matched))
+  OK   Lenskart  ->  recruitee (guess (name matched))
+  OK   Groww  ->  greenhouse (guess (name matched))
+  OK   Slice  ->  greenhouse (guess (name matched))
 
-No free direct feed found (will use the aggregator fallback): 108
+No free direct feed found (will use the aggregator fallback): 116
   --   Google
   --   Microsoft
+  --   Meta   (rejected: wrong company -> recruitee/meta is "Addis Ababa University")
   --   Apple
   --   Netflix
   --   Oracle
@@ -74,6 +67,7 @@ No free direct feed found (will use the aggregator fallback): 108
   --   Goldman Sachs
   --   Bloomberg
   --   Shopify
+  --   Snowflake
   --   Qualcomm
   --   D.E. Shaw
   --   Citadel
@@ -82,8 +76,10 @@ No free direct feed found (will use the aggregator fallback): 108
   --   Two Sigma
   --   Morgan Stanley
   --   J.P. Morgan Chase
+  --   LinkedIn
   --   Snapchat
   --   AMD
+  --   Intel
   --   IBM
   --   VMware
   --   Palo Alto Networks
@@ -106,6 +102,7 @@ No free direct feed found (will use the aggregator fallback): 108
   --   Aurora
   --   Tesla (Autopilot)
   --   Rivian
+  --   TCS   (rejected: wrong company -> greenhouse/tcs is "Thornbury Community Services")
   --   Infosys
   --   Wipro
   --   Cognizant
@@ -135,6 +132,7 @@ No free direct feed found (will use the aggregator fallback): 108
   --   Visa
   --   American Express
   --   Walmart Global Tech
+  --   Target
   --   Dell Technologies
   --   Texas Instruments
   --   SAP
@@ -149,6 +147,7 @@ No free direct feed found (will use the aggregator fallback): 108
   --   Zoho
   --   Flipkart
   --   Zomato
+  --   Paytm
   --   PhonePe
   --   Myntra
   --   Ola
@@ -169,5 +168,6 @@ No free direct feed found (will use the aggregator fallback): 108
   --   Zepto
   --   Rapido
   --   BharatPe
+  --   Atlan
   --   Chargebee
   --   Sprinklr
