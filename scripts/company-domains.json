@@ -1,0 +1,371 @@
+{
+"Google": [
+"careers.google.com",
+"google.com"
+],
+"Microsoft": [
+"microsoft.com",
+"careers.microsoft.com"
+],
+"Meta": [
+"metacareers.com",
+"meta.com"
+],
+"Apple": [
+"jobs.apple.com",
+"apple.com"
+],
+"Netflix": [
+"netflix.com",
+"jobs.netflix.com"
+],
+"Oracle": [
+"oracle.com"
+],
+"Atlassian": [
+"atlassian.com"
+],
+"Cisco": [
+"cisco.com",
+"careers.cisco.com"
+],
+"Intuit": [
+"intuit.com"
+],
+"Shopify": [
+"shopify.com"
+],
+"Snowflake": [
+"snowflake.com"
+],
+"Qualcomm": [
+"qualcomm.com"
+],
+"Snapchat": [
+"snap.com"
+],
+"AMD": [
+"amd.com"
+],
+"Intel": [
+"intel.com"
+],
+"IBM": [
+"ibm.com"
+],
+"VMware": [
+"vmware.com"
+],
+"Palo Alto Networks": [
+"paloaltonetworks.com"
+],
+"HashiCorp": [
+"hashicorp.com"
+],
+"GitHub": [
+"github.com"
+],
+"Slack": [
+"slack.com"
+],
+"Splunk": [
+"splunk.com"
+],
+"DocuSign": [
+"docusign.com"
+],
+"HubSpot": [
+"hubspot.com"
+],
+"Zendesk": [
+"zendesk.com"
+],
+"Monday.com": [
+"monday.com"
+],
+"Etsy": [
+"etsy.com"
+],
+"Booking.com": [
+"booking.com"
+],
+"Expedia": [
+"expediagroup.com"
+],
+"Cruise": [
+"getcruise.com"
+],
+"Aurora": [
+"aurora.tech"
+],
+"Tesla (Autopilot)": [
+"tesla.com"
+],
+"Rivian": [
+"rivian.com"
+],
+"LinkedIn": [
+"linkedin.com"
+],
+"Dell Technologies": [
+"dell.com",
+"jobs.dell.com"
+],
+"Texas Instruments": [
+"ti.com"
+],
+"SAP": [
+"sap.com",
+"jobs.sap.com"
+],
+"Siemens": [
+"siemens.com"
+],
+"Samsung R&D": [
+"samsung.com"
+],
+"Honeywell": [
+"honeywell.com"
+],
+"Thomson Reuters": [
+"thomsonreuters.com"
+],
+"Visa": [
+"visa.com",
+"corporate.visa.com"
+],
+"Walmart Global Tech": [
+"walmart.com",
+"careers.walmart.com"
+],
+"Target": [
+"target.com",
+"corporate.target.com"
+],
+"Checkout.com": [
+"checkout.com"
+],
+"Revolut": [
+"revolut.com"
+],
+"Klarna": [
+"klarna.com"
+],
+"GoTo": [
+"gotocompany.com"
+],
+"Goldman Sachs": [
+"goldmansachs.com"
+],
+"Bloomberg": [
+"bloomberg.com"
+],
+"D.E. Shaw": [
+"deshaw.com"
+],
+"Citadel": [
+"citadel.com"
+],
+"Optiver": [
+"optiver.com"
+],
+"Tower Research": [
+"tower-research.com"
+],
+"Two Sigma": [
+"twosigma.com"
+],
+"Morgan Stanley": [
+"morganstanley.com"
+],
+"J.P. Morgan Chase": [
+"jpmorganchase.com",
+"careers.jpmorgan.com"
+],
+"American Express": [
+"americanexpress.com",
+"aexp.com"
+],
+"Barclays": [
+"barclays.com",
+"search.jobs.barclays"
+],
+"HSBC": [
+"hsbc.com"
+],
+"Standard Chartered": [
+"sc.com"
+],
+"BNY": [
+"bny.com"
+],
+"TCS": [
+"tcs.com"
+],
+"Infosys": [
+"infosys.com"
+],
+"Wipro": [
+"wipro.com",
+"careers.wipro.com"
+],
+"Cognizant": [
+"cognizant.com"
+],
+"Accenture": [
+"accenture.com"
+],
+"Capgemini": [
+"capgemini.com"
+],
+"HCLTech": [
+"hcltech.com"
+],
+"Tech Mahindra": [
+"techmahindra.com"
+],
+"LTIMindtree": [
+"ltimindtree.com",
+"ltm.com"
+],
+"Mphasis": [
+"mphasis.com"
+],
+"Persistent Systems": [
+"persistent.com"
+],
+"Hexaware": [
+"hexaware.com"
+],
+"Coforge": [
+"coforge.com"
+],
+"Birlasoft": [
+"birlasoft.com"
+],
+"Zensar": [
+"zensar.com"
+],
+"NTT Data": [
+"nttdata.com"
+],
+"Virtusa": [
+"virtusa.com"
+],
+"Sonata Software": [
+"sonata-software.com"
+],
+"KPIT": [
+"kpit.com"
+],
+"Genpact": [
+"genpact.com"
+],
+"Deloitte": [
+"deloitte.com",
+"apply.deloitte.com"
+],
+"EY": [
+"ey.com"
+],
+"KPMG": [
+"kpmg.com"
+],
+"Mu Sigma": [
+"mu-sigma.com"
+],
+"Fractal Analytics": [
+"fractal.ai"
+],
+"Tredence": [
+"tredence.com"
+],
+"IBM Research": [
+"research.ibm.com"
+],
+"Zoho": [
+"zoho.com"
+],
+"Flipkart": [
+"flipkartcareers.com",
+"flipkart.com"
+],
+"Zomato": [
+"zomato.com"
+],
+"Paytm": [
+"paytm.com"
+],
+"PhonePe": [
+"phonepe.com"
+],
+"Myntra": [
+"myntra.com"
+],
+"Ola": [
+"olacabs.com"
+],
+"Dream11": [
+"dreamsports.group"
+],
+"MakeMyTrip": [
+"makemytrip.com"
+],
+"Nykaa": [
+"nykaa.com"
+],
+"ShareChat": [
+"sharechat.com"
+],
+"JioHotstar": [
+"hotstar.com"
+],
+"Reliance Jio": [
+"jio.com"
+],
+"Bharti Airtel": [
+"airtel.in"
+],
+"Delhivery": [
+"delhivery.com"
+],
+"PhysicsWallah": [
+"pw.live"
+],
+"Zerodha": [
+"zerodha.com"
+],
+"Postman": [
+"postman.com"
+],
+"BrowserStack": [
+"browserstack.com"
+],
+"Juspay": [
+"juspay.in"
+],
+"Urban Company": [
+"urbancompany.com"
+],
+"Zepto": [
+"zeptonow.com"
+],
+"Rapido": [
+"rapido.bike"
+],
+"BharatPe": [
+"bharatpe.com"
+],
+"Atlan": [
+"atlan.com"
+],
+"Chargebee": [
+"chargebee.com"
+],
+"Sprinklr": [
+"sprinklr.com"
+],
+"Razorpay": [
+"razorpay.com"
+]
+}

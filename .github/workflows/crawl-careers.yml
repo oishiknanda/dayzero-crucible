@@ -41,6 +41,10 @@ jobs:
       - name: Crawl
         run: node scripts/crawl-careers.mjs --prev prev.json --out out/crawled-jobs.json
 
+      - name: Read job sitemaps (no browser, new pages only)
+        run: |
+          if [ -f scripts/sitemap-sources.json ]; then node scripts/crawl-sitemaps.mjs --prev prev.json --out out/crawled-jobs.json; else echo "no sitemap-sources.json yet"; fi
+
       - name: Save screenshots of pages that returned nothing
         if: always()
         uses: actions/upload-artifact@v4
