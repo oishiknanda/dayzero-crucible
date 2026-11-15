@@ -1,5 +1,5 @@
 import { ALL_COMPANY_NAMES } from "../../data/hiringCompanies";
-import { careersUrlFor } from "../../data/careerLinks";
+import { careersUrlFor, indiaSearchUrlFor } from "../../data/careerLinks";
 import { fetchFromSource } from "./adapters";
 import { fetchCrawled } from "./crawled";
 import { aggregatorEnabled, fetchAggregated } from "./aggregator";
@@ -82,11 +82,11 @@ export async function collectAllCompanies(now: number, legacy: { name: string; o
   const agg = aggregatorEnabled();
   const coverage: CoverageRow[] = ALL_COMPANY_NAMES.map((name) => {
     const lg = legacy.find((l) => l.name === name);
-    if (lg) return { company: name, status: lg.ok ? "live" : "pending", source: "Official career feed", jobs: legacyJobs.filter((j) => j.company === name).length, careersUrl: careersUrlFor(name) } as CoverageRow;
-    if (okDirect[name]) return { company: name, status: "live", source: okDirect[name].label, jobs: okDirect[name].jobs.length, careersUrl: careersUrlFor(name) } as CoverageRow;
-    if (crawledBy[name]) return { company: name, status: "live", source: "Career-page agent", jobs: crawledBy[name], careersUrl: careersUrlFor(name) } as CoverageRow;
-    if (agg) return { company: name, status: "aggregated", source: "Job aggregator", jobs: aggBy[name] || 0, careersUrl: careersUrlFor(name) } as CoverageRow;
-    return { company: name, status: "pending", source: "Connecting", jobs: 0, careersUrl: careersUrlFor(name) } as CoverageRow;
+    if (lg) return { company: name, status: lg.ok ? "live" : "pending", source: "Official career feed", jobs: legacyJobs.filter((j) => j.company === name).length, careersUrl: careersUrlFor(name), directSearchUrl: indiaSearchUrlFor(name) } as CoverageRow;
+    if (okDirect[name]) return { company: name, status: "live", source: okDirect[name].label, jobs: okDirect[name].jobs.length, careersUrl: careersUrlFor(name), directSearchUrl: indiaSearchUrlFor(name) } as CoverageRow;
+    if (crawledBy[name]) return { company: name, status: "live", source: "Career-page agent", jobs: crawledBy[name], careersUrl: careersUrlFor(name), directSearchUrl: indiaSearchUrlFor(name) } as CoverageRow;
+    if (agg) return { company: name, status: "aggregated", source: "Job aggregator", jobs: aggBy[name] || 0, careersUrl: careersUrlFor(name), directSearchUrl: indiaSearchUrlFor(name) } as CoverageRow;
+    return { company: name, status: "pending", source: "Careers page", jobs: 0, careersUrl: careersUrlFor(name), directSearchUrl: indiaSearchUrlFor(name) } as CoverageRow;
   });
 
   return { jobs, coverage, aggregatorEnabled: agg };

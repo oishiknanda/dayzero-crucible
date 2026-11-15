@@ -25,7 +25,8 @@ export type SourceSpec =
   | { kind: "microsoft" }
   | { kind: "google" };
 
-export type CoverageStatus = "live" | "aggregated" | "pending";
+/** live = official feed; aggregated = job-data partner; alerts = official email-alert sync; pending = careers page only */
+export type CoverageStatus = "live" | "aggregated" | "alerts" | "pending";
 
 export type CoverageRow = {
   company: string;
@@ -35,4 +36,6 @@ export type CoverageRow = {
   jobs: number;
   /** where a visitor can browse this company's openings directly */
   careersUrl: string;
+  /** careers search already filtered to India engineering, when that URL format is known */
+  directSearchUrl?: string;
 };

@@ -19,10 +19,11 @@ type HiringAlert = {
 
 type CoverageRow = {
   company: string;
-  status: "live" | "aggregated" | "pending";
+  status: "live" | "aggregated" | "alerts" | "pending";
   source: string;
   jobs: number;
   careersUrl: string;
+  directSearchUrl?: string;
 };
 
 type FeedResponse = {
@@ -115,6 +116,7 @@ export function HiringAlertsFeed() {
       total: rows.length,
       live: rows.filter((row) => row.status === "live").length,
       aggregated: rows.filter((row) => row.status === "aggregated").length,
+      alerts: rows.filter((row) => row.status === "alerts").length,
       pending: rows.filter((row) => row.status === "pending").length,
     };
   }, [data?.coverage]);
@@ -178,7 +180,7 @@ export function HiringAlertsFeed() {
               {monitoredCompanies.map((company) => {
                 const count = data?.jobs.filter((job) => job.company === company).length ?? 0;
                 const row = statusOf[company];
-                const tag = count > 0 ? `${count} open` : row?.status === "pending" ? "connecting" : "no India openings now";
+                const tag = count > 0 ? `${count} open` : row?.status === "pending" ? "careers page only" : "no India openings now";
                 return <option key={company} value={company}>{company} · {tag}</option>;
               })}
             </optgroup>
@@ -195,16 +197,23 @@ export function HiringAlertsFeed() {
         <div className="mb-5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600 sm:px-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span>
-              <strong className="text-slate-900">{coverageSummary.live + coverageSummary.aggregated}</strong> of {coverageSummary.total} companies monitored
-              {" "}({coverageSummary.live} official feeds{coverageSummary.aggregated ? `, ${coverageSummary.aggregated} via job-data partners` : ""}
-              {coverageSummary.pending ? `, ${coverageSummary.pending} connecting` : ""})
+              <strong className="text-slate-900">{coverageSummary.live + coverageSummary.aggregated + coverageSummary.alerts}</strong> of {coverageSummary.total} companies have live alerts
+              {" "}({coverageSummary.live} live feeds{coverageSummary.alerts ? `, ${coverageSummary.alerts} official alert sync` : ""}{coverageSummary.aggregated ? `, ${coverageSummary.aggregated} via job-data partners` : ""}).
+              {coverageSummary.pending ? ` The other ${coverageSummary.pending} link straight to their careers page.` : ""}
             </span>
             <button type="button" onClick={() => setShowCoverage((v) => !v)} className="font-bold text-indigo-700 hover:underline">
               {showCoverage ? "Hide coverage" : "See coverage"}
             </button>
           </div>
           {showCoverage && (
-            <div className="mt-3 flex flex-wrap gap-1.5 border-t border-slate-100 pt-3">
+            <div className="mt-3 border-t border-slate-100 pt-3">
+              <div className="mb-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-semibold">
+                <span className="text-emerald-700">● Live feed</span>
+                <span className="text-amber-700">● Official alert sync</span>
+                <span className="text-sky-700">● Via job-data partner</span>
+                <span className="text-slate-500">● Careers page only</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
               {(data?.coverage ?? []).map((row) => (
                 <button
                   key={row.company}
@@ -214,11 +223,13 @@ export function HiringAlertsFeed() {
                   className={`rounded-full border px-2.5 py-1 font-semibold transition hover:border-indigo-400 ${
                     row.status === "live" ? "border-emerald-200 bg-emerald-50 text-emerald-800"
                     : row.status === "aggregated" ? "border-sky-200 bg-sky-50 text-sky-800"
+                    : row.status === "alerts" ? "border-amber-200 bg-amber-50 text-amber-800"
                     : "border-slate-200 bg-slate-50 text-slate-500"}`}
                 >
                   {row.company}{row.jobs ? ` · ${row.jobs}` : ""}
                 </button>
               ))}
+              </div>
             </div>
           )}
         </div>
@@ -236,11 +247,11 @@ export function HiringAlertsFeed() {
             {statusOf[selectedCompany].jobs > 0
               ? `${selectedCompany}: ${statusOf[selectedCompany].jobs} India opening${statusOf[selectedCompany].jobs === 1 ? "" : "s"} found.`
               : statusOf[selectedCompany].status === "pending"
-                ? `${selectedCompany}: live alerts are not connected yet.`
+                ? `${selectedCompany}: no live feed yet. Open its careers page to browse openings.`
                 : `${selectedCompany}: no India openings found right now.`}
           </span>
-          <a href={statusOf[selectedCompany].careersUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-bold text-indigo-700 hover:underline">
-            Open {selectedCompany} careers page <ExternalLink className="h-3.5 w-3.5" />
+          <a href={statusOf[selectedCompany].directSearchUrl || statusOf[selectedCompany].careersUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-bold text-indigo-700 hover:underline">
+            {statusOf[selectedCompany].directSearchUrl ? `Search ${selectedCompany} India engineering jobs` : `Open ${selectedCompany} careers page`} <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </div>
       )}
@@ -250,7 +261,7 @@ export function HiringAlertsFeed() {
           <BriefcaseBusiness className="mx-auto h-8 w-8 text-slate-400" />
           <h2 className="mt-4 text-lg font-bold text-slate-900">No matching India roles right now</h2>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-600">
-            There are no current India openings matching this filter. New postings are checked from connected official career feeds.
+            There are no current India openings matching this filter. Companies without a live feed link to their careers page instead.
           </p>
         </div>
       )}
