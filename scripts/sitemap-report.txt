@@ -1,0 +1,120 @@
+Usable job sitemaps: 6 / 117
+  OK   Accenture  1017 job URLs, JobPosting on 4/4 sampled pages (0 in India)  https://www.accenture.com/sitemap-index.xml
+  OK   Aurora  82 job URLs, JobPosting on 4/4 sampled pages (0 in India)  https://aurora.tech/sitemap.xml
+  OK   Barclays  650 job URLs, JobPosting on 4/4 sampled pages (3 in India)  https://search.jobs.barclays/sitemap.xml
+  OK   Cisco  1452 job URLs, JobPosting on 4/4 sampled pages (0 in India)  https://careers.cisco.com/ca/fr/sitemap_index.xml
+  OK   Etsy  71 job URLs, JobPosting on 4/4 sampled pages (0 in India)  https://etsy.com/careers/sitemap.xml
+  OK   Optiver  222 job URLs, JobPosting on 4/4 sampled pages (0 in India)  https://www.optiver.com/sitemap.xml
+
+Not usable:
+  --   AMD: no job sitemap
+  --   American Express: no job sitemap
+  --   Apple: no job sitemap
+  --   Atlan: no job sitemap
+  --   Atlassian: job sitemap found, but pages have no JobPosting data
+  --   BharatPe: no job sitemap
+  --   Bharti Airtel: blocked (403)
+  --   Birlasoft: job sitemap found, but pages have no JobPosting data
+  --   Bloomberg: blocked (403)
+  --   BNY: no job sitemap
+  --   Booking.com: no job sitemap
+  --   BrowserStack: no job sitemap
+  --   Capgemini: job sitemap found, but pages have no JobPosting data
+  --   Chargebee: job sitemap found, but pages have no JobPosting data
+  --   Checkout.com: no job sitemap
+  --   Citadel: blocked (403)
+  --   Coforge: no job sitemap
+  --   Cognizant: no job sitemap
+  --   Cruise: no job sitemap
+  --   D.E. Shaw: job sitemap found, but pages have no JobPosting data
+  --   Delhivery: no job sitemap
+  --   Dell Technologies: no job sitemap
+  --   Deloitte: job sitemap found, but pages have no JobPosting data
+  --   DocuSign: no job sitemap
+  --   Dream11: no job sitemap
+  --   Expedia: job sitemap found, but pages have no JobPosting data
+  --   EY: job sitemap found, but pages have no JobPosting data
+  --   Flipkart: job sitemap found, but pages have no JobPosting data
+  --   Fractal Analytics: no job sitemap
+  --   Genpact: job sitemap found, but pages have no JobPosting data
+  --   GitHub: no job sitemap
+  --   Goldman Sachs: job sitemap found, but pages have no JobPosting data
+  --   Google: job sitemap found, but pages have no JobPosting data
+  --   GoTo: no job sitemap
+  --   HashiCorp: blocked (429)
+  --   HCLTech: no job sitemap
+  --   Hexaware: no job sitemap
+  --   Honeywell: job sitemap found, but pages have no JobPosting data
+  --   HSBC: blocked (403)
+  --   HubSpot: job sitemap found, but pages have no JobPosting data
+  --   IBM: job sitemap found, but pages have no JobPosting data
+  --   IBM Research: no job sitemap
+  --   Infosys: blocked (403)
+  --   Intel: blocked (429)
+  --   Intuit: blocked (429)
+  --   J.P. Morgan Chase: job sitemap found, but pages have no JobPosting data
+  --   JioHotstar: no job sitemap
+  --   Juspay: no job sitemap
+  --   Klarna: blocked (403)
+  --   KPIT: no job sitemap
+  --   KPMG: job sitemap found, but pages have no JobPosting data
+  --   LinkedIn: no job sitemap
+  --   LTIMindtree: no job sitemap
+  --   MakeMyTrip: no job sitemap
+  --   Meta: blocked (403)
+  --   Microsoft: no job sitemap
+  --   Monday.com: no job sitemap
+  --   Morgan Stanley: no job sitemap
+  --   Mphasis: no job sitemap
+  --   Mu Sigma: no job sitemap
+  --   Myntra: no job sitemap
+  --   Netflix: job sitemap found, but pages have no JobPosting data
+  --   NTT Data: job sitemap found, but pages have no JobPosting data
+  --   Nykaa: blocked (403)
+  --   Ola: no job sitemap
+  --   Oracle: job sitemap found, but pages have no JobPosting data
+  --   Palo Alto Networks: no job sitemap
+  --   Paytm: no job sitemap
+  --   Persistent Systems: job sitemap found, but pages have no JobPosting data
+  --   PhonePe: job sitemap found, but pages have no JobPosting data
+  --   PhysicsWallah: no job sitemap
+  --   Postman: no job sitemap
+  --   Qualcomm: job sitemap found, but pages have no JobPosting data
+  --   Rapido: no job sitemap
+  --   Razorpay: no job sitemap
+  --   Reliance Jio: no job sitemap
+  --   Revolut: blocked (403)
+  --   Rivian: no job sitemap
+  --   Samsung R&D: no job sitemap
+  --   SAP: blocked (403)
+  --   ShareChat: no job sitemap
+  --   Shopify: job sitemap found, but pages have no JobPosting data
+  --   Siemens: job sitemap found, but pages have no JobPosting data
+  --   Slack: no job sitemap
+  --   Snapchat: no job sitemap
+  --   Snowflake: no job sitemap
+  --   Sonata Software: no job sitemap
+  --   Splunk: no job sitemap
+  --   Sprinklr: job sitemap found, but pages have no JobPosting data
+  --   Standard Chartered: no job sitemap
+  --   Target: job sitemap found, but pages have no JobPosting data
+  --   TCS: blocked (403)
+  --   Tech Mahindra: job sitemap found, but pages have no JobPosting data
+  --   Tesla (Autopilot): blocked (403)
+  --   Texas Instruments: no job sitemap
+  --   Thomson Reuters: blocked (429)
+  --   Tower Research: no job sitemap
+  --   Tredence: no job sitemap
+  --   Two Sigma: job sitemap found, but pages have no JobPosting data
+  --   Urban Company: no job sitemap
+  --   Virtusa: blocked (403)
+  --   Visa: no job sitemap
+  --   VMware: no job sitemap
+  --   Walmart Global Tech: job sitemap found, but pages have no JobPosting data
+  --   Wipro: job sitemap found, but pages have no JobPosting data
+  --   Zendesk: no job sitemap
+  --   Zensar: job sitemap found, but pages have no JobPosting data
+  --   Zepto: no job sitemap
+  --   Zerodha: blocked (429)
+  --   Zoho: no job sitemap
+  --   Zomato: no job sitemap

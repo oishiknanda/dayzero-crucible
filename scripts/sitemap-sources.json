@@ -1,0 +1,35 @@
+{
+ "discoveredAt": "2026-11-16T19:27:58.866Z",
+ "sources": {
+  "Accenture": {
+   "sitemaps": [
+    "https://www.accenture.com/sitemap-index.xml"
+   ]
+  },
+  "Aurora": {
+   "sitemaps": [
+    "https://aurora.tech/sitemap.xml"
+   ]
+  },
+  "Barclays": {
+   "sitemaps": [
+    "https://search.jobs.barclays/sitemap.xml"
+   ]
+  },
+  "Cisco": {
+   "sitemaps": [
+    "https://careers.cisco.com/ca/fr/sitemap_index.xml"
+   ]
+  },
+  "Etsy": {
+   "sitemaps": [
+    "https://etsy.com/careers/sitemap.xml"
+   ]
+  },
+  "Optiver": {
+   "sitemaps": [
+    "https://www.optiver.com/sitemap.xml"
+   ]
+  }
+ }
+}
