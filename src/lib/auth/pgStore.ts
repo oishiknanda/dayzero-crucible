@@ -80,6 +80,9 @@ function ready(): Promise<Pool> {
   return g.__dzSchema.then(pool);
 }
 
+// Shared with other database features (problem overrides): one pool, tables created once.
+export const dbReady = ready;
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const toUser = (r: any): StoredUser => ({
   id: r.id,
