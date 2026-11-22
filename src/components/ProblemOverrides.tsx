@@ -2,44 +2,44 @@
 // Loads question edits from the database (if any) BEFORE the interview page renders, then puts them over the
 // built-in questions. Fails open: on any error or a slow answer, the built-in questions are used unchanged.
 import { useEffect, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import { PROBLEMS_DATABASE, type ProblemDefinition } from "../data/problemsRegistry";
 import { ZOMATO_TRACKS } from "../data/zomatoTracks";
+import { GOOGLE_TRACKS } from "../data/googleTracks";
+import { buildSafeProblemSetOverrides, type OverrideTrackMap } from "../lib/problemOverrides";
+import { ProblemOverrideContext, type ProblemOverrideData } from "../lib/problemOverrideContext";
 
 // Companies whose question sets can be re-arranged from the database. Adding a company = one line here.
-type TrackSet = { setId: number; problemIds: string[] };
-type TrackMap = Record<string, { rounds: Array<{ roundId: string; sets: TrackSet[] }> }>;
-const TRACKS: Record<string, TrackMap> = { zomato: ZOMATO_TRACKS as unknown as TrackMap };
-
-let loaded = false;
+const TRACKS: Record<string, OverrideTrackMap> = {
+  google: GOOGLE_TRACKS as unknown as OverrideTrackMap,
+  zomato: ZOMATO_TRACKS as unknown as OverrideTrackMap,
+};
 
 export default function ProblemOverrides({ children }: { children: ReactNode }) {
-  const [ready, setReady] = useState(loaded);
+  const searchParams = useSearchParams();
+  const company = (searchParams.get("company") || "").toLowerCase();
+  const [ready, setReady] = useState(false);
+  const [loadedCompany, setLoadedCompany] = useState("");
+  const [overrides, setOverrides] = useState<ProblemOverrideData>({ problems: {}, sets: {} });
   useEffect(() => {
-    if (loaded) return;
+    if (!TRACKS[company]) { setLoadedCompany(company); setReady(true); return; }
+    setReady(false);
     let cancelled = false;
     const ctl = new AbortController();
     const timer = setTimeout(() => ctl.abort(), 2500);
-    fetch("/api/problems/overrides", { signal: ctl.signal })
+    fetch("/api/problems/overrides?company=" + encodeURIComponent(company), { signal: ctl.signal, cache: "no-store" })
       .then((r) => (r.ok ? r.json() : { problems: {} }))
       .then((d: { problems?: Record<string, ProblemDefinition>; sets?: Record<string, string[]> }) => {
         const p = d && d.problems ? d.problems : {};
-        for (const id of Object.keys(p)) PROBLEMS_DATABASE[id] = p[id];
-        // A set that has rows in the database is made of exactly those questions, in that order.
-        // Only questions we can actually show are used, and a set never ends up empty.
-        const sets = d && d.sets ? d.sets : {};
-        for (const key of Object.keys(sets)) {
-          const [company, role, roundId, setNo] = key.split("|");
-          const track = TRACKS[company] && TRACKS[company][role];
-          const round = track && track.rounds.find((r) => r.roundId === roundId);
-          const set = round && round.sets.find((s) => s.setId === Number(setNo));
-          const ids = sets[key].filter((id) => PROBLEMS_DATABASE[id]);
-          if (set && ids.length > 0) set.problemIds = ids;
-        }
-        loaded = true;
+        // A set with an unresolved built-in id stays entirely on its built-in question list.
+        const safeSets = buildSafeProblemSetOverrides(TRACKS[company], company, d && d.sets ? d.sets : {}, (id) => !!p[id] || !!PROBLEMS_DATABASE[id]);
+        setOverrides({ problems: p, sets: safeSets });
       })
       .catch(() => undefined)
-      .then(() => { clearTimeout(timer); if (!cancelled) setReady(true); });
+      .then(() => { clearTimeout(timer); if (!cancelled) { setLoadedCompany(company); setReady(true); } });
     return () => { cancelled = true; ctl.abort(); clearTimeout(timer); };
-  }, []);
-  return ready ? <>{children}</> : null;
+  }, [company]);
+  return ready && loadedCompany === company
+    ? <ProblemOverrideContext.Provider value={overrides}>{children}</ProblemOverrideContext.Provider>
+    : null;
 }
