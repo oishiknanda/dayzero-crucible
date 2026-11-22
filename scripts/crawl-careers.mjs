@@ -10,7 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { jobsFromJson, jobsFromJsonLd, jobsFromLinks, keepJob } from "./career-extract.mjs";
+import { INDIA, TECH, jobsFromJson, jobsFromJsonLd, jobsFromLinks, keepJob, shapeOf } from "./career-extract.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const arg = (name, dflt) => { const i = process.argv.indexOf(name); return i > -1 ? process.argv[i + 1] : dflt; };
@@ -34,6 +34,7 @@ const now = Date.now();
 const MAX_AGE = 30 * 86400000;
 const companies = {};
 const jobs = [];
+const discovery = {}; // what each page loads, so per-company readers can be written from real data
 
 for (const [company, url] of Object.entries(pages)) {
   if (only.length && !only.includes(company)) continue;
@@ -44,17 +45,26 @@ for (const [company, url] of Object.entries(pages)) {
       if (!(res.headers()["content-type"] || "").includes("json")) return;
       const body = await res.text();
       if (body.length > 3_000_000) return;
-      payloads.push({ json: JSON.parse(body), base: res.url() });
+      const json = JSON.parse(body);
+      payloads.push({ json, base: res.url() });
+      const shape = shapeOf(json);
+      if (shape) (discovery[company] = discovery[company] || []).push({ url: res.url().slice(0, 300), method: res.request().method(), post: (res.request().postData() || "").slice(0, 300), bytes: body.length, list: shape });
     } catch { /* not json / already closed */ }
   });
   let method = "none";
   let error = "";
   let found = [];
+  let status = 0;
+  let title = "";
+  let jsonCount = 0;
   try {
-    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+    const resp = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+    status = resp ? resp.status() : 0;
     await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
     for (let i = 0; i < 3; i++) { await page.mouse.wheel(0, 2500); await page.waitForTimeout(1500); }
 
+    title = (await page.title().catch(() => "")).slice(0, 60);
+    jsonCount = payloads.length;
     const fromJson = payloads.flatMap((p) => jobsFromJson(p.json, new URL(url).origin, now));
     const ld = await page.$$eval('script[type="application/ld+json"]', (els) => els.map((e) => e.textContent || ""));
     const fromLd = jobsFromJsonLd(ld, url, now);
@@ -67,12 +77,19 @@ for (const [company, url] of Object.entries(pages)) {
     }
   } catch (e) {
     error = String(e && e.message ? e.message : e).split("\n")[0].slice(0, 160);
+    // keep a picture of pages that gave nothing, so the cause (block page, cookie wall, empty search) is visible
   } finally {
+    try {
+      if (!found.length) {
+        fs.mkdirSync(path.join(path.dirname(outPath), "shots"), { recursive: true });
+        await page.screenshot({ path: path.join(path.dirname(outPath), "shots", company.replace(/[^a-z0-9]+/gi, "_") + ".png") });
+      }
+    } catch { /* ignore */ }
     await page.close().catch(() => {});
   }
 
   const seen = new Set();
-  const kept = found.filter((j) => keepJob(j, url) && !seen.has(j.url) && seen.add(j.url)).slice(0, 60);
+  const kept = found.filter((j) => keepJob(j) && !seen.has(j.url) && seen.add(j.url)).slice(0, 60);
   let count = 0;
   for (const j of kept) {
     const id = "cr-" + crypto.createHash("sha1").update(j.url).digest("hex").slice(0, 12);
@@ -87,10 +104,15 @@ for (const [company, url] of Object.entries(pages)) {
     count++;
   }
   companies[company] = { ok: count > 0, count, method, ...(error ? { error } : {}) };
-  console.log(`${count > 0 ? "OK  " : "--  "} ${company}: ${count} jobs (${method})${error ? " - " + error : ""}`);
+  const tech = found.filter((j) => TECH.test(j.title)).length;
+  const india = found.filter((j) => TECH.test(j.title) && (j.location ? INDIA.test(j.location) : false)).length;
+  const sample = found.slice(0, 2).map((j) => `${j.title.slice(0, 30)} @ ${j.location || "?"}`).join(" ; ");
+  console.log(`${count > 0 ? "OK  " : "--  "} ${company}: ${count} jobs (${method}) http=${status} json=${jsonCount} raw=${found.length} tech=${tech} india=${india} title="${title}"${sample ? " e.g. " + sample : ""}${error ? " - " + error : ""}`);
 }
 
 await browser.close();
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
+for (const c of Object.keys(discovery)) discovery[c] = discovery[c].sort((a, b) => b.list.len - a.list.len).slice(0, 8);
+fs.writeFileSync(path.join(path.dirname(outPath), "discovery.json"), JSON.stringify({ generatedAt: new Date(now).toISOString(), discovery }, null, 1));
 fs.writeFileSync(outPath, JSON.stringify({ generatedAt: new Date(now).toISOString(), companies, jobs }, null, 1));
 console.log(`\nWrote ${jobs.length} jobs for ${Object.values(companies).filter((c) => c.ok).length}/${Object.keys(companies).length} companies -> ${outPath}`);
