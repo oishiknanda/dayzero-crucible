@@ -1,10 +1,11 @@
 // Copies a company's built-in questions into dz_problems. Existing question data is never overwritten.
-// For now the database-backed role x round x set adapters are Google and Zomato.
-// Usage: npx tsx scripts/seed-problems.ts <google|zomato|all>
+// Usage: npx tsx scripts/seed-problems.ts <google|accenture|zomato|all>
 import fs from "node:fs";
 import path from "node:path";
 import { GOOGLE_ALL_PROBLEMS } from "../src/data/problems/google/googleProblems";
 import { GOOGLE_TRACKS } from "../src/data/googleTracks";
+import { ACCENTURE_ALL_PROBLEMS } from "../src/data/problems/accenture/accentureProblems";
+import { ACCENTURE_TRACKS } from "../src/data/accentureTracks";
 import { ZOMATO_ALL_PROBLEMS } from "../src/data/problems/zomato/zomatoProblems";
 import { ZOMATO_TRACKS } from "../src/data/zomatoTracks";
 import { prepareProblemRows, type SeedTracks } from "../src/lib/problemSeed";
@@ -23,6 +24,7 @@ if (!process.env.DATABASE_URL) {
 type Source = { name: string; data: Record<string, unknown>; tracks: SeedTracks };
 const SOURCES: Record<string, Source> = {
   google: { name: "Google", data: GOOGLE_ALL_PROBLEMS, tracks: GOOGLE_TRACKS as unknown as SeedTracks },
+  accenture: { name: "Accenture", data: ACCENTURE_ALL_PROBLEMS, tracks: ACCENTURE_TRACKS as unknown as SeedTracks },
   zomato: { name: "Zomato", data: ZOMATO_ALL_PROBLEMS, tracks: ZOMATO_TRACKS as unknown as SeedTracks },
 };
 

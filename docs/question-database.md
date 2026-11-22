@@ -1,6 +1,6 @@
 # Question database
 
-The built-in question modules in `src/data/**` remain the source of truth for fallback behavior. PostgreSQL rows in `dz_problems` can override a question's data and the ordered problem ids in a role/round/set. Seed adapters currently cover Google and Zomato; additional companies are added one at a time after verification. The database fails open to built-in questions when it is unavailable or `DATABASE_URL` is unset.
+The built-in question modules in `src/data/**` remain the source of truth for fallback behavior. PostgreSQL rows in `dz_problems` can override a question's data and the ordered problem ids in a role/round/set. Seed adapters currently cover Google, Accenture, and Zomato; additional companies are added one at a time after verification. The database fails open to built-in questions when it is unavailable or `DATABASE_URL` is unset.
 
 ## Hierarchy and columns
 

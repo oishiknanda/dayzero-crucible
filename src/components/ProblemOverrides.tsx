@@ -6,12 +6,14 @@ import { useSearchParams } from "next/navigation";
 import { PROBLEMS_DATABASE, type ProblemDefinition } from "../data/problemsRegistry";
 import { ZOMATO_TRACKS } from "../data/zomatoTracks";
 import { GOOGLE_TRACKS } from "../data/googleTracks";
+import { ACCENTURE_TRACKS } from "../data/accentureTracks";
 import { buildSafeProblemSetOverrides, type OverrideTrackMap } from "../lib/problemOverrides";
 import { ProblemOverrideContext, type ProblemOverrideData } from "../lib/problemOverrideContext";
 
 // Companies whose question sets can be re-arranged from the database. Adding a company = one line here.
 const TRACKS: Record<string, OverrideTrackMap> = {
   google: GOOGLE_TRACKS as unknown as OverrideTrackMap,
+  accenture: ACCENTURE_TRACKS as unknown as OverrideTrackMap,
   zomato: ZOMATO_TRACKS as unknown as OverrideTrackMap,
 };
 

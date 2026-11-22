@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { GOOGLE_TRACKS } from "../data/googleTracks";
 import { GOOGLE_ALL_PROBLEMS } from "../data/problems/google/googleProblems";
+import { ACCENTURE_TRACKS } from "../data/accentureTracks";
+import { ACCENTURE_ALL_PROBLEMS } from "../data/problems/accenture/accentureProblems";
 import { prepareProblemRows, type SeedTracks } from "./problemSeed";
 
 describe("prepareProblemRows", () => {
@@ -15,6 +17,15 @@ describe("prepareProblemRows", () => {
       id: "goog-intern-s1-r1-q1", company: "Google", role: "swe_intern",
       roleName: "Google SWE Intern", roundId: "round-1", setId: 1, position: 1,
     });
+  });
+
+  it("maps all Accenture track questions into hierarchy rows", () => {
+    const check = prepareProblemRows("Accenture", ACCENTURE_ALL_PROBLEMS, ACCENTURE_TRACKS);
+    expect(check.rows).toHaveLength(150);
+    expect(check.missingDefinitionIds).toEqual([]);
+    expect(check.invalidDefinitionIds).toEqual([]);
+    expect(check.untrackedDefinitionIds).toEqual([]);
+    expect(check.duplicateTrackIds).toEqual([]);
   });
 
   it("reports missing, invalid, untracked, and duplicated ids before a write", () => {
