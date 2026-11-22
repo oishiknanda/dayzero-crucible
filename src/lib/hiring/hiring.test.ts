@@ -117,7 +117,7 @@ describe("career-page extractor", () => {
     expect(jobs).toHaveLength(2);
     expect(jobs[0].url).toBe("https://careers.example.com/job/blr/se2_R1");
     expect(jobs[0].publishedMs).toBe(NOW - 3 * 86400000);
-    expect(jobs.filter((j) => keepJob(j, base)).map((j) => j.title)).toEqual(["Software Engineer II"]);
+    expect(jobs.filter((j) => keepJob(j)).map((j) => j.title)).toEqual(["Software Engineer II"]);
   });
   it("reads JobPosting markup, including @graph", () => {
     const block = JSON.stringify({ "@graph": [{ "@type": "JobPosting", title: "Data Engineer", url: "https://x.com/j/1", datePosted: "2026-11-10", jobLocation: { address: { addressLocality: "Pune", addressCountry: "IN" } } }] });
@@ -133,10 +133,12 @@ describe("career-page extractor", () => {
     ], base);
     expect(jobs.map((j) => j.title)).toEqual(["Backend Developer"]);
   });
-  it("trusts location-less jobs only on India-searched pages", () => {
+  it("keeps only technical jobs that name an India location", () => {
     const j = { title: "Software Engineer", url: "https://a.com/1", location: "", publishedMs: null };
-    expect(keepJob(j, "https://x.com/jobs?location=India")).toBe(true);
-    expect(keepJob(j, "https://x.com/jobs")).toBe(false);
+    expect(keepJob(j)).toBe(false);                                   // no location: could be a menu link
+    expect(keepJob({ ...j, location: "Pune, India" })).toBe(true);
+    expect(keepJob({ ...j, location: "London, UK" })).toBe(false);
+    expect(keepJob({ ...j, title: "Sales Manager", location: "Pune, India" })).toBe(false);
     expect(parseDate("garbage")).toBeNull();
   });
 });
