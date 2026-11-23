@@ -2,7 +2,7 @@
 
 import { getTrackCompany } from '@/data/companyTrackRegistry';
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useContext } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import { clearProctoringSession, getProctoringStream, readProctoringGrant } from
 import { getRoundDurationSeconds } from "@/lib/crucible/roundTiming";
 import { MAX_PROCTOR_WARNINGS, shouldFailForWarningCount } from "@/lib/crucible/proctoringPolicy";
 import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTracks";
+import { ProblemOverrideContext } from "@/lib/problemOverrideContext";
 import { executeCandidateCode, EvaluationReport } from "@/utils/codeRunner";
 import {
   decideGate,
@@ -136,6 +137,7 @@ export default function CrucibleCockpitPage({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const overrideData = useContext(ProblemOverrideContext);
   const companySlug = searchParams.get("company") || "google";
   const isGoogle = (companySlug || "").toLowerCase() === "google";
   // Generated-track companies (Google, Accenture, Zomato): roles, sets and rounds come from the registry.
@@ -298,6 +300,8 @@ export default function CrucibleCockpitPage({
 
   const getResolvedProblemId = (c: string, r: string, role: string, setNum: number, override?: string | null) => {
     if (override && PROBLEMS_DATABASE && PROBLEMS_DATABASE[override]) return override;
+    const overrideIds = overrideData.sets[c.toLowerCase() + "|" + role + "|" + r + "|" + setNum];
+    if (overrideIds && overrideIds.length > 0 && (overrideData.problems[overrideIds[0]] || PROBLEMS_DATABASE[overrideIds[0]])) return overrideIds[0];
 
     // Generated tracks (Google, Accenture, Zomato): resolve from the registry and fall back to Set 1.
     const tc = getTrackCompany(c);
@@ -353,7 +357,13 @@ export default function CrucibleCockpitPage({
   const [selectedSetId, setSelectedSetId] = useState<number>(setParam);
   // Google Rounds 2-4 have one problem per set; Round 1 has two tasks.
   const singleTask = !!trackCo && !isRound1;
-  const getQSet = () => (trackCo ? trackCo.getQuestionSet(selectedRole, roundSlug, selectedSetId) : getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId));
+  const getQSet = () => {
+    const baseSet = trackCo ? trackCo.getQuestionSet(selectedRole, roundSlug, selectedSetId) : getAmazonQuestionSet(selectedRole, roundSlug, selectedSetId);
+    const key = companySlug.toLowerCase() + "|" + selectedRole + "|" + roundSlug + "|" + selectedSetId;
+    const ids = overrideData.sets[key];
+    if (!ids || ids.length === 0 || baseSet.problemIds.some((id) => !overrideData.problems[id] && !PROBLEMS_DATABASE[id])) return baseSet;
+    return { ...baseSet, problemIds: ids };
+  };
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [taskScores, setTaskScores] = useState<[number, number]>([0, 0]);
   const [allSetHistory, setAllSetHistory] = useState<any[]>([]);
@@ -366,7 +376,11 @@ export default function CrucibleCockpitPage({
     getResolvedProblemId(companySlug, roundSlug, selectedRole, selectedSetId, problemParam)
   );
 
-  const rawProblem = getProblemById(currentProblemId);
+  useEffect(() => {
+    setCurrentProblemId(getResolvedProblemId(companySlug, roundSlug, selectedRole, selectedSetId, problemParam));
+  }, [companySlug, roundSlug, selectedRole, selectedSetId, problemParam, overrideData]);
+
+  const rawProblem = overrideData.problems[currentProblemId] || getProblemById(currentProblemId);
   const problem: ProblemDefinition =
     rawProblem || PROBLEMS_DATABASE["amz-sde1-oa-s1-q1"] || Object.values(PROBLEMS_DATABASE)[0];
 

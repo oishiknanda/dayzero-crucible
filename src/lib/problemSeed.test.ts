@@ -1,0 +1,70 @@
+import { describe, expect, it } from "vitest";
+import { GOOGLE_TRACKS } from "../data/googleTracks";
+import { GOOGLE_ALL_PROBLEMS } from "../data/problems/google/googleProblems";
+import { ACCENTURE_TRACKS } from "../data/accentureTracks";
+import { ACCENTURE_ALL_PROBLEMS } from "../data/problems/accenture/accentureProblems";
+import { AMAZON_ROLES } from "../data/amazonTracks";
+import { PROBLEMS_DATABASE } from "../data/problemsRegistry";
+import { isValidProblem } from "./problemDefinitionValidation";
+import { prepareProblemRows, type SeedTracks } from "./problemSeed";
+
+describe("prepareProblemRows", () => {
+  it("maps all Google track questions into hierarchy rows", () => {
+    const check = prepareProblemRows("Google", GOOGLE_ALL_PROBLEMS, GOOGLE_TRACKS);
+    expect(check.rows).toHaveLength(150);
+    expect(check.missingDefinitionIds).toEqual([]);
+    expect(check.invalidDefinitionIds).toEqual([]);
+    expect(check.untrackedDefinitionIds).toEqual([]);
+    expect(check.duplicateTrackIds).toEqual([]);
+    expect(check.rows[0]).toMatchObject({
+      id: "goog-intern-s1-r1-q1", company: "Google", role: "swe_intern",
+      roleName: "Google SWE Intern", roundId: "round-1", setId: 1, position: 1,
+    });
+  });
+
+  it("maps all Accenture track questions into hierarchy rows", () => {
+    const check = prepareProblemRows("Accenture", ACCENTURE_ALL_PROBLEMS, ACCENTURE_TRACKS);
+    expect(check.rows).toHaveLength(150);
+    expect(check.missingDefinitionIds).toEqual([]);
+    expect(check.invalidDefinitionIds).toEqual([]);
+    expect(check.untrackedDefinitionIds).toEqual([]);
+    expect(check.duplicateTrackIds).toEqual([]);
+  });
+
+  it("prepares only valid Amazon questions and reports invalid built-in references", () => {
+    const trackedIds = Object.keys(AMAZON_ROLES).flatMap((role) => AMAZON_ROLES[role as keyof typeof AMAZON_ROLES].rounds.flatMap((round) => round.sets.flatMap((set) => set.problemIds)));
+    const trackedIdSet: Record<string, true> = {};
+    trackedIds.forEach((id) => { trackedIdSet[id] = true; });
+    const amazonDefinitions = Object.fromEntries(Object.keys(PROBLEMS_DATABASE).filter((id) => trackedIdSet[id] && isValidProblem(id, PROBLEMS_DATABASE[id])).map((id) => [id, PROBLEMS_DATABASE[id]]));
+    const check = prepareProblemRows("Amazon", amazonDefinitions, AMAZON_ROLES as unknown as SeedTracks, true);
+    expect(check.rows).toHaveLength(158);
+    expect(check.missingDefinitionIds).toHaveLength(51);
+    expect(check.invalidDefinitionIds).toEqual([]);
+    expect(check.untrackedDefinitionIds).toEqual([]);
+    expect(check.duplicateTrackIds).toHaveLength(8);
+    expect(check.rows.every((row) => isValidProblem(row.id, row.data))).toBe(true);
+    expect(check.rows[0].roleName).toBe("Software Development Engineer - Intern");
+  });
+
+  it("reports missing, invalid, untracked, and duplicated ids before a write", () => {
+    const validId = "goog-intern-s1-r1-q1";
+    const invalidId = "goog-invalid";
+    const tracks: SeedTracks = {
+      intern: {
+        roleId: "intern", roleName: "Test Intern", rounds: [{ roundId: "round-1", title: "Round 1", sets: [
+          { setId: 1, title: "Set 1", problemIds: [validId, validId, "missing-id", invalidId] },
+        ] }],
+      },
+    };
+    const check = prepareProblemRows("Google", {
+      [validId]: GOOGLE_ALL_PROBLEMS[validId],
+      [invalidId]: { ...GOOGLE_ALL_PROBLEMS[validId], id: "wrong-id" },
+      orphan: GOOGLE_ALL_PROBLEMS[validId],
+    }, tracks);
+
+    expect(check.missingDefinitionIds).toEqual(["missing-id"]);
+    expect(check.invalidDefinitionIds).toEqual([invalidId]);
+    expect(check.untrackedDefinitionIds).toEqual(["orphan"]);
+    expect(check.duplicateTrackIds).toEqual([validId]);
+  });
+});

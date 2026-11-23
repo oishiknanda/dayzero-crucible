@@ -1,6 +1,8 @@
 // Question overrides stored in Postgres. The built-in questions in src/data stay the default and the fallback:
 // a question is replaced only when a valid, enabled row exists for it. With no DATABASE_URL, nothing changes.
 import { dbReady } from "./auth/pgStore";
+import { isValidProblem } from "./problemDefinitionValidation";
+export { isValidProblem } from "./problemDefinitionValidation";
 
 type Row = { id: string; data: unknown };
 
@@ -13,7 +15,7 @@ CREATE TABLE IF NOT EXISTS dz_problems (
   source text NOT NULL DEFAULT 'seed',
   updated_at text NOT NULL
 );
-CREATE INDEX IF NOT EXISTS dz_problems_company ON dz_problems (company);
+CREATE INDEX IF NOT EXISTS dz_problems_company_enabled ON dz_problems (company, enabled);
 ALTER TABLE dz_problems ADD COLUMN IF NOT EXISTS role text;
 ALTER TABLE dz_problems ADD COLUMN IF NOT EXISTS role_name text;
 ALTER TABLE dz_problems ADD COLUMN IF NOT EXISTS round_id text;
@@ -50,23 +52,7 @@ async function pool() {
   return p;
 }
 
-const isStr = (v: unknown): v is string => typeof v === "string" && v.length > 0;
-const isStrArr = (v: unknown) => Array.isArray(v) && v.every((x) => typeof x === "string");
-const isCases = (v: unknown) => Array.isArray(v) && v.every((t) => t && typeof t === "object" && isStr((t as { id?: unknown }).id));
-
 // A row is used only if it still looks like a complete question. A half-edited row is ignored, never served.
-export function isValidProblem(id: string, d: unknown): boolean {
-  if (!d || typeof d !== "object") return false;
-  const o = d as Record<string, unknown>;
-  const oc = o.optimalComplexity as Record<string, unknown> | undefined;
-  return (
-    o.id === id && isStr(o.title) && ["Easy", "Medium", "Hard"].indexOf(String(o.difficulty)) >= 0 && isStr(o.company) && isStr(o.category) &&
-    isStrArr(o.tags) && isStrArr(o.paragraphs) && Array.isArray(o.examples) && isStrArr(o.constraints) &&
-    isCases(o.visibleTestCases) && isCases(o.hiddenTestCases) && !!o.starterTemplates && typeof o.starterTemplates === "object" &&
-    !!oc && typeof oc.time === "string" && typeof oc.space === "string"
-  );
-}
-
 export type ProblemRow = {
   id: string; company: string; data: unknown;
   role: string; roleName: string; roundId: string; roundTitle: string; setId: number; setTitle: string; position: number;
@@ -75,10 +61,15 @@ export type ProblemRow = {
 // Returns the edited questions, and for each set that has rows in the database the ordered list of question ids
 // that make it up (so removing, adding or re-ordering a question in the database changes the set).
 // Key format: "company|role|roundId|setId" (company in lower case).
-export async function listProblemOverrides(): Promise<{ problems: Record<string, unknown>; sets: Record<string, string[]> }> {
+export async function listProblemOverrides(company: string, role?: string | null): Promise<{ problems: Record<string, unknown>; sets: Record<string, string[]> }> {
   if (!process.env.DATABASE_URL) return { problems: {}, sets: {} };
+  const normalizedCompany = company.trim().toLowerCase();
+  if (!normalizedCompany) return { problems: {}, sets: {} };
   const p = await pool();
-  const r = await p.query("SELECT id, data, company, role, round_id, set_id FROM dz_problems WHERE enabled = true ORDER BY position NULLS LAST, id");
+  const normalizedRole = role && role.trim() ? role.trim() : null;
+  const r = normalizedRole
+    ? await p.query("SELECT id, data, company, role, round_id, set_id FROM dz_problems WHERE enabled = true AND lower(company) = $1 AND role = $2 ORDER BY position NULLS LAST, id", [normalizedCompany, normalizedRole])
+    : await p.query("SELECT id, data, company, role, round_id, set_id FROM dz_problems WHERE enabled = true AND lower(company) = $1 ORDER BY position NULLS LAST, id", [normalizedCompany]);
   const problems: Record<string, unknown> = {};
   const sets: Record<string, string[]> = {};
   for (const row of r.rows as Array<Row & { company: string; role: string | null; round_id: string | null; set_id: number | null }>) {
