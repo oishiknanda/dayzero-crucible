@@ -7,6 +7,7 @@ import { Navbar } from "@/components/landing/Navbar";
 import { getCompanyTrackData } from "@/data/companyTracks";
 import { getTrackCompany } from "@/data/companyTrackRegistry";
 import { authorizeProctoringSession } from "@/lib/crucible/proctoringSession";
+import { captureFaceIdentity, type FaceIdentityReference } from "@/lib/crucible/proctoringVision";
 import { 
   Camera, 
   Mic, 
@@ -50,6 +51,11 @@ export default function PreFlightSetupPage({
 
   // Strict monitoring is selected per assessment and can be disabled for practice.
   const [proctorStrictMode, setProctorStrictMode] = useState<boolean>(true);
+  const [faceConsent, setFaceConsent] = useState(false);
+  const [faceCaptureBusy, setFaceCaptureBusy] = useState(false);
+  const [faceCaptureError, setFaceCaptureError] = useState("");
+  const [faceCaptured, setFaceCaptured] = useState(false);
+  const faceIdentityRef = useRef<FaceIdentityReference | null>(null);
   const handedOffStreamRef = useRef(false);
 
   const router = useRouter();
@@ -106,6 +112,23 @@ export default function PreFlightSetupPage({
       url.searchParams.set("role", selectedRole);
       url.searchParams.set("set", String(setNum));
       window.history.replaceState({}, "", url.toString());
+    }
+  };
+
+  const handleCaptureFace = async () => {
+    if (!videoRef.current || hasCamera !== true || !faceConsent) return;
+    setFaceCaptureBusy(true);
+    setFaceCaptureError("");
+    try {
+      const identity = await captureFaceIdentity(videoRef.current);
+      faceIdentityRef.current = identity;
+      setFaceCaptured(true);
+    } catch (error) {
+      faceIdentityRef.current = null;
+      setFaceCaptured(false);
+      setFaceCaptureError(error instanceof Error ? error.message : "Face verification could not start. Check the camera and try again.");
+    } finally {
+      setFaceCaptureBusy(false);
     }
   };
 
@@ -261,8 +284,12 @@ export default function PreFlightSetupPage({
     setLaunchError("");
     const cameraTrack = streamRef.current?.getVideoTracks()[0];
     const microphoneTrack = streamRef.current?.getAudioTracks()[0];
+    if (proctorStrictMode && (!faceConsent || !faceIdentityRef.current)) {
+      setLaunchError("Strict monitoring needs your consent and a clear face check before entry.");
+      return;
+    }
     if (proctorStrictMode && (isInitializing || hasCamera !== true || hasMic !== true || !cameraTrack || cameraTrack.readyState !== "live" || !microphoneTrack || microphoneTrack.readyState !== "live")) {
-      setLaunchError("Strict proctoring needs working camera and microphone access. Retry the device check or switch to practice mode.");
+      setLaunchError("Strict monitoring needs working camera and microphone access. Retry the device check or switch to practice mode.");
       return;
     }
     setIsLaunching(true);
@@ -281,7 +308,7 @@ export default function PreFlightSetupPage({
 
     const isAmz = params.companyId.toLowerCase() === "amazon" || !!getTrackCompany(params.companyId);
     const mode = proctorStrictMode ? "strict" : "practice";
-    authorizeProctoringSession(sessionId, mode, proctorStrictMode ? streamRef.current : null);
+    authorizeProctoringSession(sessionId, mode, proctorStrictMode ? streamRef.current : null, proctorStrictMode ? faceIdentityRef.current : null);
     if (proctorStrictMode && typeof document !== "undefined" && document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen().catch(() => undefined);
     }
@@ -296,7 +323,7 @@ export default function PreFlightSetupPage({
   }, []);
 
   const sessionId = `${params.companyId}-${params.roundId}-${Date.now().toString(36)}`;
-  const canEnterAssessment = !proctorStrictMode || (!isInitializing && hasCamera === true && hasMic === true && !!streamRef.current);
+  const canEnterAssessment = !proctorStrictMode || (!isInitializing && hasCamera === true && hasMic === true && !!streamRef.current && faceConsent && faceCaptured);
 
   return (
     <main className="min-h-screen bg-[#F1F4F9] text-slate-950 font-sans selection:bg-primary selection:text-white pb-24">
@@ -507,6 +534,20 @@ export default function PreFlightSetupPage({
                 </div>
               </div>
 
+              {proctorStrictMode && <div className="space-y-3 border-t-2 border-slate-200 bg-slate-50 p-4">
+                <label className="flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-slate-700">
+                  <input type="checkbox" checked={faceConsent} onChange={(event) => { setFaceConsent(event.target.checked); faceIdentityRef.current = null; setFaceCaptured(false); setFaceCaptureError(""); }} className="mt-0.5" />
+                  <span>I consent to an on-device face check for this strict round. The reference is held in memory for this round and is not uploaded or saved.</span>
+                </label>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button type="button" onClick={() => void handleCaptureFace()} disabled={!faceConsent || hasCamera !== true || faceCaptureBusy} className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-black text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50">
+                    {faceCaptureBusy ? "Checking face…" : faceCaptured ? "Capture face again" : "Capture face to continue"}
+                  </button>
+                  <span role="status" className={`text-xs font-bold ${faceCaptured ? "text-emerald-700" : "text-slate-500"}`}>{faceCaptured ? "Face reference ready for this round" : "One clear face is required"}</span>
+                </div>
+                {faceCaptureError && <p role="alert" className="text-xs font-semibold text-rose-700">{faceCaptureError}</p>}
+              </div>}
+
               <div className="p-4 bg-slate-50 border-t-2 border-slate-200 flex items-center justify-between text-xs font-mono font-semibold text-slate-700">
                 <span>Resolution: {hasCamera ? "1280x720 (720p HD)" : "Default Standard"}</span>
                 <span>Aspect: 16:9 Landscape</span>
@@ -650,7 +691,7 @@ export default function PreFlightSetupPage({
               </div>
 
               <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
-                Strict monitoring checks your camera and microphone before entry, keeps a small camera preview visible, and warns about camera interruptions, major movement, tab changes, and fullscreen exits. Six warnings are allowed; the seventh ends the attempt. Camera analysis stays in this browser; audio is only sent when you submit a spoken answer. Browser monitoring is best-effort and cannot prevent every way to leave a page.
+                Strict monitoring requires a face check, camera and microphone access, fullscreen, and focus. During the round it checks for missing, multiple, or changed faces, sustained head/gaze shifts, dark or interrupted camera frames, microphone interruptions, tab changes, and fullscreen exits. Warnings appear immediately; unresolved issues receive 15 seconds to recover before the round ends. Face matching runs locally and is not a definitive identity or cheating decision.
               </p>
 
               <button
@@ -671,7 +712,7 @@ export default function PreFlightSetupPage({
                   />
                   <span className="text-xs font-bold text-slate-950 font-sans">
                     {proctorStrictMode
-                      ? "Strict monitoring enabled (camera, focus and fullscreen warnings)"
+                      ? "Strict monitoring enabled (face, camera, microphone, focus and fullscreen checks)"
                       : "Practice mode (camera and focus monitoring off)"}
                   </span>
                 </div>
@@ -708,7 +749,7 @@ export default function PreFlightSetupPage({
       {isInitializing && proctorStrictMode ? "Checking camera and microphone…" : isLaunching ? <><LoaderCircle className="h-5 w-5 animate-spin" />Starting your assessment…</> : "Enter Assessment Sandbox →"}
    </button>
               <p className="mt-3 text-center text-[11px] font-mono text-slate-500 font-semibold">
-                Strict mode analyzes camera frames locally. Audio is sent for transcription only when you submit a spoken answer.
+                Face checks run locally. Audio is sent for transcription only when you submit a spoken answer. No continuous audio is recorded.
               </p>
             </div>
 

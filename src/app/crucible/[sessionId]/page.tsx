@@ -14,7 +14,8 @@ import { getCompanyTrackData } from "@/data/companyTracks";
 import ScorecardShareModal from "@/components/scorecard/ScorecardShareModal";
 import ProctoringCameraTile, { type ProctoringWarning } from "@/components/crucible/ProctoringCameraTile";
 import ProctorRecoveryNotice from "@/components/crucible/ProctorRecoveryNotice";
-import { clearProctoringSession, getProctoringStream, readProctoringGrant } from "@/lib/crucible/proctoringSession";
+import { clearProctoringSession, getProctoringFaceIdentity, getProctoringStream, readProctoringGrant } from "@/lib/crucible/proctoringSession";
+import type { FaceIdentityReference } from "@/lib/crucible/proctoringVision";
 import { getRoundDurationSeconds } from "@/lib/crucible/roundTiming";
 import { MAX_PROCTOR_WARNINGS, shouldFailForWarningCount } from "@/lib/crucible/proctoringPolicy";
 import { AmazonRole, AMAZON_TRACKS, getAmazonQuestionSet } from "@/data/amazonTracks";
@@ -188,6 +189,7 @@ export default function CrucibleCockpitPage({
   const isStrict = proctorMode === "strict";
   const [proctorGateReady, setProctorGateReady] = useState(false);
   const [proctorStream, setProctorStream] = useState<MediaStream | null>(null);
+  const [proctorFaceIdentity, setProctorFaceIdentity] = useState<FaceIdentityReference | null>(null);
   const [proctorWarnings, setProctorWarnings] = useState<ProctoringWarning[]>([]);
   const [proctorWarningCount, setProctorWarningCount] = useState(0);
   const [proctorFailed, setProctorFailed] = useState(false);
@@ -199,15 +201,22 @@ export default function CrucibleCockpitPage({
   const proctorFailedRef = useRef(false);
   const cleanupTimerRef = useRef<number | null>(null);
   const recoveryTimerRef = useRef<number | null>(null);
-  const recoveryWarningRef = useRef<{ code: string; message: string; deadline: number } | null>(null);
-  const clearRecoveryNotice = useCallback((code?: string) => {
-    const active = recoveryWarningRef.current;
-    if (!active || (code && active.code !== code)) return;
-    if (recoveryTimerRef.current !== null) window.clearInterval(recoveryTimerRef.current);
-    recoveryTimerRef.current = null;
-    recoveryWarningRef.current = null;
-    setRecoveryNotice(null);
+  const recoveryWarningRef = useRef<Record<string, { code: string; message: string; deadline: number }>>({});
+  const refreshRecoveryNotice = useCallback(() => {
+    const next = Object.values(recoveryWarningRef.current).sort((left, right) => left.deadline - right.deadline)[0];
+    if (!next) {
+      if (recoveryTimerRef.current !== null) window.clearInterval(recoveryTimerRef.current);
+      recoveryTimerRef.current = null;
+      setRecoveryNotice(null);
+      return;
+    }
+    setRecoveryNotice({ code: next.code, message: next.message, secondsLeft: Math.max(0, Math.ceil((next.deadline - Date.now()) / 1000)) });
   }, []);
+  const clearRecoveryNotice = useCallback((code?: string) => {
+    if (code) delete recoveryWarningRef.current[code];
+    else recoveryWarningRef.current = {};
+    refreshRecoveryNotice();
+  }, [refreshRecoveryNotice]);
   const terminateProctorAssessment = useCallback((message: string) => {
     if (proctorFailedRef.current) return;
     proctorFailedRef.current = true;
@@ -236,31 +245,35 @@ export default function CrucibleCockpitPage({
   }, [isStrict, terminateProctorAssessment]);
   const beginRecoveryNotice = useCallback((code: string, message: string) => {
     if (!isStrict || proctorFailedRef.current) return;
+    if (recoveryWarningRef.current[code]) return;
     recordProctorWarning(code, message);
-    if (proctorFailedRef.current || recoveryWarningRef.current) return;
+    if (proctorFailedRef.current) return;
     const deadline = Date.now() + 15_000;
-    recoveryWarningRef.current = { code, message, deadline };
-    setRecoveryNotice({ code, message, secondsLeft: 15 });
-    recoveryTimerRef.current = window.setInterval(() => {
-      const active = recoveryWarningRef.current;
-      if (!active || active.code !== code) return;
-      const secondsLeft = Math.max(0, Math.ceil((active.deadline - Date.now()) / 1000));
-      setRecoveryNotice({ code, message, secondsLeft });
-      if (secondsLeft === 0) {
-        clearRecoveryNotice(code);
-        terminateProctorAssessment(`Your round was terminated because this issue was not fixed within 15 seconds: ${message}`);
-      }
-    }, 1000);
-  }, [clearRecoveryNotice, isStrict, recordProctorWarning, terminateProctorAssessment]);
+    recoveryWarningRef.current[code] = { code, message, deadline };
+    refreshRecoveryNotice();
+    if (recoveryTimerRef.current === null) {
+      recoveryTimerRef.current = window.setInterval(() => {
+        const now = Date.now();
+        const active = Object.values(recoveryWarningRef.current).sort((left, right) => left.deadline - right.deadline);
+        const expired = active.find((warning) => warning.deadline <= now);
+        if (expired) {
+          clearRecoveryNotice();
+          terminateProctorAssessment(`Your round was terminated because this issue was not fixed within 15 seconds: ${expired.message}`);
+        } else {
+          refreshRecoveryNotice();
+        }
+      }, 250);
+    }
+  }, [clearRecoveryNotice, isStrict, recordProctorWarning, refreshRecoveryNotice, terminateProctorAssessment]);
   const handleProctorWarning = useCallback((code: string, message: string) => {
-    if (code === "camera-ended" || code === "camera-muted" || code === "camera-blank" || code === "fullscreen-exit") {
+    if (["camera-ended", "camera-muted", "camera-blank", "microphone-ended", "microphone-muted", "fullscreen-exit", "face-missing", "multiple-faces", "identity-mismatch", "head-away"].includes(code)) {
       beginRecoveryNotice(code, message);
     } else {
       recordProctorWarning(code, message);
     }
   }, [beginRecoveryNotice, recordProctorWarning]);
   const clearCameraRecovery = useCallback(() => {
-    if (recoveryWarningRef.current?.code.startsWith("camera-")) clearRecoveryNotice(recoveryWarningRef.current.code);
+    Object.keys(recoveryWarningRef.current).filter((code) => code.startsWith("camera-")).forEach(clearRecoveryNotice);
   }, [clearRecoveryNotice]);
   const handleProctorRecovery = useCallback((code: string) => {
     if (code === "camera") clearCameraRecovery();
@@ -270,10 +283,11 @@ export default function CrucibleCockpitPage({
   useEffect(() => {
     const grant = readProctoringGrant(params.sessionId);
     const stream = getProctoringStream(params.sessionId);
+    const faceIdentity = getProctoringFaceIdentity(params.sessionId);
     const videoReady = stream?.getVideoTracks().some((track) => track.readyState === "live") ?? false;
     const audioReady = stream?.getAudioTracks().some((track) => track.readyState === "live") ?? false;
 
-    if (!grant || (grant.mode === "strict" && (!videoReady || !audioReady))) {
+    if (!grant || (grant.mode === "strict" && (!videoReady || !audioReady || !faceIdentity))) {
       const setupParams = new URLSearchParams();
       const role = searchParams.get("role");
       const set = searchParams.get("set");
@@ -286,6 +300,7 @@ export default function CrucibleCockpitPage({
 
     setProctorMode(grant.mode);
     setProctorStream(grant.mode === "strict" ? stream : null);
+    setProctorFaceIdentity(grant.mode === "strict" ? faceIdentity : null);
     setIsFullscreen(Boolean(document.fullscreenElement));
     setProctorGateReady(true);
   }, [params.sessionId, companySlug, roundSlug, router, searchParams]);
@@ -1328,6 +1343,7 @@ export default function CrucibleCockpitPage({
         roleTitle={companyData.roles[selectedRole]?.roleTitle || selectedRole}
         strict={isStrict}
         stream={proctorStream}
+        faceIdentity={proctorFaceIdentity}
         warnings={proctorWarnings}
         warningCount={proctorWarningCount}
         warningLimit={MAX_PROCTOR_WARNINGS}
@@ -1527,7 +1543,7 @@ export default function CrucibleCockpitPage({
             </div>
             <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
             {isStrict && proctorStream && (
-              <ProctoringCameraTile stream={proctorStream} onWarning={handleProctorWarning} onRecovery={clearCameraRecovery} />
+              <ProctoringCameraTile stream={proctorStream} faceIdentity={proctorFaceIdentity} onWarning={handleProctorWarning} onRecovery={handleProctorRecovery} />
             )}
           </div>
 

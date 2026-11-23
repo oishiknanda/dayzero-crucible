@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Camera } from "lucide-react";
 import { isCameraFrameObscured } from "@/lib/crucible/proctoringPolicy";
+import { compareFaceIdentity, detectFaces, loadProctoringVision, type FaceIdentityReference } from "@/lib/crucible/proctoringVision";
 
 export interface ProctoringWarning {
   id: string;
@@ -13,15 +14,17 @@ export interface ProctoringWarning {
 
 interface ProctoringCameraTileProps {
   stream: MediaStream;
+  faceIdentity: FaceIdentityReference | null;
   onWarning: (code: string, message: string) => void;
-  onRecovery?: () => void;
+  onRecovery?: (code: string) => void;
 }
 
-export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: ProctoringCameraTileProps) {
+export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, onRecovery }: ProctoringCameraTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastWarningRef = useRef<Record<string, number>>({});
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraIssue, setCameraIssue] = useState("");
+  const [faceMonitorStatus, setFaceMonitorStatus] = useState("Loading face monitor…");
 
   useEffect(() => {
     const video = videoRef.current;
@@ -61,13 +64,15 @@ export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: 
       delete lastWarningRef.current["camera-blank"];
       setCameraIssue("");
       setCameraReady(true);
-      onRecovery?.();
+      onRecovery?.("camera");
     };
     const onAudioEnded = () => warn("microphone-ended", "Microphone access was interrupted. Voice answers may not work until it is restored.");
     const onAudioMute = () => warn("microphone-muted", "Microphone access was muted. Check your device and browser permissions.");
     const onAudioUnmute = () => {
       delete lastWarningRef.current["microphone-muted"];
       delete lastWarningRef.current["microphone-ended"];
+      onRecovery?.("microphone-muted");
+      onRecovery?.("microphone-ended");
     };
 
     videoTrack?.addEventListener("ended", onVideoEnded);
@@ -83,7 +88,6 @@ export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: 
     const context = canvas.getContext("2d", { willReadFrequently: true });
     let blankSamples = 0;
     let obscuredSamples = 0;
-    let movementSamples = 0;
     let previousPixels: Uint8ClampedArray | null = null;
     let wasReady = false;
 
@@ -149,17 +153,10 @@ export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: 
           setCameraIssue("");
           if (blankSamples === 0 && obscuredSamples === 0) {
             delete lastWarningRef.current["camera-blank"];
-            onRecovery?.();
+            onRecovery?.("camera");
           }
         }
 
-        if (previousPixels && obscuredSamples === 0) {
-          movementSamples = changedRatio > 0.16 ? movementSamples + 1 : Math.max(0, movementSamples - 1);
-          if (movementSamples >= 5) {
-            warn("camera-movement", "Large movement in the camera image was detected. Please steady the device and return to your interview position.");
-            movementSamples = 0;
-          }
-        }
         previousPixels = new Uint8ClampedArray(pixels);
         if (!wasReady && averageBrightness >= 3) setCameraIssue("");
         wasReady = true;
@@ -169,8 +166,82 @@ export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: 
       }
     }, 1500);
 
+    let cancelled = false;
+    let scanRunning = false;
+    let missingFaceSamples = 0;
+    let multipleFaceSamples = 0;
+    let mismatchSamples = 0;
+    let headAwaySamples = 0;
+    const runFaceCheck = async () => {
+      if (cancelled || scanRunning || !videoRef.current || !faceIdentity) return;
+      scanRunning = true;
+      try {
+        const faces = await detectFaces(videoRef.current);
+        if (cancelled) return;
+        setFaceMonitorStatus("Face check active");
+        missingFaceSamples = faces.length === 0 ? missingFaceSamples + 1 : 0;
+        multipleFaceSamples = faces.length > 1 ? multipleFaceSamples + 1 : 0;
+        if (missingFaceSamples >= 3) {
+          warn("face-missing", "Your face has not been visible for several checks. Return to the camera view.");
+        } else if (faces.length > 0) {
+          delete lastWarningRef.current["face-missing"];
+          onRecovery?.("face-missing");
+        }
+        if (multipleFaceSamples >= 2) {
+          warn("multiple-faces", "More than one face is visible. Keep the camera frame clear and continue alone.");
+        } else if (faces.length <= 1) {
+          delete lastWarningRef.current["multiple-faces"];
+          onRecovery?.("multiple-faces");
+        }
+
+        if (faces.length === 1) {
+          const face = faces[0];
+          const similarity = await compareFaceIdentity(faceIdentity, face);
+          if (cancelled) return;
+          mismatchSamples = similarity !== null && similarity < 0.5 ? mismatchSamples + 1 : 0;
+          if (mismatchSamples >= 3) {
+            warn("identity-mismatch", "The visible face does not match the face captured before this round. Re-center yourself in the camera.");
+          } else if (similarity !== null && similarity >= 0.5) {
+            delete lastWarningRef.current["identity-mismatch"];
+            onRecovery?.("identity-mismatch");
+          }
+
+          const angle = face.rotation?.angle;
+          const gaze = face.rotation?.gaze;
+          const gazeBearingDelta = gaze ? Math.abs(gaze.bearing - faceIdentity.neutralGazeBearing) % Math.PI : 0;
+          const gazeAway = Boolean(gaze && (Math.min(gazeBearingDelta, Math.PI - gazeBearingDelta) > 0.55 || Math.abs(gaze.strength - faceIdentity.neutralGazeStrength) > 0.18));
+          const headAway = Boolean(angle && (Math.abs(angle.yaw - faceIdentity.neutralYaw) > 0.45 || Math.abs(angle.pitch - faceIdentity.neutralPitch) > 0.45));
+          headAwaySamples = headAway || gazeAway ? headAwaySamples + 1 : 0;
+          if (headAwaySamples >= 5) {
+            warn("head-away", "Your head has stayed turned or lowered. Face the screen and keep your face visible.");
+          } else if (!headAway) {
+            delete lastWarningRef.current["head-away"];
+            onRecovery?.("head-away");
+          }
+        }
+      } catch {
+        if (!cancelled) {
+          setFaceMonitorStatus("Face monitor unavailable");
+          warn("face-monitor-unavailable", "The local face monitor could not run. Check browser compatibility and reload this round.");
+        }
+      } finally {
+        scanRunning = false;
+      }
+    };
+    void loadProctoringVision().then(() => {
+      if (!cancelled) void runFaceCheck();
+    }).catch(() => {
+      if (!cancelled) {
+        setFaceMonitorStatus("Face monitor unavailable");
+        warn("face-monitor-unavailable", "The local face monitor could not load. Check your connection and reload this round.");
+      }
+    });
+    const faceTimer = window.setInterval(() => void runFaceCheck(), 2500);
+
     return () => {
+      cancelled = true;
       window.clearInterval(sampleTimer);
+      window.clearInterval(faceTimer);
       videoTrack?.removeEventListener("ended", onVideoEnded);
       videoTrack?.removeEventListener("mute", onVideoMute);
       videoTrack?.removeEventListener("unmute", onVideoUnmute);
@@ -179,7 +250,7 @@ export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: 
       audioTrack?.removeEventListener("unmute", onAudioUnmute);
       if (video.srcObject === stream) video.srcObject = null;
     };
-  }, [stream, onWarning, onRecovery]);
+  }, [stream, faceIdentity, onWarning, onRecovery]);
 
   return (
     <div className="sticky top-2 z-20 mt-4 w-52 max-w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">
@@ -191,7 +262,8 @@ export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: 
         <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover scale-x-[-1]" />
         {!cameraReady && <div className="absolute inset-0 flex items-center justify-center bg-slate-950/90 px-2 text-center text-[10px] font-semibold text-amber-200">{cameraIssue || "Waiting for camera frames…"}</div>}
       </div>
-      <p className="px-2.5 py-1.5 text-[9px] leading-tight text-slate-400">Frames are analyzed locally and are not uploaded.</p>
+      <p className="px-2.5 pt-1.5 text-[9px] font-bold text-slate-300" role="status">{faceMonitorStatus}</p>
+      <p className="px-2.5 pb-1.5 text-[9px] leading-tight text-slate-400">Face frames and the temporary face reference are analyzed locally and are not uploaded.</p>
     </div>
   );
 }
