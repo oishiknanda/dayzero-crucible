@@ -195,22 +195,15 @@ export default function CrucibleCockpitPage({
   const [proctorFailed, setProctorFailed] = useState(false);
   const [proctorFailureMessage, setProctorFailureMessage] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [recoveryNotice, setRecoveryNotice] = useState<{ code: string; message: string; secondsLeft: number } | null>(null);
+  const [recoveryNotice, setRecoveryNotice] = useState<{ code: string; message: string } | null>(null);
   const warningCooldownRef = useRef<Record<string, number>>({});
   const warningCountRef = useRef(0);
   const proctorFailedRef = useRef(false);
   const cleanupTimerRef = useRef<number | null>(null);
-  const recoveryTimerRef = useRef<number | null>(null);
-  const recoveryWarningRef = useRef<Record<string, { code: string; message: string; deadline: number }>>({});
+  const recoveryWarningRef = useRef<Record<string, { code: string; message: string }>>({});
   const refreshRecoveryNotice = useCallback(() => {
-    const next = Object.values(recoveryWarningRef.current).sort((left, right) => left.deadline - right.deadline)[0];
-    if (!next) {
-      if (recoveryTimerRef.current !== null) window.clearInterval(recoveryTimerRef.current);
-      recoveryTimerRef.current = null;
-      setRecoveryNotice(null);
-      return;
-    }
-    setRecoveryNotice({ code: next.code, message: next.message, secondsLeft: Math.max(0, Math.ceil((next.deadline - Date.now()) / 1000)) });
+    const next = Object.values(recoveryWarningRef.current)[0];
+    setRecoveryNotice(next ? { code: next.code, message: next.message } : null);
   }, []);
   const clearRecoveryNotice = useCallback((code?: string) => {
     if (code) delete recoveryWarningRef.current[code];
@@ -240,7 +233,7 @@ export default function CrucibleCockpitPage({
       { id: `${code}-${now}`, code, message, at: new Date(now).toLocaleTimeString() },
     ].slice(-10));
     if (shouldFailForWarningCount(nextCount)) {
-      terminateProctorAssessment(`Your round was terminated because the warning limit was exceeded (${nextCount} warnings).`);
+      terminateProctorAssessment(`Your round was terminated after reaching the warning limit (${nextCount} warnings).`);
     }
   }, [isStrict, terminateProctorAssessment]);
   const beginRecoveryNotice = useCallback((code: string, message: string) => {
@@ -248,25 +241,11 @@ export default function CrucibleCockpitPage({
     if (recoveryWarningRef.current[code]) return;
     recordProctorWarning(code, message);
     if (proctorFailedRef.current) return;
-    const deadline = Date.now() + 15_000;
-    recoveryWarningRef.current[code] = { code, message, deadline };
+    recoveryWarningRef.current[code] = { code, message };
     refreshRecoveryNotice();
-    if (recoveryTimerRef.current === null) {
-      recoveryTimerRef.current = window.setInterval(() => {
-        const now = Date.now();
-        const active = Object.values(recoveryWarningRef.current).sort((left, right) => left.deadline - right.deadline);
-        const expired = active.find((warning) => warning.deadline <= now);
-        if (expired) {
-          clearRecoveryNotice();
-          terminateProctorAssessment(`Your round was terminated because this issue was not fixed within 15 seconds: ${expired.message}`);
-        } else {
-          refreshRecoveryNotice();
-        }
-      }, 250);
-    }
   }, [clearRecoveryNotice, isStrict, recordProctorWarning, refreshRecoveryNotice, terminateProctorAssessment]);
   const handleProctorWarning = useCallback((code: string, message: string) => {
-    if (["camera-ended", "camera-muted", "camera-blank", "microphone-ended", "microphone-muted", "fullscreen-exit", "face-missing", "multiple-faces", "identity-mismatch", "head-away"].includes(code)) {
+    if (["camera-ended", "camera-muted", "camera-frame-blank", "camera-face-missing", "camera-face-obscured", "microphone-ended", "microphone-muted", "fullscreen-exit", "face-missing", "multiple-faces", "identity-mismatch", "head-away"].includes(code)) {
       beginRecoveryNotice(code, message);
     } else {
       recordProctorWarning(code, message);
@@ -311,7 +290,7 @@ export default function CrucibleCockpitPage({
     let hadFullscreen = Boolean(document.fullscreenElement);
     let lastAwayWarningAt = 0;
     if (!hadFullscreen) {
-      beginRecoveryNotice("fullscreen-exit", "Strict monitoring requires fullscreen. Enter fullscreen within 15 seconds to continue.");
+      beginRecoveryNotice("fullscreen-exit", "Strict monitoring requires fullscreen. Re-enter fullscreen to continue.");
     }
     const onVisibilityChange = () => {
       if (document.visibilityState !== "visible") {
@@ -360,10 +339,6 @@ export default function CrucibleCockpitPage({
       window.removeEventListener("focus", onFocus);
     };
   }, [proctorGateReady, isStrict, recordProctorWarning, beginRecoveryNotice, clearRecoveryNotice]);
-
-  useEffect(() => () => {
-    if (recoveryTimerRef.current !== null) window.clearInterval(recoveryTimerRef.current);
-  }, []);
 
   useEffect(() => {
     if (cleanupTimerRef.current !== null) window.clearTimeout(cleanupTimerRef.current);
@@ -1404,9 +1379,9 @@ export default function CrucibleCockpitPage({
             </span>
           )}
 
-            {isStrict && proctorWarnings.length > 0 && (
+            {isStrict && (
               <span className="rounded-lg border border-amber-500/40 bg-amber-950/40 px-2.5 py-1.5 text-[10px] font-bold text-amber-300" aria-live="polite">
-                {proctorWarningCount} WARNING{proctorWarningCount === 1 ? "" : "S"}
+                {Math.max(0, MAX_PROCTOR_WARNINGS - proctorWarningCount)} WARNINGS LEFT
               </span>
             )}
 
@@ -1506,27 +1481,11 @@ export default function CrucibleCockpitPage({
         <ProctorRecoveryNotice
           code={recoveryNotice.code}
           message={recoveryNotice.message}
-          secondsLeft={recoveryNotice.secondsLeft}
+          warningsLeft={Math.max(0, MAX_PROCTOR_WARNINGS - proctorWarningCount)}
           onReenterFullscreen={toggleFullscreen}
         />
       )}
 
-      {isStrict && proctorWarnings.length > 0 && (
-        <div role="alert" aria-live="assertive" className="fixed left-1/2 top-14 z-40 w-[min(92vw,38rem)] -translate-x-1/2 rounded-xl border border-amber-500/50 bg-amber-950/95 px-4 py-3 shadow-2xl">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Proctoring warning · {proctorWarningCount} recorded</p>
-              <p className="mt-1 text-xs font-semibold text-amber-100">{proctorWarnings[proctorWarnings.length - 1]?.message}</p>
-              <p className="mt-1 text-[10px] text-amber-200/70">{proctorWarnings[proctorWarnings.length - 1]?.at}</p>
-            </div>
-            {!isFullscreen && (
-              <button type="button" onClick={toggleFullscreen} className="shrink-0 rounded-lg bg-amber-500 px-2.5 py-2 text-[10px] font-black text-slate-950 hover:bg-amber-400">
-                Re-enter fullscreen
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* ───────── Main Content Split Panes ───────── */}
       <div className="flex-1 flex min-h-0 relative">
@@ -1937,7 +1896,7 @@ export default function CrucibleCockpitPage({
             <p className="text-sm leading-relaxed text-slate-300">
               {proctorFailureMessage || "Strict proctoring requirements were not met."}
             </p>
-            <p className="text-xs font-bold text-rose-300">Warnings recorded: {proctorWarningCount}</p>
+            <p className="text-xs font-bold text-rose-300">Warnings recorded: {proctorWarningCount}/{MAX_PROCTOR_WARNINGS}</p>
             <button type="button" onClick={handleProctorFailureReturn} className="w-full rounded-xl bg-rose-600 px-4 py-3 text-sm font-black text-white hover:bg-rose-500">
               Return to pipeline
             </button>

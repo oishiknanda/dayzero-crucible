@@ -1,4 +1,4 @@
-export const MAX_PROCTOR_WARNINGS = 6;
+export const MAX_PROCTOR_WARNINGS = 5;
 
 export interface CameraFrameSignals {
   averageBrightness: number;
@@ -19,5 +19,5 @@ export function isCameraFrameObscured(signals: CameraFrameSignals): boolean {
 }
 
 export function shouldFailForWarningCount(warningCount: number): boolean {
-  return warningCount > MAX_PROCTOR_WARNINGS;
+  return warningCount >= MAX_PROCTOR_WARNINGS;
 }

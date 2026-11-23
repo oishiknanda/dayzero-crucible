@@ -691,7 +691,7 @@ export default function PreFlightSetupPage({
               </div>
 
               <p className="text-xs text-slate-600 font-medium leading-relaxed mb-4">
-                Strict monitoring requires a face check, camera and microphone access, fullscreen, and focus. During the round it checks for missing, multiple, or changed faces, sustained head/gaze shifts, dark or interrupted camera frames, microphone interruptions, tab changes, and fullscreen exits. Warnings appear immediately; unresolved issues receive 15 seconds to recover before the round ends. Face matching runs locally and is not a definitive identity or cheating decision.
+                Strict monitoring requires a face check, camera and microphone access, fullscreen, and focus. During the round it checks for missing, multiple, or changed faces, sustained head/gaze shifts, dark or interrupted camera frames, microphone interruptions, tab changes, and fullscreen exits. Warnings are recorded immediately; the fifth warning ends the round. Face matching runs locally and is not a definitive identity or cheating decision.
               </p>
 
               <button

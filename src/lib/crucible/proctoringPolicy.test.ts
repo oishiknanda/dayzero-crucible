@@ -38,9 +38,9 @@ describe("strict proctoring policy", () => {
     })).toBe(true);
   });
 
-  it("allows six warnings and ends the attempt on the seventh", () => {
-    expect(MAX_PROCTOR_WARNINGS).toBe(6);
-    expect(shouldFailForWarningCount(6)).toBe(false);
-    expect(shouldFailForWarningCount(7)).toBe(true);
+  it("ends the attempt on the fifth warning", () => {
+    expect(MAX_PROCTOR_WARNINGS).toBe(5);
+    expect(shouldFailForWarningCount(4)).toBe(false);
+    expect(shouldFailForWarningCount(5)).toBe(true);
   });
 });

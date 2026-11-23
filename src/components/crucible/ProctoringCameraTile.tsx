@@ -61,10 +61,11 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     const onVideoUnmute = () => {
       delete lastWarningRef.current["camera-muted"];
       delete lastWarningRef.current["camera-ended"];
-      delete lastWarningRef.current["camera-blank"];
+      delete lastWarningRef.current["camera-frame-blank"];
       setCameraIssue("");
       setCameraReady(true);
-      onRecovery?.("camera");
+      onRecovery?.("camera-ended");
+      onRecovery?.("camera-muted");
     };
     const onAudioEnded = () => warn("microphone-ended", "Microphone access was interrupted. Voice answers may not work until it is restored.");
     const onAudioMute = () => warn("microphone-muted", "Microphone access was muted. Check your device and browser permissions.");
@@ -83,8 +84,8 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     audioTrack?.addEventListener("unmute", onAudioUnmute);
 
     const canvas = document.createElement("canvas");
-    canvas.width = 32;
-    canvas.height = 18;
+    canvas.width = 64;
+    canvas.height = 36;
     const context = canvas.getContext("2d", { willReadFrequently: true });
     let blankSamples = 0;
     let obscuredSamples = 0;
@@ -102,10 +103,10 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         currentVideo.videoWidth === 0
       ) {
         blankSamples += 1;
-        if (blankSamples >= 5) {
+        if (blankSamples >= 3) {
           setCameraReady(false);
           setCameraIssue("No camera frames are arriving.");
-          warn("camera-blank", "Camera image went blank. Check the camera cover, device, or browser permission.");
+          warn("camera-frame-blank", "Camera image went blank. Check the camera cover, device, or browser permission.");
         }
         return;
       }
@@ -144,16 +145,16 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         blankSamples = averageBrightness < 20 && brightnessVariance < 220 ? blankSamples + 1 : 0;
         obscuredSamples = frameObscured ? obscuredSamples + 1 : 0;
 
-        if (blankSamples >= 3 || obscuredSamples >= 3) {
+        if (blankSamples >= 3 || obscuredSamples >= 2) {
           setCameraReady(false);
           setCameraIssue("Camera image appears blank or covered.");
-          warn("camera-blank", "Camera image went dark or became obscured. Remove anything covering the lens and check the camera preview.");
+          warn("camera-frame-blank", "Camera image went dark or became obscured. Remove anything covering the lens and check the camera preview.");
         } else {
           setCameraReady(true);
           setCameraIssue("");
           if (blankSamples === 0 && obscuredSamples === 0) {
-            delete lastWarningRef.current["camera-blank"];
-            onRecovery?.("camera");
+            delete lastWarningRef.current["camera-frame-blank"];
+            onRecovery?.("camera-frame-blank");
           }
         }
 
@@ -164,11 +165,12 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         setCameraReady(false);
         setCameraIssue("Camera frames could not be analyzed in this browser.");
       }
-    }, 1500);
+    }, 750);
 
     let cancelled = false;
     let scanRunning = false;
     let missingFaceSamples = 0;
+    let lowFaceConfidenceSamples = 0;
     let multipleFaceSamples = 0;
     let mismatchSamples = 0;
     let headAwaySamples = 0;
@@ -181,11 +183,13 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         setFaceMonitorStatus("Face check active");
         missingFaceSamples = faces.length === 0 ? missingFaceSamples + 1 : 0;
         multipleFaceSamples = faces.length > 1 ? multipleFaceSamples + 1 : 0;
-        if (missingFaceSamples >= 3) {
-          warn("face-missing", "Your face has not been visible for several checks. Return to the camera view.");
+        if (missingFaceSamples >= 2) {
+          setCameraReady(false);
+          setCameraIssue("No face visible. Uncover the camera and return to the frame.");
+          warn("camera-face-missing", "The camera view is covered or your face is out of frame. Uncover the lens and return to view.");
         } else if (faces.length > 0) {
-          delete lastWarningRef.current["face-missing"];
-          onRecovery?.("face-missing");
+          delete lastWarningRef.current["camera-face-missing"];
+          onRecovery?.("camera-face-missing");
         }
         if (multipleFaceSamples >= 2) {
           warn("multiple-faces", "More than one face is visible. Keep the camera frame clear and continue alone.");
@@ -196,6 +200,19 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
 
         if (faces.length === 1) {
           const face = faces[0];
+          lowFaceConfidenceSamples = face.faceScore < 0.35 ? lowFaceConfidenceSamples + 1 : 0;
+          if (lowFaceConfidenceSamples >= 3) {
+            setCameraReady(false);
+            setCameraIssue("Face is partly obscured. Uncover the camera and keep your face visible.");
+            warn("camera-face-obscured", "The camera view appears partly covered. Uncover the lens and keep your face visible.");
+          } else if (face.faceScore >= 0.45) {
+            delete lastWarningRef.current["camera-face-missing"];
+            delete lastWarningRef.current["camera-face-obscured"];
+            setCameraIssue("");
+            setCameraReady(true);
+            onRecovery?.("camera-face-missing");
+            onRecovery?.("camera-face-obscured");
+          }
           const similarity = await compareFaceIdentity(faceIdentity, face);
           if (cancelled) return;
           mismatchSamples = similarity !== null && similarity < 0.5 ? mismatchSamples + 1 : 0;
