@@ -7,15 +7,22 @@ import { PROBLEMS_DATABASE, type ProblemDefinition } from "../data/problemsRegis
 import { ZOMATO_TRACKS } from "../data/zomatoTracks";
 import { GOOGLE_TRACKS } from "../data/googleTracks";
 import { ACCENTURE_TRACKS } from "../data/accentureTracks";
+import { AMAZON_ROLES } from "../data/amazonTracks";
 import { buildSafeProblemSetOverrides, type OverrideTrackMap } from "../lib/problemOverrides";
+import { isValidProblem } from "../lib/problemDefinitionValidation";
 import { ProblemOverrideContext, type ProblemOverrideData } from "../lib/problemOverrideContext";
 
 // Companies whose question sets can be re-arranged from the database. Adding a company = one line here.
 const TRACKS: Record<string, OverrideTrackMap> = {
   google: GOOGLE_TRACKS as unknown as OverrideTrackMap,
   accenture: ACCENTURE_TRACKS as unknown as OverrideTrackMap,
+  amazon: AMAZON_ROLES as unknown as OverrideTrackMap,
   zomato: ZOMATO_TRACKS as unknown as OverrideTrackMap,
 };
+const AMAZON_ID_COUNTS: Record<string, number> = {};
+Object.values(AMAZON_ROLES).forEach((track) => track.rounds.forEach((round) => round.sets.forEach((set) => {
+  set.problemIds.forEach((id) => { AMAZON_ID_COUNTS[id] = (AMAZON_ID_COUNTS[id] || 0) + 1; });
+})));
 
 export default function ProblemOverrides({ children }: { children: ReactNode }) {
   const searchParams = useSearchParams();
@@ -34,7 +41,11 @@ export default function ProblemOverrides({ children }: { children: ReactNode }) 
       .then((d: { problems?: Record<string, ProblemDefinition>; sets?: Record<string, string[]> }) => {
         const p = d && d.problems ? d.problems : {};
         // A set with an unresolved built-in id stays entirely on its built-in question list.
-        const safeSets = buildSafeProblemSetOverrides(TRACKS[company], company, d && d.sets ? d.sets : {}, (id) => !!p[id] || !!PROBLEMS_DATABASE[id]);
+        const safeSets = buildSafeProblemSetOverrides(
+          TRACKS[company], company, d && d.sets ? d.sets : {},
+          (id) => !!p[id] || isValidProblem(id, PROBLEMS_DATABASE[id]),
+          (id) => isValidProblem(id, PROBLEMS_DATABASE[id]) && !(company === "amazon" && AMAZON_ID_COUNTS[id] > 1)
+        );
         setOverrides({ problems: p, sets: safeSets });
       })
       .catch(() => undefined)

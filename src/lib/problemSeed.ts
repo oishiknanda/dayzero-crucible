@@ -1,8 +1,9 @@
-import { isValidProblem, type ProblemRow } from "./problemsDb";
+import type { ProblemRow } from "./problemsDb";
+import { isValidProblem } from "./problemDefinitionValidation";
 
-type SeedSet = { setId: number; title: string; problemIds: string[] };
+type SeedSet = { setId: number; title?: string; setName?: string; problemIds: string[] };
 type SeedRound = { roundId: string; title: string; sets: SeedSet[] };
-type SeedTrack = { roleId: string; roleName: string; rounds: SeedRound[] };
+type SeedTrack = { roleId: string; roleName?: string; displayName?: string; rounds: SeedRound[] };
 export type SeedTracks = Record<string, SeedTrack>;
 
 export type ProblemSeedCheck = {
@@ -17,7 +18,8 @@ export type ProblemSeedCheck = {
 export function prepareProblemRows(
   company: string,
   data: Record<string, unknown>,
-  tracks: SeedTracks
+  tracks: SeedTracks,
+  deduplicateRepeatedIds = false
 ): ProblemSeedCheck {
   const rows: ProblemRow[] = [];
   const seen: Record<string, number> = {};
@@ -28,17 +30,19 @@ export function prepareProblemRows(
     const track = tracks[roleKey];
     for (const round of track.rounds) for (const set of round.sets) {
       set.problemIds.forEach((id, index) => {
-        seen[id] = (seen[id] || 0) + 1;
+        const occurrence = seen[id] || 0;
+        seen[id] = occurrence + 1;
         const definition = data[id];
         if (!definition) {
           missingDefinitionIds.push(id);
           return;
         }
         if (!isValidProblem(id, definition)) invalidDefinitionIds.push(id);
+        if (deduplicateRepeatedIds && occurrence > 0) return;
         rows.push({
-          id, company, data: definition, role: track.roleId, roleName: track.roleName,
+          id, company, data: definition, role: track.roleId, roleName: track.roleName || track.displayName || track.roleId,
           roundId: round.roundId, roundTitle: round.title, setId: set.setId,
-          setTitle: set.title, position: index + 1,
+          setTitle: set.title || set.setName || `Set ${set.setId}`, position: index + 1,
         });
       });
     }
@@ -47,7 +51,7 @@ export function prepareProblemRows(
   const untrackedDefinitionIds = Object.keys(data).filter((id) => !seen[id]);
   const duplicateTrackIds = Object.keys(seen).filter((id) => seen[id] > 1);
   return {
-    rows, missingDefinitionIds, invalidDefinitionIds,
+    rows, missingDefinitionIds: missingDefinitionIds.filter((id, index, ids) => ids.indexOf(id) === index), invalidDefinitionIds,
     untrackedDefinitionIds, duplicateTrackIds,
   };
 }

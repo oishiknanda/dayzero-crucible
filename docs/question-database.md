@@ -1,6 +1,6 @@
 # Question database
 
-The built-in question modules in `src/data/**` remain the source of truth for fallback behavior. PostgreSQL rows in `dz_problems` can override a question's data and the ordered problem ids in a role/round/set. Seed adapters currently cover Google, Accenture, and Zomato; additional companies are added one at a time after verification. The database fails open to built-in questions when it is unavailable or `DATABASE_URL` is unset.
+The built-in question modules in `src/data/**` remain the source of truth for fallback behavior. PostgreSQL rows in `dz_problems` can override a question's data and the ordered problem ids in a role/round/set. Seed adapters currently cover Google, Accenture, Amazon, and Zomato. The database fails open to built-in questions when it is unavailable or `DATABASE_URL` is unset.
 
 ## Hierarchy and columns
 
@@ -46,4 +46,4 @@ Run the seed script with a throwaway or local database only. Existing `data` is 
 npx tsx scripts/seed-problems.ts google
 ```
 
-The script checks that every track id has a valid definition and every definition is represented by the tracks before it writes any rows. It prints offending ids and performs no writes when those checks fail. Never point it at the production Neon database during development.
+The script checks that every track id has a valid definition and every definition is represented by the tracks before it writes any rows. Amazon references that fail `isValidProblem` are listed with their role, round, and set, then skipped; no placeholder rows are created. Reused Amazon ids are seeded once for question edits, while any set containing an invalid or reused id keeps its built-in ordering. Other validation errors stop the seed before writes. Never point it at the production Neon database during development.

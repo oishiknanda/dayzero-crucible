@@ -8,6 +8,9 @@ import { ACCENTURE_ALL_PROBLEMS } from "../src/data/problems/accenture/accenture
 import { ACCENTURE_TRACKS } from "../src/data/accentureTracks";
 import { ZOMATO_ALL_PROBLEMS } from "../src/data/problems/zomato/zomatoProblems";
 import { ZOMATO_TRACKS } from "../src/data/zomatoTracks";
+import { AMAZON_ROLES } from "../src/data/amazonTracks";
+import { PROBLEMS_DATABASE } from "../src/data/problemsRegistry";
+import { isValidProblem } from "../src/lib/problemDefinitionValidation";
 import { prepareProblemRows, type SeedTracks } from "../src/lib/problemSeed";
 import { seedProblems } from "../src/lib/problemsDb";
 
@@ -22,10 +25,15 @@ if (!process.env.DATABASE_URL) {
 }
 
 type Source = { name: string; data: Record<string, unknown>; tracks: SeedTracks };
+const amazonTrackIds = Object.keys(AMAZON_ROLES).flatMap((role) => AMAZON_ROLES[role as keyof typeof AMAZON_ROLES].rounds.flatMap((round) => round.sets.flatMap((set) => set.problemIds)));
+const amazonIdSet: Record<string, true> = {};
+amazonTrackIds.forEach((id) => { amazonIdSet[id] = true; });
+const AMAZON_PROBLEMS = Object.fromEntries(Object.keys(PROBLEMS_DATABASE).filter((id) => amazonIdSet[id] && isValidProblem(id, PROBLEMS_DATABASE[id])).map((id) => [id, PROBLEMS_DATABASE[id]]));
 const SOURCES: Record<string, Source> = {
   google: { name: "Google", data: GOOGLE_ALL_PROBLEMS, tracks: GOOGLE_TRACKS as unknown as SeedTracks },
   accenture: { name: "Accenture", data: ACCENTURE_ALL_PROBLEMS, tracks: ACCENTURE_TRACKS as unknown as SeedTracks },
   zomato: { name: "Zomato", data: ZOMATO_ALL_PROBLEMS, tracks: ZOMATO_TRACKS as unknown as SeedTracks },
+  amazon: { name: "Amazon", data: AMAZON_PROBLEMS, tracks: AMAZON_ROLES as unknown as SeedTracks },
 };
 
 function printIssues(key: string, check: ReturnType<typeof prepareProblemRows>) {
@@ -53,11 +61,24 @@ async function main() {
   }
 
   // Validate every requested company before writing any company, so a bad batch is a no-op.
-  const batches = keys.map((name) => ({ key: name, source: SOURCES[name], check: prepareProblemRows(SOURCES[name].name, SOURCES[name].data, SOURCES[name].tracks) }));
+  const batches = keys.map((name) => ({ key: name, source: SOURCES[name], check: prepareProblemRows(SOURCES[name].name, SOURCES[name].data, SOURCES[name].tracks, name === "amazon") }));
   let invalid = false;
   for (const batch of batches) {
     printIssues(batch.key, batch.check);
-    if (batch.check.missingDefinitionIds.length || batch.check.invalidDefinitionIds.length || batch.check.untrackedDefinitionIds.length || batch.check.duplicateTrackIds.length) invalid = true;
+    if ((batch.key !== "amazon" && batch.check.missingDefinitionIds.length) || batch.check.invalidDefinitionIds.length || batch.check.untrackedDefinitionIds.length || (batch.key !== "amazon" && batch.check.duplicateTrackIds.length)) invalid = true;
+    if (batch.key === "amazon" && batch.check.missingDefinitionIds.length) {
+      console.log("Amazon: skipping " + batch.check.missingDefinitionIds.length + " ids that do not pass ProblemDefinition validation; no placeholder rows will be created.");
+      for (const id of batch.check.missingDefinitionIds) {
+        const locations = Object.keys(batch.source.tracks).flatMap((roleKey) => {
+          const track = batch.source.tracks[roleKey];
+          return track.rounds.flatMap((round) => round.sets.filter((set) => set.problemIds.includes(id)).map((set) => track.roleId + "/" + round.roundId + "/set-" + set.setId));
+        });
+        console.log("  " + id + ": " + locations.join(", "));
+      }
+      if (batch.check.duplicateTrackIds.length) console.log("Amazon: shared ids are seeded once; any set containing a shared id keeps its built-in ordering: " + batch.check.duplicateTrackIds.join(", "));
+      // In Amazon, invalid built-in rows are treated as undefined; only valid definitions are seeded.
+      if (batch.check.invalidDefinitionIds.length) invalid = true;
+    }
   }
   if (invalid) {
     console.error("Nothing was copied.");

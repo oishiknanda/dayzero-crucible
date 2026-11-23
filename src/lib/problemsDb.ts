@@ -1,6 +1,8 @@
 // Question overrides stored in Postgres. The built-in questions in src/data stay the default and the fallback:
 // a question is replaced only when a valid, enabled row exists for it. With no DATABASE_URL, nothing changes.
 import { dbReady } from "./auth/pgStore";
+import { isValidProblem } from "./problemDefinitionValidation";
+export { isValidProblem } from "./problemDefinitionValidation";
 
 type Row = { id: string; data: unknown };
 
@@ -50,23 +52,7 @@ async function pool() {
   return p;
 }
 
-const isStr = (v: unknown): v is string => typeof v === "string" && v.length > 0;
-const isStrArr = (v: unknown) => Array.isArray(v) && v.every((x) => typeof x === "string");
-const isCases = (v: unknown) => Array.isArray(v) && v.every((t) => t && typeof t === "object" && isStr((t as { id?: unknown }).id));
-
 // A row is used only if it still looks like a complete question. A half-edited row is ignored, never served.
-export function isValidProblem(id: string, d: unknown): boolean {
-  if (!d || typeof d !== "object") return false;
-  const o = d as Record<string, unknown>;
-  const oc = o.optimalComplexity as Record<string, unknown> | undefined;
-  return (
-    o.id === id && isStr(o.title) && ["Easy", "Medium", "Hard"].indexOf(String(o.difficulty)) >= 0 && isStr(o.company) && isStr(o.category) &&
-    isStrArr(o.tags) && isStrArr(o.paragraphs) && Array.isArray(o.examples) && isStrArr(o.constraints) &&
-    isCases(o.visibleTestCases) && isCases(o.hiddenTestCases) && !!o.starterTemplates && typeof o.starterTemplates === "object" &&
-    !!oc && typeof oc.time === "string" && typeof oc.space === "string"
-  );
-}
-
 export type ProblemRow = {
   id: string; company: string; data: unknown;
   role: string; roleName: string; roundId: string; roundTitle: string; setId: number; setTitle: string; position: number;
