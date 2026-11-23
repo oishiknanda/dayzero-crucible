@@ -215,3 +215,36 @@ export async function getOverview(): Promise<{ users: number; interviews: number
   }));
   return { users: userDetails.length, interviews: h.rows[0].n, activeSeconds: userDetails.reduce((s: number, x: FounderUserSummary) => s + x.activeSeconds, 0), userDetails };
 }
+
+
+export async function exportAccount(userId: string): Promise<Record<string, unknown> | null> {
+  const p = await ready();
+  const u = await p.query("SELECT id, email, name, provider, created_at FROM dz_users WHERE id = $1", [userId]);
+  if (!u.rows[0]) return null;
+  const h = await p.query("SELECT id, company, role, round, set_id, score, verdict, at FROM dz_history WHERE user_id = $1 ORDER BY seq", [userId]);
+  const v = await p.query("SELECT company, at, notification_email FROM dz_votes WHERE user_id = $1", [userId]);
+  const a = await p.query("SELECT id, active_seconds, at FROM dz_activity WHERE user_id = $1", [userId]);
+  const x = u.rows[0];
+  return {
+    user: { id: x.id, email: x.email, name: x.name, provider: x.provider, createdAt: x.created_at },
+    history: h.rows, waitlistVotes: v.rows, activity: a.rows,
+  };
+}
+
+export async function deleteAccount(userId: string): Promise<void> {
+  const p = await ready();
+  const c = await p.connect();
+  try {
+    await c.query("BEGIN");
+    await c.query("DELETE FROM dz_history WHERE user_id = $1", [userId]);
+    await c.query("DELETE FROM dz_votes WHERE user_id = $1", [userId]);
+    await c.query("DELETE FROM dz_activity WHERE user_id = $1", [userId]);
+    await c.query("DELETE FROM dz_users WHERE id = $1", [userId]);
+    await c.query("COMMIT");
+  } catch (e) {
+    try { await c.query("ROLLBACK"); } catch { /* closing */ }
+    throw e;
+  } finally {
+    c.release();
+  }
+}

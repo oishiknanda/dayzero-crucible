@@ -24,8 +24,11 @@ export async function POST(req: NextRequest) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
-  if (password.length < 8 || password.length > 128) {
-    return NextResponse.json({ error: "Password must be 8 to 128 characters." }, { status: 400 });
+  if (password.length < 10 || password.length > 128) {
+    return NextResponse.json({ error: "Password must be 10 to 128 characters." }, { status: 400 });
+  }
+  if (password.toLowerCase() === email.toLowerCase()) {
+    return NextResponse.json({ error: "Password must not be the same as your email." }, { status: 400 });
   }
 
   const user = await createEmailUser(name, email, password);

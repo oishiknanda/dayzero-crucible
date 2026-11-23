@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { ArrowLeft } from "lucide-react";
+import AccountData from "@/components/AccountData";
 
 interface HistoryEntry {
   id: string;
@@ -155,6 +156,7 @@ export default function ProfilePage() {
             </div>
           )}
         </section>
+        <AccountData />
       </div>
     </main>
   );

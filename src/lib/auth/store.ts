@@ -325,3 +325,30 @@ export function getOverview(): Promise<{
     };
   }, false);
 }
+
+
+// ---------- Account export and deletion (privacy) ----------
+
+export function exportAccount(userId: string): Promise<Record<string, unknown> | null> {
+  if (usePg()) return pg.exportAccount(userId);
+  return withDb((db) => {
+    const u = db.users.find((x) => x.id === userId);
+    if (!u) return null;
+    return {
+      user: { id: u.id, email: u.email, name: u.name, provider: u.provider, createdAt: u.createdAt },
+      history: db.history.filter((h) => h.userId === userId),
+      waitlistVotes: db.votes.filter((v) => v.userId === userId),
+      activity: db.activity.filter((a) => a.userId === userId),
+    };
+  }, false);
+}
+
+export function deleteAccount(userId: string): Promise<void> {
+  if (usePg()) return pg.deleteAccount(userId);
+  return withDb((db) => {
+    db.users = db.users.filter((u) => u.id !== userId);
+    db.history = db.history.filter((h) => h.userId !== userId);
+    db.votes = db.votes.filter((v) => v.userId !== userId);
+    db.activity = db.activity.filter((a) => a.userId !== userId);
+  }, true);
+}

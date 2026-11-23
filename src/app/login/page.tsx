@@ -180,7 +180,7 @@ function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete={mode === "signup" ? "new-password" : "current-password"}
-          minLength={mode === "signup" ? 8 : undefined}
+          minLength={mode === "signup" ? 10 : undefined}
           required
         />
         {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
