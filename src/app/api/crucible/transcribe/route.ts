@@ -1,12 +1,19 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
+import { guard } from "../../../../lib/rateGuard";
 
 export async function POST(req: NextRequest) {
+  const blocked = await guard(req, { scope: "transcribe", user: 60, anon: 15, ai: true, maxBytes: 12000000 });
+  if (blocked) return blocked;
   try {
     const formData = await req.formData();
     const audioBlob = formData.get("audio") as Blob | null;
 
     if (!audioBlob || audioBlob.size === 0) {
       return NextResponse.json({ text: "", warning: "Empty audio blob" }, { status: 400 });
+    }
+
+    if (audioBlob.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ text: "", warning: "Audio is too large" }, { status: 413 });
     }
 
     const groqKey = process.env.GROQ_API_KEY;

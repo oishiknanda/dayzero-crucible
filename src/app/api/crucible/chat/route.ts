@@ -1,5 +1,6 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { decideGate, buildReaskReply, buildClarificationReply, NUDGE_REPLIES } from "@/lib/crucible/answerGate";
+import { guard } from "../../../../lib/rateGuard";
 
 const GATE_ONLY_KINDS = ["non_answer", "clarification", "reask", "nudge"];
 
@@ -76,6 +77,8 @@ function gateBackstop(round: 2 | 3 | 4, phase: string, message: string, history:
 }
 
 export async function POST(req: NextRequest) {
+  const blocked = await guard(req, { scope: "chat", user: 120, anon: 40, ai: true, maxBytes: 600000 });
+  if (blocked) return blocked;
   try {
     const {
       code = "",

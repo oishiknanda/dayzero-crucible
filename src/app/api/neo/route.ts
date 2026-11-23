@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { EXTRA_COMPANIES } from "@/data/indianCompanies";
 import { TRACK_COMPANIES } from "@/data/companyTrackRegistry";
 import { LIVE_COMPANIES } from "@/lib/waitlist";
+import { guard } from "../../../lib/rateGuard";
 
 export const runtime = "nodejs";
 
@@ -64,6 +65,8 @@ function offlineAnswer(question: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  const blocked = await guard(request, { scope: "neo", user: 120, anon: 40, ai: true, maxBytes: 100000 });
+  if (blocked) return blocked;
   try {
     const body = await request.json();
     const question = typeof body?.question === "string" ? body.question.trim().slice(0, 1000) : "";

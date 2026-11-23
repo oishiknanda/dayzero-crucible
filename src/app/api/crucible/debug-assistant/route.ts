@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDebuggingScenario } from "@/data/problems/debuggingProblems";
+import { guard } from "../../../../lib/rateGuard";
 
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
+  const blocked = await guard(request, { scope: "debug", user: 60, anon: 20, ai: true, maxBytes: 200000 });
+  if (blocked) return blocked;
   try {
     const body = await request.json();
     const scenario = getDebuggingScenario(String(body?.problemId || ""));

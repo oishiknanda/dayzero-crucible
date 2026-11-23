@@ -1,6 +1,9 @@
 ﻿import { NextRequest, NextResponse } from "next/server";
+import { guard } from "../../../../lib/rateGuard";
 
 export async function POST(req: NextRequest) {
+  const blocked = await guard(req, { scope: "resume", user: 20, anon: 15, ai: true, maxBytes: 12000000 });
+  if (blocked) return blocked;
   try {
     const formData = await req.formData();
     const file = formData.get("resume") as File | null;

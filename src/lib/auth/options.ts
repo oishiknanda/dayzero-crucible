@@ -3,13 +3,20 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { findUserByEmail, upsertOAuthUser, verifyPassword } from "./store";
+import { checkRateLimit, envNumber } from "../rateLimit";
 
 const providers: NextAuthOptions["providers"] = [
   CredentialsProvider({
     name: "Email",
     credentials: { email: { label: "Email", type: "email" }, password: { label: "Password", type: "password" } },
-    async authorize(credentials) {
+    async authorize(credentials, req) {
       const email = String(credentials?.email ?? "");
+      // Throttle password guessing: per email and per IP. Fails open if the counter is unavailable.
+      const hdr = (req && req.headers ? req.headers : {}) as Record<string, string | string[] | undefined>;
+      const ip = String(hdr["x-forwarded-for"] || "").split(",")[0].trim() || String(hdr["x-real-ip"] || "") || "local";
+      const byEmail = await checkRateLimit({ key: "login-email:" + email.toLowerCase(), limit: envNumber("RL_LOGIN_EMAIL", 10), windowSeconds: 600 });
+      const byIp = await checkRateLimit({ key: "login-ip:" + ip, limit: envNumber("RL_LOGIN_IP", 100), windowSeconds: 600 });
+      if (!byEmail.allowed || !byIp.allowed) throw new Error("TOO_MANY_ATTEMPTS");
       const password = String(credentials?.password ?? "");
       const user = await findUserByEmail(email);
       if (!user) {

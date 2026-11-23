@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createEmailUser } from "@/lib/auth/store";
+import { guard, tooMany } from "../../../../lib/rateGuard";
+import { checkRateLimit, envNumber } from "../../../../lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const blocked = await guard(req, { scope: "signup", user: 5, anon: 5, windowSeconds: 3600, maxBytes: 20000 });
+  if (blocked) return blocked;
   const body = (await req.json().catch(() => null)) as { name?: unknown; email?: unknown; password?: unknown } | null;
   const name = typeof body?.name === "string" ? body.name.trim() : "";
   const email = typeof body?.email === "string" ? body.email.trim() : "";
   const password = typeof body?.password === "string" ? body.password : "";
+  if (email) {
+    const er = await checkRateLimit({ key: "signup-email:" + email.toLowerCase(), limit: envNumber("RL_SIGNUP_EMAIL", 3), windowSeconds: 3600 });
+    if (!er.allowed) return tooMany(er.retryAfterSeconds);
+  }
 
   if (name.length < 1 || name.length > 60) {
     return NextResponse.json({ error: "Please enter your name." }, { status: 400 });

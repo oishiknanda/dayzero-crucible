@@ -93,6 +93,8 @@ function LoginForm() {
       if (!result || result.error) {
         if (result?.error?.includes("NO_ACCOUNT_FOUND")) {
           setError("No account found with this email. Please create an account first.");
+        } else if (result?.error?.includes("TOO_MANY_ATTEMPTS")) {
+          setError("Too many sign-in attempts. Please wait a few minutes and try again.");
         } else {
           setError("Incorrect password or credentials.");
         }
