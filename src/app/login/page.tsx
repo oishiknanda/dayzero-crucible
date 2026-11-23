@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getProviders, signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
-import { Terminal } from "lucide-react";
+import { LoaderCircle, Terminal } from "lucide-react";
 
 const OAUTH_LABELS: Record<string, string> = { google: "Continue with Google", github: "Continue with GitHub" };
 
@@ -23,6 +23,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [oauthBusy, setOauthBusy] = useState("");
   const [oauth, setOauth] = useState<string[]>([]);
 
   useEffect(() => {
@@ -108,7 +109,22 @@ function LoginForm() {
     // Tells the server whether this is "Create account" or "Sign in" (new social accounts are only created from signup).
     document.cookie = "dz_intent=" + mode + "; path=/; max-age=600; SameSite=Lax";
     setError("");
-    await signIn(providerId, { callbackUrl: nextUrl });
+    setOauthBusy(providerId);
+    try {
+      const result = await signIn(providerId, { callbackUrl: nextUrl, redirect: false });
+      if (result?.error) {
+        setOauthBusy("");
+        setError("Could not connect to that account. Please try again.");
+      } else if (result?.url) {
+        window.location.assign(result.url);
+      } else {
+        setOauthBusy("");
+        setError("Could not connect to the sign-in provider. Please try again.");
+      }
+    } catch {
+      setOauthBusy("");
+      setError("Could not connect to the sign-in provider. Please try again.");
+    }
   };
 
   const input = "w-full rounded-lg border-2 border-slate-300 px-3.5 py-2.5 text-sm font-medium focus:border-slate-800 focus:outline-none";
@@ -138,9 +154,10 @@ function LoginForm() {
               variant="outline"
               size="md"
               className="w-full"
+              disabled={busy || !!oauthBusy}
               onClick={() => handleOAuthClick(id)}
             >
-              {OAUTH_LABELS[id]}
+              {oauthBusy === id ? <><LoaderCircle className="mr-2 h-4 w-4 animate-spin" />Connecting…</> : OAUTH_LABELS[id]}
             </Button>
           ))}
           <div className="flex items-center gap-3 py-1 text-xs font-semibold text-slate-500">
@@ -165,8 +182,8 @@ function LoginForm() {
           required
         />
         {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-        <Button type="submit" variant="primary" size="md" className="w-full" disabled={busy}>
-          {busy ? "Please wait..." : mode === "signin" ? "Sign in" : "Create account"}
+        <Button type="submit" variant="primary" size="md" className="w-full" disabled={busy || !!oauthBusy} aria-busy={busy}>
+          {busy ? <><LoaderCircle className="mr-2 h-4 w-4 animate-spin" />{mode === "signin" ? "Signing in…" : "Creating account…"}</> : mode === "signin" ? "Sign in" : "Create account"}
         </Button>
       </form>
 

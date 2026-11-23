@@ -17,7 +17,8 @@ import {
   Terminal, 
   AlertTriangle,
   Sliders,
-  CheckCircle2
+  CheckCircle2,
+  LoaderCircle
 } from "lucide-react";
 
 export default function PreFlightSetupPage({
@@ -42,6 +43,8 @@ export default function PreFlightSetupPage({
   const [latencyMs, setLatencyMs] = useState<number>(24);
   const [screenResolution, setScreenResolution] = useState<string>("Detecting...");
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [isLaunching, setIsLaunching] = useState(false);
+  const launchTimeoutRef = useRef<number | null>(null);
   const [launchError, setLaunchError] = useState("");
   const [hardwareCheckAttempt, setHardwareCheckAttempt] = useState(0);
 
@@ -254,6 +257,7 @@ export default function PreFlightSetupPage({
   
   const handleStartNow = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (isLaunching) return;
     setLaunchError("");
     const cameraTrack = streamRef.current?.getVideoTracks()[0];
     const microphoneTrack = streamRef.current?.getAudioTracks()[0];
@@ -261,6 +265,11 @@ export default function PreFlightSetupPage({
       setLaunchError("Strict proctoring needs working camera and microphone access. Retry the device check or switch to practice mode.");
       return;
     }
+    setIsLaunching(true);
+    launchTimeoutRef.current = window.setTimeout(() => {
+      setIsLaunching(false);
+      setLaunchError("The assessment is taking longer than expected. Try entering again.");
+    }, 12000);
 
     if (animationFrameRef.current !== null) cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = null;
@@ -281,6 +290,10 @@ export default function PreFlightSetupPage({
     const target = "/crucible/" + sessionId + "?strict=" + proctorStrictMode + "&company=" + params.companyId + "&round=" + params.roundId + (includeRole ? ("&role=" + encodeURIComponent(selectedRole) + "&set=" + selectedSet) : "");
     router.push(target);
   };
+
+  useEffect(() => () => {
+    if (launchTimeoutRef.current !== null) window.clearTimeout(launchTimeoutRef.current);
+  }, []);
 
   const sessionId = `${params.companyId}-${params.roundId}-${Date.now().toString(36)}`;
   const canEnterAssessment = !proctorStrictMode || (!isInitializing && hasCamera === true && hasMic === true && !!streamRef.current);
@@ -691,8 +704,8 @@ export default function PreFlightSetupPage({
             {/* Launch Cockpit CTA */}
             <div className="p-6 rounded-2xl border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
               {launchError && <p role="alert" className="mb-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-left text-sm font-semibold text-rose-800">{launchError}</p>}
-              <button type="button" onClick={handleStartNow} disabled={!canEnterAssessment} className="w-full py-5 rounded-xl font-black text-base bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
-      {isInitializing && proctorStrictMode ? "Checking camera and microphone…" : "Enter Assessment Sandbox →"}
+              <button type="button" onClick={handleStartNow} disabled={!canEnterAssessment || isLaunching} aria-busy={isLaunching} className="w-full py-5 rounded-xl font-black text-base bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg flex items-center justify-center gap-2 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50">
+      {isInitializing && proctorStrictMode ? "Checking camera and microphone…" : isLaunching ? <><LoaderCircle className="h-5 w-5 animate-spin" />Starting your assessment…</> : "Enter Assessment Sandbox →"}
    </button>
               <p className="mt-3 text-center text-[11px] font-mono text-slate-500 font-semibold">
                 Strict mode analyzes camera frames locally. Audio is sent for transcription only when you submit a spoken answer.

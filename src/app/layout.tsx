@@ -2,6 +2,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/auth/Providers";
+import NavigationProgress from "@/components/ui/NavigationProgress";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -17,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="bg-background text-slate-950 font-sans antialiased"><Providers>{children}</Providers></body>
+      <body className="bg-background text-slate-950 font-sans antialiased"><Providers><NavigationProgress />{children}</Providers></body>
     </html>
   );
 }

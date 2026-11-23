@@ -14,9 +14,10 @@ export interface ProctoringWarning {
 interface ProctoringCameraTileProps {
   stream: MediaStream;
   onWarning: (code: string, message: string) => void;
+  onRecovery?: () => void;
 }
 
-export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCameraTileProps) {
+export default function ProctoringCameraTile({ stream, onWarning, onRecovery }: ProctoringCameraTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastWarningRef = useRef<Record<string, number>>({});
   const [cameraReady, setCameraReady] = useState(false);
@@ -60,6 +61,7 @@ export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCa
       delete lastWarningRef.current["camera-blank"];
       setCameraIssue("");
       setCameraReady(true);
+      onRecovery?.();
     };
     const onAudioEnded = () => warn("microphone-ended", "Microphone access was interrupted. Voice answers may not work until it is restored.");
     const onAudioMute = () => warn("microphone-muted", "Microphone access was muted. Check your device and browser permissions.");
@@ -145,7 +147,10 @@ export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCa
         } else {
           setCameraReady(true);
           setCameraIssue("");
-          if (blankSamples === 0 && obscuredSamples === 0) delete lastWarningRef.current["camera-blank"];
+          if (blankSamples === 0 && obscuredSamples === 0) {
+            delete lastWarningRef.current["camera-blank"];
+            onRecovery?.();
+          }
         }
 
         if (previousPixels && obscuredSamples === 0) {
@@ -174,7 +179,7 @@ export default function ProctoringCameraTile({ stream, onWarning }: ProctoringCa
       audioTrack?.removeEventListener("unmute", onAudioUnmute);
       if (video.srcObject === stream) video.srcObject = null;
     };
-  }, [stream, onWarning]);
+  }, [stream, onWarning, onRecovery]);
 
   return (
     <div className="sticky top-2 z-20 mt-4 w-52 max-w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">
