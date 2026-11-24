@@ -7,7 +7,8 @@ import { Navbar } from "@/components/landing/Navbar";
 import { getCompanyTrackData } from "@/data/companyTracks";
 import { getTrackCompany } from "@/data/companyTrackRegistry";
 import { authorizeProctoringSession } from "@/lib/crucible/proctoringSession";
-import { captureFaceIdentity, type FaceIdentityReference } from "@/lib/crucible/proctoringVision";
+import { captureFaceIdentity, detectFaces, type FaceIdentityReference } from "@/lib/crucible/proctoringVision";
+import { readinessIssues } from "@/lib/crucible/proctoringReadiness";
 import { 
   Camera, 
   Mic, 
@@ -120,6 +121,23 @@ export default function PreFlightSetupPage({
     setFaceCaptureBusy(true);
     setFaceCaptureError("");
     try {
+      // Readiness check first: lighting, framing, one face. Tells the candidate exactly what to fix.
+      const video = videoRef.current;
+      const probe = document.createElement("canvas");
+      probe.width = 64; probe.height = 36;
+      const pctx = probe.getContext("2d", { willReadFrequently: true });
+      let brightness = 120;
+      if (pctx) {
+        pctx.drawImage(video, 0, 0, 64, 36);
+        const px = pctx.getImageData(0, 0, 64, 36).data;
+        let sum = 0;
+        for (let i = 0; i < px.length; i += 4) sum += px[i] * 0.299 + px[i + 1] * 0.587 + px[i + 2] * 0.114;
+        brightness = sum / (px.length / 4);
+      }
+      const seen = await detectFaces(video);
+      const raw = seen[0]?.boxRaw;
+      const problems = readinessIssues({ brightness, faceCount: seen.length, faceBox: raw ? [raw[0], raw[1], raw[2], raw[3]] : undefined });
+      if (problems.length) throw new Error(problems.join(" "));
       const identity = await captureFaceIdentity(videoRef.current);
       faceIdentityRef.current = identity;
       setFaceCaptured(true);
@@ -535,9 +553,19 @@ export default function PreFlightSetupPage({
               </div>
 
               {proctorStrictMode && <div className="space-y-3 border-t-2 border-slate-200 bg-slate-50 p-4">
+                <div className="rounded-lg border border-slate-200 bg-white p-3 text-xs leading-relaxed text-slate-700">
+                  <p className="font-black text-slate-900">What this strict round monitors</p>
+                  <ul className="mt-1 list-disc space-y-0.5 pl-4">
+                    <li>Your camera, checked on your device for: one face, your head position, a covered lens and a phone in view.</li>
+                    <li>Fullscreen, switching tabs or windows, and pasting.</li>
+                    <li>Sustained sound on the microphone (flagged for review, not an automatic penalty).</li>
+                    <li>An occasional "look at the camera" spot check at a random time.</li>
+                  </ul>
+                  <p className="mt-2">Video and images are never uploaded or stored. A text log of events (type, time and a short note) is kept for 60 days so a person can review the session fairly. Five confirmed warnings end the round. If you think a warning was a mistake, you can contact us with your session reference. See the Privacy page.</p>
+                </div>
                 <label className="flex cursor-pointer items-start gap-2 text-xs leading-relaxed text-slate-700">
                   <input type="checkbox" checked={faceConsent} onChange={(event) => { setFaceConsent(event.target.checked); faceIdentityRef.current = null; setFaceCaptured(false); setFaceCaptureError(""); }} className="mt-0.5" />
-                  <span>I consent to an on-device face check for this strict round. The reference is held in memory for this round and is not uploaded or saved.</span>
+                  <span>I consent to the monitoring described above. The face reference is held in memory for this round only and is never uploaded or saved; only the text event log is kept.</span>
                 </label>
                 <div className="flex flex-wrap items-center gap-3">
                   <button type="button" onClick={() => void handleCaptureFace()} disabled={!faceConsent || hasCamera !== true || faceCaptureBusy} className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-black text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50">

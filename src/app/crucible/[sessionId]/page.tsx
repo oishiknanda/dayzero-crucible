@@ -212,16 +212,6 @@ export default function CrucibleCockpitPage({
     else recoveryWarningRef.current = {};
     refreshRecoveryNotice();
   }, [refreshRecoveryNotice]);
-  const terminateProctorAssessment = useCallback((message: string) => {
-    if (proctorFailedRef.current) return;
-    proctorFailedRef.current = true;
-    setProctorFailureMessage(message);
-    setProctorFailed(true);
-    clearRecoveryNotice();
-    setProctorStream(null);
-    clearProctoringSession(params.sessionId);
-    if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
-  }, [clearRecoveryNotice, params.sessionId]);
   // Evidence log: events are queued and sent in small batches. It never blocks or breaks the interview.
   const proctorQueueRef = useRef<Array<{ code: string; detail: string; counted: boolean; at: string }>>([]);
   const flushProctorEvents = useCallback(() => {
@@ -243,6 +233,17 @@ export default function CrucibleCockpitPage({
     window.addEventListener("pagehide", onHide);
     return () => { window.clearInterval(timer); window.removeEventListener("pagehide", onHide); flushProctorEvents(); };
   }, [isStrict, flushProctorEvents]);
+  const terminateProctorAssessment = useCallback((message: string) => {
+    if (proctorFailedRef.current) return;
+    proctorFailedRef.current = true;
+    flushProctorEvents();
+    setProctorFailureMessage(message + " If you think this was a mistake, contact " + (process.env.NEXT_PUBLIC_CONTACT_EMAIL || "us (see the Privacy page)") + " and quote reference " + params.sessionId + ". A person will review the recorded events.");
+    setProctorFailed(true);
+    clearRecoveryNotice();
+    setProctorStream(null);
+    clearProctoringSession(params.sessionId);
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+  }, [clearRecoveryNotice, params.sessionId]);
   const recordProctorWarning = useCallback((code: string, message: string) => {
     if (!isStrict || proctorFailedRef.current) return;
     const now = Date.now();

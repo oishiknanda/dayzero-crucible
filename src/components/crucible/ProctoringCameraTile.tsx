@@ -28,6 +28,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
   const [cameraReady, setCameraReady] = useState(false);
   const [cameraIssue, setCameraIssue] = useState("");
   const [faceMonitorStatus, setFaceMonitorStatus] = useState("Loading face monitor…");
+  const [spotCheck, setSpotCheck] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -179,6 +180,9 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     const headWindow = new SampleWindow(8);
     const phoneWindow = new SampleWindow(4);
     let scanTick = 0;
+    let spotActive = false;
+    let spotOk = false;
+    let spotScans = 0;
     const runFaceCheck = async () => {
       if (cancelled || scanRunning || !videoRef.current || !faceIdentity) return;
       scanRunning = true;
@@ -198,6 +202,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           faces = await detectFaces(videoRef.current);
         }
         if (cancelled) return;
+        if (spotActive) spotScans += 1;
         setFaceMonitorStatus("Face check active");
         missingFaceSamples = faces.length === 0 ? missingFaceSamples + 1 : 0;
         multipleFaceSamples = faces.length > 1 ? multipleFaceSamples + 1 : 0;
@@ -233,6 +238,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           }
           const similarity = await compareFaceIdentity(faceIdentity, face);
           if (cancelled) return;
+          if (spotActive && faces.length === 1 && similarity !== null && similarity >= 0.5) spotOk = true;
           mismatchSamples = similarity !== null && similarity < 0.5 ? mismatchSamples + 1 : 0;
           if (mismatchSamples >= 3) {
             warn("identity-mismatch", "The visible face does not match the face captured before this round. Re-center yourself in the camera.");
@@ -276,6 +282,24 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     });
     const faceTimer = window.setInterval(() => void runFaceCheck(), 1200);
 
+    // Random spot check (announced in the setup screen): the candidate is asked to look at the camera for a few seconds.
+    let spotStart = 0, spotEnd = 0;
+    const scheduleSpot = () => {
+      spotStart = window.setTimeout(() => {
+        if (cancelled) return;
+        spotActive = true; spotOk = false; spotScans = 0; setSpotCheck(true);
+        spotEnd = window.setTimeout(() => {
+          spotActive = false; setSpotCheck(false);
+          if (cancelled) return;
+          if (spotScans === 0) { /* face monitor did not run: do not judge the candidate */ }
+          else if (spotOk) onEvidence?.("spot-check-passed", "Identity spot check passed.");
+          else warn("spot-check-failed", "The random identity check could not confirm you. When asked, look at the camera with your face clearly visible.");
+          scheduleSpot();
+        }, 10_000);
+      }, (4 + Math.random() * 5) * 60_000);
+    };
+    scheduleSpot();
+
     // Sustained sound is logged for a human to review. It never counts as a warning: the candidate may be answering aloud.
     let audioCtx: AudioContext | null = null;
     let soundTimer = 0;
@@ -302,6 +326,8 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
 
     return () => {
       cancelled = true;
+      window.clearTimeout(spotStart);
+      window.clearTimeout(spotEnd);
       window.clearInterval(soundTimer);
       if (audioCtx) void audioCtx.close().catch(() => undefined);
       window.clearInterval(sampleTimer);
@@ -324,6 +350,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
       </div>
       <div className="relative aspect-video bg-black">
         <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-cover scale-x-[-1]" />
+        {spotCheck && <div className="absolute inset-x-0 top-0 bg-amber-400 px-2 py-1 text-center text-[10px] font-black text-slate-950">Spot check: look at the camera</div>}
         {!cameraReady && <div className="absolute inset-0 flex items-center justify-center bg-slate-950/90 px-2 text-center text-[10px] font-semibold text-amber-200">{cameraIssue || "Waiting for camera frames…"}</div>}
       </div>
       <p className="px-2.5 pt-1.5 text-[9px] font-bold text-slate-300" role="status">{faceMonitorStatus}</p>

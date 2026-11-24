@@ -15,6 +15,7 @@
 | `FOUNDER_CODE` | Choose a long random code only you know |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud Console > Credentials |
 | `GITHUB_ID` / `GITHUB_SECRET` | GitHub > Settings > Developer settings > OAuth Apps |
+| `NEXT_PUBLIC_CONTACT_EMAIL` | The support email candidates can write to about a proctoring review |
 | `JOOBLE_API_KEY` (optional) | Only if you use that job source |
 | `REQUIRE_LOGIN_FOR_AI=true`, `AI_DAILY_CALL_CAP=150` (recommended on free AI keys) | See `docs/rate-limits.md` |
 

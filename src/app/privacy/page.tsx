@@ -15,6 +15,9 @@ export default function PrivacyPage() {
       <h2 className="mt-8 text-xl font-bold">Camera and microphone</h2>
       <p className="mt-2 text-sm leading-6">Proctored rounds ask for your camera and microphone. The camera image is analysed inside your browser to check that you are present and looking at the screen; the video is not uploaded or stored by us. Audio is sent to our server and then to an AI speech service only when you submit a spoken answer, so it can be turned into text. We do not keep the recording.</p>
 
+      <h2 className="mt-8 text-xl font-bold">Strict-round monitoring log</h2>
+      <p className="mt-2 text-sm leading-6">During a strict round we record a text log of events such as a phone appearing in view, the camera being covered or lost, more than one face, a look-away, leaving fullscreen or the tab, pasting, sustained sound, and the result of random identity spot checks. Each entry has a type, a time and a short note, linked to your session and, if you are signed in, your account. No images or video are stored. The log is kept for 60 days and can be reviewed by the site owner to check a flagged attempt. Warnings are signals, not proof, and weaker signals (such as looking away or noise) are treated as such. If you believe an attempt was ended by mistake, contact {"{{CONTACT_EMAIL}}"} with the session reference shown on the screen and a person will review the log.</p>
+
       <h2 className="mt-8 text-xl font-bold">AI services</h2>
       <p className="mt-2 text-sm leading-6">What you type or say in interviews, the Neo assistant, the debugging assistant and the resume scanner (including resume text) is sent to third-party AI providers (Google Gemini and Groq) to produce replies and scores. Please do not enter anything you would not want processed this way.</p>
 
