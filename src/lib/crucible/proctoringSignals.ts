@@ -43,7 +43,7 @@ export type EvidenceStrength = "strong" | "weak" | "info";
 /** Strong signals are direct evidence; weak ones can have innocent causes (look away, noise, focus loss). */
 export function strengthOf(code: string): EvidenceStrength {
   if (["phone-detected", "multiple-faces", "identity-mismatch", "camera-frame-blank", "camera-face-obscured", "camera-ended", "camera-muted", "lens-covered"].indexOf(code) >= 0) return "strong";
-  if (["sound-detected", "face-monitor-unavailable", "spot-check-passed"].indexOf(code) >= 0) return "info";
+  if (["sound-detected", "face-monitor-unavailable", "spot-check-passed", "phone-check-off"].indexOf(code) >= 0) return "info";
   return "weak";
 }
 

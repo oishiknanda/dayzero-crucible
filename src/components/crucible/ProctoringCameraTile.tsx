@@ -29,6 +29,9 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
   const [cameraIssue, setCameraIssue] = useState("");
   const [faceMonitorStatus, setFaceMonitorStatus] = useState("Loading face monitor…");
   const [spotCheck, setSpotCheck] = useState(false);
+  // Kept in a ref so a new callback from the parent never restarts the camera monitor.
+  const onEvidenceRef = useRef(onEvidence);
+  onEvidenceRef.current = onEvidence;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -180,6 +183,8 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     const headWindow = new SampleWindow(8);
     const phoneWindow = new SampleWindow(4);
     let scanTick = 0;
+    let slowObjectScans = 0;
+    let objectsOff = false;
     let spotActive = false;
     let spotOk = false;
     let spotScans = 0;
@@ -190,8 +195,11 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         // Every third scan also looks for a phone; the other scans stay light so the editor never lags.
         scanTick += 1;
         let faces;
-        if (scanTick % 3 === 0) {
+        if (scanTick % 3 === 0 && !objectsOff) {
+          const startedAt = performance.now();
           const scan = await detectFacesAndObjects(videoRef.current);
+          // On a slow computer the phone check would make the page stutter, so it switches itself off after two slow scans.
+          if (performance.now() - startedAt > 1800 && ++slowObjectScans >= 2) { objectsOff = true; onEvidenceRef.current?.("phone-check-off", "Phone detection was switched off because this computer was too slow to run it smoothly."); }
           faces = scan.faces;
           if (!cancelled) {
             phoneWindow.push(scan.objects.some((o) => isPhoneObject(o)));
@@ -280,7 +288,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         warn("face-monitor-unavailable", "The local face monitor could not load. Check your connection and reload this round.");
       }
     });
-    const faceTimer = window.setInterval(() => void runFaceCheck(), 1200);
+    const faceTimer = window.setInterval(() => void runFaceCheck(), 1500);
 
     // Random spot check (announced in the setup screen): the candidate is asked to look at the camera for a few seconds.
     let spotStart = 0, spotEnd = 0;
@@ -292,7 +300,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           spotActive = false; setSpotCheck(false);
           if (cancelled) return;
           if (spotScans === 0) { /* face monitor did not run: do not judge the candidate */ }
-          else if (spotOk) onEvidence?.("spot-check-passed", "Identity spot check passed.");
+          else if (spotOk) onEvidenceRef.current?.("spot-check-passed", "Identity spot check passed.");
           else warn("spot-check-failed", "The random identity check could not confirm you. When asked, look at the camera with your face clearly visible.");
           scheduleSpot();
         }, 10_000);
@@ -318,7 +326,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           loud.push(audioLevel(buf) > 0.06);
           if (loud.reached(9, 12) && Date.now() - lastLogged > 60_000) {
             lastLogged = Date.now();
-            onEvidence?.("sound-detected", "Sustained sound was heard on the microphone for several seconds. It may be the candidate's own voice or the room.");
+            onEvidenceRef.current?.("sound-detected", "Sustained sound was heard on the microphone for several seconds. It may be the candidate's own voice or the room.");
           }
         }, 500);
       }
@@ -340,7 +348,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
       audioTrack?.removeEventListener("unmute", onAudioUnmute);
       if (video.srcObject === stream) video.srcObject = null;
     };
-  }, [stream, faceIdentity, onWarning, onRecovery, onEvidence]);
+  }, [stream, faceIdentity, onWarning, onRecovery]);
 
   return (
     <div className="sticky top-2 z-20 mt-4 w-52 max-w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">

@@ -279,6 +279,7 @@ export default function CrucibleCockpitPage({
   const clearCameraRecovery = useCallback(() => {
     Object.keys(recoveryWarningRef.current).filter((code) => code.startsWith("camera-")).forEach(clearRecoveryNotice);
   }, [clearRecoveryNotice]);
+  const handleProctorEvidence = useCallback((code: string, detail: string) => logProctorEvent(code, detail, false), [logProctorEvent]);
   const handleProctorRecovery = useCallback((code: string) => {
     if (code === "camera") clearCameraRecovery();
     else clearRecoveryNotice(code);
@@ -1539,7 +1540,7 @@ export default function CrucibleCockpitPage({
             </div>
             <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
             {isStrict && proctorStream && (
-              <ProctoringCameraTile stream={proctorStream} faceIdentity={proctorFaceIdentity} onWarning={handleProctorWarning} onRecovery={handleProctorRecovery} onEvidence={(code, detail) => logProctorEvent(code, detail, false)} />
+              <ProctoringCameraTile stream={proctorStream} faceIdentity={proctorFaceIdentity} onWarning={handleProctorWarning} onRecovery={handleProctorRecovery} onEvidence={handleProctorEvidence} />
             )}
           </div>
 
