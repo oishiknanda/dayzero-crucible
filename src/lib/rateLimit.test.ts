@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { checkRateLimit, clientIp, envNumber, limitedBody } from "./rateLimit";
 
+// These tests check the in-memory mode, so they must not use a database even if DATABASE_URL is set.
+delete process.env.DATABASE_URL;
+
 describe("rate limiter (in-memory mode)", () => {
   it("allows up to the limit then blocks, and resets in the next window", async () => {
     const t0 = 1_800_000_000_000;

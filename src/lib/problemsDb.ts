@@ -52,6 +52,9 @@ async function pool() {
   return p;
 }
 
+// Shared pool with the question table guaranteed to exist (used by the founder question editor).
+export const problemsPool = pool;
+
 // A row is used only if it still looks like a complete question. A half-edited row is ignored, never served.
 export type ProblemRow = {
   id: string; company: string; data: unknown;

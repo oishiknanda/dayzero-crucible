@@ -1,0 +1,10 @@
+import { redirect } from "next/navigation";
+import { isFounder } from "@/lib/auth/founder";
+import QuestionEditor from "@/components/founder/QuestionEditor";
+
+export const dynamic = "force-dynamic";
+
+export default function FounderQuestionsPage() {
+  if (!isFounder()) redirect("/founder");
+  return <QuestionEditor />;
+}
