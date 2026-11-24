@@ -30,7 +30,8 @@ export function loadProctoringVision(): Promise<HumanEngine> {
         },
         body: { enabled: false },
         hand: { enabled: false },
-        object: { enabled: false },
+        // Switched on per call only (see detectFaces), so the heavier model runs every few seconds, not every frame.
+        object: { enabled: false, modelPath: "centernet.json", minConfidence: 0.4, maxDetected: 6, skipTime: 0 },
         segmentation: { enabled: false },
         gesture: { enabled: false },
       });
@@ -49,6 +50,13 @@ export async function detectFaces(video: HTMLVideoElement): Promise<FaceResult[]
   const human = await loadProctoringVision();
   const result = await human.detect(video);
   return result.face;
+}
+
+// One scan that also looks for objects such as a phone. Used every few seconds, not every frame.
+export async function detectFacesAndObjects(video: HTMLVideoElement): Promise<{ faces: FaceResult[]; objects: Array<{ label: string; score: number }> }> {
+  const human = await loadProctoringVision();
+  const result = await human.detect(video, { object: { enabled: true } });
+  return { faces: result.face, objects: (result.object || []).map((o) => ({ label: String(o.label), score: o.score })) };
 }
 
 export async function captureFaceIdentity(video: HTMLVideoElement): Promise<FaceIdentityReference> {

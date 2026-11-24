@@ -222,11 +222,33 @@ export default function CrucibleCockpitPage({
     clearProctoringSession(params.sessionId);
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
   }, [clearRecoveryNotice, params.sessionId]);
+  // Evidence log: events are queued and sent in small batches. It never blocks or breaks the interview.
+  const proctorQueueRef = useRef<Array<{ code: string; detail: string; counted: boolean; at: string }>>([]);
+  const flushProctorEvents = useCallback(() => {
+    const events = proctorQueueRef.current.splice(0, 50);
+    if (!events.length) return;
+    try {
+      void fetch("/api/proctor/events", { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId: params.sessionId, company: companySlug, round: roundSlug, events }) }).catch(() => undefined);
+    } catch { /* logging is best effort */ }
+  }, [params.sessionId, companySlug, roundSlug]);
+  const logProctorEvent = useCallback((code: string, detail: string, counted: boolean) => {
+    if (!isStrict) return;
+    proctorQueueRef.current.push({ code, detail, counted, at: new Date().toISOString() });
+    if (proctorQueueRef.current.length >= 10) flushProctorEvents();
+  }, [isStrict, flushProctorEvents]);
+  useEffect(() => {
+    if (!isStrict) return;
+    const timer = window.setInterval(flushProctorEvents, 8000);
+    const onHide = () => flushProctorEvents();
+    window.addEventListener("pagehide", onHide);
+    return () => { window.clearInterval(timer); window.removeEventListener("pagehide", onHide); flushProctorEvents(); };
+  }, [isStrict, flushProctorEvents]);
   const recordProctorWarning = useCallback((code: string, message: string) => {
     if (!isStrict || proctorFailedRef.current) return;
     const now = Date.now();
     if (now - (warningCooldownRef.current[code] || 0) < 2000) return;
     warningCooldownRef.current[code] = now;
+    logProctorEvent(code, message, true);
     const nextCount = warningCountRef.current + 1;
     warningCountRef.current = nextCount;
     setProctorWarningCount(nextCount);
@@ -237,7 +259,7 @@ export default function CrucibleCockpitPage({
     if (shouldFailForWarningCount(nextCount)) {
       terminateProctorAssessment(`Your round was terminated after reaching the warning limit (${nextCount} warnings).`);
     }
-  }, [isStrict, terminateProctorAssessment]);
+  }, [isStrict, terminateProctorAssessment, logProctorEvent]);
   const beginRecoveryNotice = useCallback((code: string, message: string) => {
     if (!isStrict || proctorFailedRef.current) return;
     if (recoveryWarningRef.current[code]) return;
@@ -247,7 +269,7 @@ export default function CrucibleCockpitPage({
     refreshRecoveryNotice();
   }, [clearRecoveryNotice, isStrict, recordProctorWarning, refreshRecoveryNotice, terminateProctorAssessment]);
   const handleProctorWarning = useCallback((code: string, message: string) => {
-    if (["camera-ended", "camera-muted", "camera-frame-blank", "camera-face-missing", "camera-face-obscured", "microphone-ended", "microphone-muted", "fullscreen-exit", "face-missing", "multiple-faces", "identity-mismatch", "head-away"].includes(code)) {
+    if (["camera-ended", "camera-muted", "camera-frame-blank", "camera-face-missing", "camera-face-obscured", "microphone-ended", "microphone-muted", "fullscreen-exit", "face-missing", "multiple-faces", "identity-mismatch", "head-away", "phone-detected"].includes(code)) {
       beginRecoveryNotice(code, message);
     } else {
       recordProctorWarning(code, message);
@@ -1516,7 +1538,7 @@ export default function CrucibleCockpitPage({
             </div>
             <h1 className="text-2xl font-bold text-white">{problem?.title}</h1>
             {isStrict && proctorStream && (
-              <ProctoringCameraTile stream={proctorStream} faceIdentity={proctorFaceIdentity} onWarning={handleProctorWarning} onRecovery={handleProctorRecovery} />
+              <ProctoringCameraTile stream={proctorStream} faceIdentity={proctorFaceIdentity} onWarning={handleProctorWarning} onRecovery={handleProctorRecovery} onEvidence={(code, detail) => logProctorEvent(code, detail, false)} />
             )}
           </div>
 

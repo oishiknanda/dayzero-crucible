@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Camera } from "lucide-react";
 import { isCameraFrameObscured } from "@/lib/crucible/proctoringPolicy";
-import { compareFaceIdentity, detectFaces, loadProctoringVision, type FaceIdentityReference } from "@/lib/crucible/proctoringVision";
+import { compareFaceIdentity, detectFaces, detectFacesAndObjects, loadProctoringVision, type FaceIdentityReference } from "@/lib/crucible/proctoringVision";
+import { SampleWindow, audioLevel, classifyHeadPose, isLowDetailFrame, isPhoneObject } from "@/lib/crucible/proctoringSignals";
 
 export interface ProctoringWarning {
   id: string;
@@ -17,9 +18,11 @@ interface ProctoringCameraTileProps {
   faceIdentity: FaceIdentityReference | null;
   onWarning: (code: string, message: string) => void;
   onRecovery?: (code: string) => void;
+  /** Low-confidence signals that are logged for review but never counted as warnings. */
+  onEvidence?: (code: string, detail: string) => void;
 }
 
-export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, onRecovery }: ProctoringCameraTileProps) {
+export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, onRecovery, onEvidence }: ProctoringCameraTileProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastWarningRef = useRef<Record<string, number>>({});
   const [cameraReady, setCameraReady] = useState(false);
@@ -142,7 +145,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           hasPreviousFrame: previousPixels !== null,
           previousFrameWasObscured: obscuredSamples > 0,
         });
-        blankSamples = averageBrightness < 20 && brightnessVariance < 220 ? blankSamples + 1 : 0;
+        blankSamples = isLowDetailFrame(averageBrightness, brightnessVariance) ? blankSamples + 1 : 0;
         obscuredSamples = frameObscured ? obscuredSamples + 1 : 0;
 
         if (blankSamples >= 3 || obscuredSamples >= 2) {
@@ -173,12 +176,27 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     let lowFaceConfidenceSamples = 0;
     let multipleFaceSamples = 0;
     let mismatchSamples = 0;
-    let headAwaySamples = 0;
+    const headWindow = new SampleWindow(8);
+    const phoneWindow = new SampleWindow(4);
+    let scanTick = 0;
     const runFaceCheck = async () => {
       if (cancelled || scanRunning || !videoRef.current || !faceIdentity) return;
       scanRunning = true;
       try {
-        const faces = await detectFaces(videoRef.current);
+        // Every third scan also looks for a phone; the other scans stay light so the editor never lags.
+        scanTick += 1;
+        let faces;
+        if (scanTick % 3 === 0) {
+          const scan = await detectFacesAndObjects(videoRef.current);
+          faces = scan.faces;
+          if (!cancelled) {
+            phoneWindow.push(scan.objects.some((o) => isPhoneObject(o)));
+            if (phoneWindow.reached(2, 2)) warn("phone-detected", "A phone appears to be in view. Put it away, out of sight, and continue.");
+            else if (phoneWindow.count() >= 2 && phoneWindow.hits() === 0) { delete lastWarningRef.current["phone-detected"]; onRecovery?.("phone-detected"); }
+          }
+        } else {
+          faces = await detectFaces(videoRef.current);
+        }
         if (cancelled) return;
         setFaceMonitorStatus("Face check active");
         missingFaceSamples = faces.length === 0 ? missingFaceSamples + 1 : 0;
@@ -227,11 +245,14 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           const gaze = face.rotation?.gaze;
           const gazeBearingDelta = gaze ? Math.abs(gaze.bearing - faceIdentity.neutralGazeBearing) % Math.PI : 0;
           const gazeAway = Boolean(gaze && (Math.min(gazeBearingDelta, Math.PI - gazeBearingDelta) > 0.55 || Math.abs(gaze.strength - faceIdentity.neutralGazeStrength) > 0.18));
-          const headAway = Boolean(angle && (Math.abs(angle.yaw - faceIdentity.neutralYaw) > 0.45 || Math.abs(angle.pitch - faceIdentity.neutralPitch) > 0.45));
-          headAwaySamples = headAway || gazeAway ? headAwaySamples + 1 : 0;
-          if (headAwaySamples >= 5) {
-            warn("head-away", "Your head has stayed turned or lowered. Face the screen and keep your face visible.");
-          } else if (!headAway) {
+          const pose = classifyHeadPose(angle ? { yaw: angle.yaw, pitch: angle.pitch } : undefined, { yaw: faceIdentity.neutralYaw, pitch: faceIdentity.neutralPitch });
+          // A sliding window: 5 of the last 8 checks (about 6 seconds), so one good frame cannot hide a long look-down.
+          headWindow.push(pose !== "ok" || gazeAway);
+          if (headWindow.reached(5, 6)) {
+            warn("head-away", pose === "down-or-up"
+              ? "You have been looking down or up for a while. Face the screen and keep your face in view."
+              : "Your head or eyes have stayed turned away from the screen. Face the screen and keep your face in view.");
+          } else if (headWindow.count() >= 4 && headWindow.hits() <= 1) {
             delete lastWarningRef.current["head-away"];
             onRecovery?.("head-away");
           }
@@ -253,10 +274,36 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         warn("face-monitor-unavailable", "The local face monitor could not load. Check your connection and reload this round.");
       }
     });
-    const faceTimer = window.setInterval(() => void runFaceCheck(), 2500);
+    const faceTimer = window.setInterval(() => void runFaceCheck(), 1200);
+
+    // Sustained sound is logged for a human to review. It never counts as a warning: the candidate may be answering aloud.
+    let audioCtx: AudioContext | null = null;
+    let soundTimer = 0;
+    try {
+      if (audioTrack && audioTrack.readyState === "live" && typeof AudioContext !== "undefined") {
+        audioCtx = new AudioContext();
+        void audioCtx.resume().catch(() => undefined);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 512;
+        audioCtx.createMediaStreamSource(new MediaStream([audioTrack])).connect(analyser);
+        const buf = new Uint8Array(analyser.fftSize);
+        const loud = new SampleWindow(12);
+        let lastLogged = 0;
+        soundTimer = window.setInterval(() => {
+          analyser.getByteTimeDomainData(buf);
+          loud.push(audioLevel(buf) > 0.06);
+          if (loud.reached(9, 12) && Date.now() - lastLogged > 60_000) {
+            lastLogged = Date.now();
+            onEvidence?.("sound-detected", "Sustained sound was heard on the microphone for several seconds. It may be the candidate's own voice or the room.");
+          }
+        }, 500);
+      }
+    } catch { /* sound check unavailable: not essential */ }
 
     return () => {
       cancelled = true;
+      window.clearInterval(soundTimer);
+      if (audioCtx) void audioCtx.close().catch(() => undefined);
       window.clearInterval(sampleTimer);
       window.clearInterval(faceTimer);
       videoTrack?.removeEventListener("ended", onVideoEnded);
@@ -267,7 +314,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
       audioTrack?.removeEventListener("unmute", onAudioUnmute);
       if (video.srcObject === stream) video.srcObject = null;
     };
-  }, [stream, faceIdentity, onWarning, onRecovery]);
+  }, [stream, faceIdentity, onWarning, onRecovery, onEvidence]);
 
   return (
     <div className="sticky top-2 z-20 mt-4 w-52 max-w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950 shadow-2xl">

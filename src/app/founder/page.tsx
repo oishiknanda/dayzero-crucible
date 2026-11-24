@@ -125,6 +125,7 @@ export default function FounderPage() {
           <h1 className="text-2xl font-extrabold">Founder dashboard</h1>
           <div className="flex items-center gap-3">
             <Link href="/founder/questions" className="text-sm font-semibold text-slate-700 hover:text-slate-950">Questions</Link>
+            <Link href="/founder/proctoring" className="text-sm font-semibold text-slate-700 hover:text-slate-950">Proctoring</Link>
             <Link href="/" className="text-sm font-semibold text-slate-700 hover:text-slate-950">Home</Link>
             <Button variant="outline" size="sm" onClick={lock}>Lock</Button>
           </div>

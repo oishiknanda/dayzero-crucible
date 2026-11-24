@@ -11,8 +11,9 @@ d("question editor (database)", () => {
     const id = first.id;
     const before = (await getQuestion(id)).row.data as Record<string, unknown>;
 
+    const historyBefore = (await getQuestion(id)).history.length;
     await updateQuestion(id, { data: before });                       // no edit -> no change recorded
-    expect((await getQuestion(id)).history.length).toBe(0);
+    expect((await getQuestion(id)).history.length).toBe(historyBefore);
 
     await updateQuestion(id, { data: { ...before, title: "Edited title" } });
     expect(((await getQuestion(id)).row.data as { title: string }).title).toBe("Edited title");
