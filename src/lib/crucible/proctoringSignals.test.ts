@@ -12,9 +12,9 @@ describe("proctoring signals", () => {
   });
   it("classifies head pose against the setup pose", () => {
     const n = { yaw: 0, pitch: 0.05 };
-    expect(classifyHeadPose({ yaw: 0.05, pitch: 0.1 }, n)).toBe("ok");
+    expect(classifyHeadPose({ yaw: 0.05, pitch: 0.12 }, n)).toBe("ok");
     expect(classifyHeadPose({ yaw: 0, pitch: 0.4 }, n)).toBe("down-or-up");
-    expect(classifyHeadPose({ yaw: 0.7, pitch: 0.05 }, n)).toBe("sideways");
+    expect(classifyHeadPose({ yaw: 0.6, pitch: 0.05 }, n)).toBe("sideways");
     expect(classifyHeadPose(undefined, n)).toBe("ok");
   });
   it("a bright but featureless frame (hand over lens) is low detail; a normal frame is not", () => {

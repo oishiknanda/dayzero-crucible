@@ -43,7 +43,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
 
     const warn = (code: string, message: string) => {
       const now = Date.now();
-      if (now - (lastWarningRef.current[code] || 0) < 30_000) return;
+      if (now - (lastWarningRef.current[code] || 0) < 15_000) return;
       lastWarningRef.current[code] = now;
       onWarning(code, message);
     };
@@ -110,7 +110,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         currentVideo.videoWidth === 0
       ) {
         blankSamples += 1;
-        if (blankSamples >= 3) {
+        if (blankSamples >= 2) {
           setCameraReady(false);
           setCameraIssue("No camera frames are arriving.");
           warn("camera-frame-blank", "Camera image went blank. Check the camera cover, device, or browser permission.");
@@ -152,7 +152,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         blankSamples = isLowDetailFrame(averageBrightness, brightnessVariance) ? blankSamples + 1 : 0;
         obscuredSamples = frameObscured ? obscuredSamples + 1 : 0;
 
-        if (blankSamples >= 3 || obscuredSamples >= 2) {
+        if (blankSamples >= 2 || obscuredSamples >= 2) {
           setCameraReady(false);
           setCameraIssue("Camera image appears blank or covered.");
           warn("camera-frame-blank", "Camera image went dark or became obscured. Remove anything covering the lens and check the camera preview.");
@@ -172,7 +172,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         setCameraReady(false);
         setCameraIssue("Camera frames could not be analyzed in this browser.");
       }
-    }, 750);
+    }, 500);
 
     let cancelled = false;
     let scanRunning = false;
@@ -180,8 +180,8 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     let lowFaceConfidenceSamples = 0;
     let multipleFaceSamples = 0;
     let mismatchSamples = 0;
-    const headWindow = new SampleWindow(8);
-    const phoneWindow = new SampleWindow(4);
+    const headWindow = new SampleWindow(5);
+    const phoneWindow = new SampleWindow(3);
     let scanTick = 0;
     let slowObjectScans = 0;
     let objectsOff = false;
@@ -195,7 +195,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         // Every third scan also looks for a phone; the other scans stay light so the editor never lags.
         scanTick += 1;
         let faces;
-        if (scanTick % 3 === 0 && !objectsOff) {
+        if (scanTick % 2 === 0 && !objectsOff) {
           const startedAt = performance.now();
           const scan = await detectFacesAndObjects(videoRef.current);
           // On a slow computer the phone check would make the page stutter, so it switches itself off after two slow scans.
@@ -262,11 +262,11 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           const pose = classifyHeadPose(angle ? { yaw: angle.yaw, pitch: angle.pitch } : undefined, { yaw: faceIdentity.neutralYaw, pitch: faceIdentity.neutralPitch });
           // A sliding window: 5 of the last 8 checks (about 6 seconds), so one good frame cannot hide a long look-down.
           headWindow.push(pose !== "ok" || gazeAway);
-          if (headWindow.reached(5, 6)) {
+          if (headWindow.reached(3, 4)) {
             warn("head-away", pose === "down-or-up"
               ? "You have been looking down or up for a while. Face the screen and keep your face in view."
               : "Your head or eyes have stayed turned away from the screen. Face the screen and keep your face in view.");
-          } else if (headWindow.count() >= 4 && headWindow.hits() <= 1) {
+          } else if (headWindow.count() >= 3 && headWindow.hits() <= 0) {
             delete lastWarningRef.current["head-away"];
             onRecovery?.("head-away");
           }
@@ -288,7 +288,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         warn("face-monitor-unavailable", "The local face monitor could not load. Check your connection and reload this round.");
       }
     });
-    const faceTimer = window.setInterval(() => void runFaceCheck(), 1500);
+    const faceTimer = window.setInterval(() => void runFaceCheck(), 1000);
 
     // Random spot check (announced in the setup screen): the candidate is asked to look at the camera for a few seconds.
     let spotStart = 0, spotEnd = 0;
