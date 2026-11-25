@@ -7,7 +7,7 @@
 ## 2. Environment variables (Project > Settings > Environment Variables)
 | Name | Where to get it |
 |---|---|
-| `DATABASE_URL` | Neon dashboard > Connection string > **Pooled** connection |
+| `DATABASE_URL` | Neon dashboard > Connection string > **Pooled** connection. End it with `?sslmode=verify-full` |
 | `NEXTAUTH_URL` | Your live site URL, e.g. `https://yourdomain.com` |
 | `NEXTAUTH_SECRET` | Run `openssl rand -base64 32` (any long random string) |
 | `GEMINI_API_KEY` | Google AI Studio |

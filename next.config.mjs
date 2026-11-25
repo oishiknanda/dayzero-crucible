@@ -6,7 +6,10 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
+  },
+  experimental: {
+    instrumentationHook: true,
   },
   async headers() {
     const h = [
@@ -15,8 +18,8 @@ const nextConfig = {
       { key: "X-Frame-Options", value: "SAMEORIGIN" },
       // Proctoring needs the camera and microphone on this site only.
       { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=()" },
-      // Report-Only: it logs problems in the browser console but blocks nothing.
-      { key: "Content-Security-Policy-Report-Only", value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
+      // Enforced subset that cannot break scripts: no framing by other sites, no plugins, no base-tag tricks, forms post only to this site.
+      { key: "Content-Security-Policy", value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" },
     ];
     if (process.env.NODE_ENV === "production") h.push({ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" });
     return [{ source: "/:path*", headers: h }];

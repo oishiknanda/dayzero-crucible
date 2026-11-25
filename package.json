@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@google/genai": "^2.31.0",
     "@monaco-editor/react": "^4.7.0",
     "@vladmandic/human": "^3.3.6",
     "clsx": "^2.1.1",

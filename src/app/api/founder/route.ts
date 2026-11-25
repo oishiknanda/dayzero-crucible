@@ -4,12 +4,13 @@ import { getAllVoteCounts, getFounderWaitlistContacts, getOverview } from "@/lib
 import { COMPANY_PROFILES } from "@/data/companyTracks";
 import { EXTRA_COMPANY_PROFILES } from "@/data/indianCompanies";
 import { isLiveCompany } from "@/lib/waitlist";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-// Simple brute-force guard: 5 wrong codes per 10 minutes per IP.
-const attempts = new Map<string, { count: number; resetAt: number }>();
+// Brute-force guard: 10 unlock attempts per 10 minutes per IP (kept in the database, so it holds across server instances).
+const ATTEMPT_LIMIT = 10;
 
 export async function GET() {
   if (!isFounder()) return NextResponse.json({ founder: false });
@@ -38,21 +39,18 @@ export async function POST(req: NextRequest) {
   if (!process.env.FOUNDER_CODE || !process.env.NEXTAUTH_SECRET) {
     return NextResponse.json({ error: "Founder access is not configured on this server." }, { status: 503 });
   }
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (entry && entry.resetAt > now && entry.count >= 5) {
-    return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429 });
+  const ip = clientIp(req.headers);
+  const rl = await checkRateLimit({ key: "founder-unlock:" + ip, limit: ATTEMPT_LIMIT, windowSeconds: 600 });
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Too many attempts. Try again later." }, { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds) } });
   }
 
   const body = (await req.json().catch(() => null)) as { code?: unknown } | null;
   const code = typeof body?.code === "string" ? body.code : "";
   if (!codeMatches(code)) {
-    attempts.set(ip, { count: (entry && entry.resetAt > now ? entry.count : 0) + 1, resetAt: entry && entry.resetAt > now ? entry.resetAt : now + 600_000 });
     return NextResponse.json({ error: "Wrong code." }, { status: 401 });
   }
 
-  attempts.delete(ip);
   const res = NextResponse.json({ ok: true });
   res.cookies.set(FOUNDER_COOKIE, makeFounderToken(), founderCookieOptions);
   return res;
