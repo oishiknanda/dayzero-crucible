@@ -3,13 +3,14 @@
 import { getTrackCompany } from "@/data/companyTrackRegistry";
 import React, { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import { Navbar } from "@/components/landing/Navbar";
 import { Button } from "@/components/ui/Button";
 import { getCompanyTrackData } from "@/data/companyTracks";
 import { Terminal, PlayCircle, ShieldAlert, Cpu, CheckCircle2, Award, Info, Sparkles, Crown } from "lucide-react";
 
-export default function CompanyTrackPage({ params }: { params: { companyId: string } }) {
+export default function CompanyTrackPage() {
+  const params = useParams<{ companyId: string }>();
   const searchParams = useSearchParams();
   const [selectedRole, setSelectedRole] = useState<string>("sde1");
 

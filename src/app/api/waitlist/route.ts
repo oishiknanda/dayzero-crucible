@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   const state = await getVoteState(company, session?.user?.id);
   return NextResponse.json({
     live: isLiveCompany(company),
-    founder: isFounder(),
+    founder: await isFounder(),
     signedIn: Boolean(session?.user?.id),
     ...state,
   });

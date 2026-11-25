@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import { NextRequest } from "next/server";
 import { buildAuthOptions } from "@/lib/auth/options";
 
-type RouteContext = { params: { nextauth: string[] } };
+type RouteContext = { params: Promise<{ nextauth: string[] }> };
 
 // The login page sets the dz_intent cookie ("signin" or "signup") before starting Google or GitHub.
 async function handler(req: NextRequest, ctx: RouteContext) {

@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Navbar } from "@/components/landing/Navbar";
@@ -23,11 +23,8 @@ import {
   LoaderCircle
 } from "lucide-react";
 
-export default function PreFlightSetupPage({
-  params,
-}: {
-  params: { companyId: string; roundId: string };
-}) {
+export default function PreFlightSetupPage() {
+  const params = useParams<{ companyId: string; roundId: string }>();
   const companyData = getCompanyTrackData(params.companyId);
   const formattedRound = params.roundId.replace("-", " ").toUpperCase();
 

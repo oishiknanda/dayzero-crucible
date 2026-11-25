@@ -29,9 +29,9 @@ export function verifyFounderToken(token: string | undefined): boolean {
   return expected.length === given.length && timingSafeEqual(expected, given);
 }
 
-export function isFounder(): boolean {
+export async function isFounder(): Promise<boolean> {
   try {
-    return verifyFounderToken(cookies().get(FOUNDER_COOKIE)?.value);
+    return verifyFounderToken((await cookies()).get(FOUNDER_COOKIE)?.value);
   } catch {
     return false;
   }

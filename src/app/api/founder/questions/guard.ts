@@ -3,8 +3,8 @@ import { isFounder } from "@/lib/auth/founder";
 import { EditorError } from "@/lib/problemEditor";
 
 // Every question-editor route: founder cookie, database configured, and (for changes) JSON + same-origin.
-export function gate(req: NextRequest, mutating: boolean): NextResponse | null {
-  if (!isFounder()) return NextResponse.json({ error: "Founder access required." }, { status: 401 });
+export async function gate(req: NextRequest, mutating: boolean): Promise<NextResponse | null> {
+  if (!(await isFounder())) return NextResponse.json({ error: "Founder access required." }, { status: 401 });
   if (!process.env.DATABASE_URL) return NextResponse.json({ error: "Database not configured." }, { status: 503 });
   if (mutating) {
     const origin = req.headers.get("origin");

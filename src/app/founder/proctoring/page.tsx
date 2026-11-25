@@ -4,7 +4,7 @@ import ProctoringReport from "@/components/founder/ProctoringReport";
 
 export const dynamic = "force-dynamic";
 
-export default function FounderProctoringPage() {
-  if (!isFounder()) redirect("/founder");
+export default async function FounderProctoringPage() {
+  if (!(await isFounder())) redirect("/founder");
   return <ProctoringReport />;
 }

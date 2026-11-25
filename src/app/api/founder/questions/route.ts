@@ -6,14 +6,14 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
-  const g = gate(req, false);
+  const g = await gate(req, false);
   if (g) return g;
   try { return NextResponse.json({ questions: await listQuestions() }); } catch (e) { return fail(e); }
 }
 
 // Actions: add (clone), move (reorder or change set), reset (back to built-in), undo.
 export async function POST(req: NextRequest) {
-  const g = gate(req, true);
+  const g = await gate(req, true);
   if (g) return g;
   const b = (await req.json().catch(() => null)) as Record<string, unknown> | null;
   if (!b || typeof b.action !== "string") return NextResponse.json({ error: "Bad request." }, { status: 400 });

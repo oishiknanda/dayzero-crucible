@@ -18,6 +18,5 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npx tsc --noEmit
       - run: npx vitest run
-      - run: npx next build
-      - run: npx next lint
-        continue-on-error: true
+      - run: npx next build --webpack
+      - run: npx eslint src --ext .ts,.tsx

@@ -2,14 +2,12 @@ import path from "node:path";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   typescript: {
     ignoreBuildErrors: false,
   },
-  experimental: {
-    instrumentationHook: true,
+  // The old /hub page was removed but several buttons still link to it. Send those visitors to the company tracks.
+  async redirects() {
+    return [{ source: "/hub", destination: "/#tracks", permanent: false }];
   },
   async headers() {
     const h = [

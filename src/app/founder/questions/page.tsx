@@ -4,7 +4,7 @@ import QuestionEditor from "@/components/founder/QuestionEditor";
 
 export const dynamic = "force-dynamic";
 
-export default function FounderQuestionsPage() {
-  if (!isFounder()) redirect("/founder");
+export default async function FounderQuestionsPage() {
+  if (!(await isFounder())) redirect("/founder");
   return <QuestionEditor />;
 }

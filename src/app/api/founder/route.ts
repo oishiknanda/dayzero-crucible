@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 const ATTEMPT_LIMIT = 10;
 
 export async function GET() {
-  if (!isFounder()) return NextResponse.json({ founder: false });
+  if (!(await isFounder())) return NextResponse.json({ founder: false });
   const [overview, voteCounts, waitlistContacts] = await Promise.all([
     getOverview(),
     getAllVoteCounts(),

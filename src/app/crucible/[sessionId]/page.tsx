@@ -5,7 +5,7 @@ import { getTrackCompany } from '@/data/companyTrackRegistry';
 import React, { useState, useEffect, useCallback, useRef, useContext } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, useParams } from "next/navigation";
 import { getProblemById, getProblemForRound, ProblemDefinition } from "@/data/problemsRegistry";
 import { PROBLEMS_DATABASE } from "@/data/problemsRegistry";
 import { getDebuggingScenario } from "@/data/problems/debuggingProblems";
@@ -132,11 +132,8 @@ function FormatText({ text }: { text: string }) {
   );
 }
 
-export default function CrucibleCockpitPage({
-  params,
-}: {
-  params: { sessionId: string };
-}) {
+export default function CrucibleCockpitPage() {
+  const params = useParams<{ sessionId: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
   const overrideData = useContext(ProblemOverrideContext);
