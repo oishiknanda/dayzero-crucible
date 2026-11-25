@@ -1,11 +1,11 @@
 ﻿import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/auth/Providers";
 import NavigationProgress from "@/components/ui/NavigationProgress";
 import SiteFooter from "@/components/SiteFooter";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Manrope({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "DAY-ZERO.AI | Tech Placement Flight Simulator",

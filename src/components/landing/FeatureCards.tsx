@@ -26,7 +26,7 @@ export const FeatureCards = () => {
       num: "03.",
       title: "Clean Code & Static AST Analysis",
       desc: "Passing tests is only table stakes. Our engine inspects your Abstract Syntax Tree to identify memory leaks, unnecessary allocations, poor variable semantics, and missing modular architecture before you submit.",
-      highlight: "Ensures code meets enterprise engineering standards, not just basic competitive programming hacks."
+      highlight: "Ensures code meets enterprise engineering standards, beyond basic competitive programming tricks."
     },
     {
       badgeText: "STAR REASONING FRAMEWORK",
@@ -54,7 +54,7 @@ export const FeatureCards = () => {
           {features.map((item, idx) => (
             <div
               key={idx}
-              className="p-8 rounded-2xl bg-white border-2 border-slate-300 shadow-md hover:border-slate-800 hover:shadow-xl transition-all duration-200 flex flex-col justify-between"
+              className="p-8 rounded-xl bg-white border-2 border-slate-300 shadow-sm hover:border-slate-800 transition-colors duration-200 flex flex-col justify-between"
             >
               <div>
                 <div className="mb-4">

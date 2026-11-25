@@ -13,7 +13,7 @@ export const TrackPreview = () => {
     {
       num: "02",
       title: "Undergo Proctor Lockdown",
-      desc: "Enter full-screen isolated mode with dual-monitor surveillance, tab monitoring, and live voice evaluation active in the background."
+      desc: "Enter full-screen mode with camera checks, tab monitoring, and live voice evaluation active in the background."
     },
     {
       num: "03",
@@ -90,17 +90,12 @@ export const TrackPreview = () => {
             Experience the complete placement loop end-to-end under genuine test conditions.
           </p>
 
-          <div className="mt-14 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="mt-14 grid grid-cols-1 overflow-hidden rounded-xl border-2 border-slate-300 bg-slate-50 text-left md:grid-cols-3 md:divide-x-2 divide-y-2 md:divide-y-0 divide-slate-300">
             {steps.map((s, idx) => (
-              <div
-                key={idx}
-                className="p-8 rounded-2xl bg-slate-50 border-2 border-slate-300 shadow-md text-center flex flex-col items-center hover:border-slate-800 transition-all duration-200"
-              >
-                <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center font-mono font-black text-xl shadow-md shadow-primary/20 mb-6">
-                  {s.num}
-                </div>
-                <h3 className="text-xl font-black text-slate-950 mb-3">{s.title}</h3>
-                <p className="text-sm text-slate-700 leading-relaxed font-normal">{s.desc}</p>
+              <div key={idx} className="p-8">
+                <span className="font-mono text-sm font-black text-primary">{s.num}</span>
+                <h3 className="mt-3 text-xl font-black text-slate-950">{s.title}</h3>
+                <p className="mt-3 text-sm text-slate-700 leading-relaxed font-normal">{s.desc}</p>
               </div>
             ))}
           </div>

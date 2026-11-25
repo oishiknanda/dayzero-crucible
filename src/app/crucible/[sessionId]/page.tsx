@@ -521,7 +521,7 @@ export default function CrucibleCockpitPage({
       } else if (isRound3) {
         greet = "Welcome to your Amazon Round 3 Technical Loop: " + pTitle + ". First, outline your core class interfaces, thread-safe data structures, and backpressure strategy in the editor above.";
       } else if (isRound4) {
-        greet = "Hello. I am your Amazon Bar Raiser for this session. As an independent evaluator, my goal is to assess your alignment with Amazon's Leadership Principles and your technical decision-making in real-world scenarios. We will begin with: " + pTitle + ". Please walk me through your Situation and Task using the STAR framework—focusing strictly on your individual actions ('I', not 'we') and measurable metrics.";
+        greet = "Hello. I am your Amazon Bar Raiser for this session. As an independent evaluator, my goal is to assess your alignment with Amazon's Leadership Principles and your technical decision-making in real-world scenarios. We will begin with: " + pTitle + ". Please walk me through your Situation and Task using the STAR framework, focusing strictly on your individual actions ('I', not 'we') and measurable metrics.";
       } else {
         greet = "Hello. Welcome to the " + compName + " technical round. You are solving " + pTitle + ". Before writing code, state your intended algorithm and data structure.";
       }

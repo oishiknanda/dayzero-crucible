@@ -357,7 +357,7 @@ export default function PreFlightSetupPage({
                 <span>PRE-FLIGHT DIAGNOSTICS & SYSTEM LOCKDOWN GATEWAY</span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight font-sans">
-                {companyData.companyName} — {formattedRound} Calibration
+                {companyData.companyName} · {formattedRound} Calibration
               </h1>
               <p className="mt-2 text-sm sm:text-base text-slate-600 font-medium">
                 Verify audiovisual telemetry and proctoring parameters prior to entering the isolated test sandbox.

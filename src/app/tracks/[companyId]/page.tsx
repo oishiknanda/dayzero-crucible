@@ -132,7 +132,7 @@ export default function CompanyTrackPage({ params }: { params: { companyId: stri
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b-2 border-slate-300">
           <div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight font-sans">
-              {currentRole.roleTitle} — Simulation Pipeline
+              {currentRole.roleTitle} · Simulation Pipeline
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1">
               All rounds are actively unlocked for developer diagnostics. Choose any stage to rehearse.
