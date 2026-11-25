@@ -68,7 +68,7 @@ interface Db {
 }
 
 // When DATABASE_URL is set the accounts live in Postgres (pgStore.ts). Otherwise the JSON file below is used, as before.
-const usePg = () => Boolean(process.env.DATABASE_URL);
+const pgEnabled = () => Boolean(process.env.DATABASE_URL);
 
 const FILE = path.join(process.cwd(), ".data", "store.json");
 let queue: Promise<unknown> = Promise.resolve();
@@ -114,13 +114,13 @@ export const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
 export function findUserByEmail(email: string): Promise<StoredUser | undefined> {
   const key = normalizeEmail(email);
-  if (usePg()) return pg.findUserByEmail(key);
+  if (pgEnabled()) return pg.findUserByEmail(key);
   return withDb((db) => db.users.find((u) => u.email === key), false);
 }
 
 export function createEmailUser(name: string, email: string, password: string): Promise<StoredUser | null> {
   const key = normalizeEmail(email);
-  if (usePg()) {
+  if (pgEnabled()) {
     return pg.createUser({
       id: randomUUID(),
       email: key,
@@ -147,7 +147,7 @@ export function createEmailUser(name: string, email: string, password: string): 
 
 export function upsertOAuthUser(input: { email: string; name: string; image?: string; provider: string }): Promise<StoredUser> {
   const key = normalizeEmail(input.email);
-  if (usePg()) {
+  if (pgEnabled()) {
     return pg.upsertOAuthUser({
       id: randomUUID(),
       email: key,
@@ -177,7 +177,7 @@ export function upsertOAuthUser(input: { email: string; name: string; image?: st
 }
 
 export function addHistory(entry: Omit<HistoryEntry, "id" | "at">): Promise<HistoryEntry> {
-  if (usePg()) return pg.addHistory({ ...entry, id: randomUUID(), at: new Date().toISOString() });
+  if (pgEnabled()) return pg.addHistory({ ...entry, id: randomUUID(), at: new Date().toISOString() });
   return withDb((db) => {
     const saved: HistoryEntry = { ...entry, id: randomUUID(), at: new Date().toISOString() };
     db.history.push(saved);
@@ -186,7 +186,7 @@ export function addHistory(entry: Omit<HistoryEntry, "id" | "at">): Promise<Hist
 }
 
 export function getHistory(userId: string): Promise<HistoryEntry[]> {
-  if (usePg()) return pg.getHistory(userId);
+  if (pgEnabled()) return pg.getHistory(userId);
   return withDb(
     (db) => db.history.filter((h) => h.userId === userId).sort((a, b) => b.at.localeCompare(a.at)),
     false
@@ -196,7 +196,7 @@ export function getHistory(userId: string): Promise<HistoryEntry[]> {
 // ---------- Company waitlist votes (one vote per account per company) ----------
 
 export function addVote(company: string, userId: string, notificationEmail?: string): Promise<void> {
-  if (usePg()) {
+  if (pgEnabled()) {
     return pg.addVote(company, userId, notificationEmail === undefined ? undefined : notificationEmail ? normalizeEmail(notificationEmail) : "", new Date().toISOString());
   }
   return withDb((db) => {
@@ -218,7 +218,7 @@ export function addVote(company: string, userId: string, notificationEmail?: str
 }
 
 export function updateVoteEmail(company: string, userId: string, notificationEmail: string): Promise<boolean> {
-  if (usePg()) return pg.updateVoteEmail(company, userId, notificationEmail ? normalizeEmail(notificationEmail) : "");
+  if (pgEnabled()) return pg.updateVoteEmail(company, userId, notificationEmail ? normalizeEmail(notificationEmail) : "");
   return withDb((db) => {
     const existing = db.votes.find((v) => v.company === company && v.userId === userId);
     if (!existing) return false;
@@ -229,14 +229,14 @@ export function updateVoteEmail(company: string, userId: string, notificationEma
 }
 
 export function removeVote(company: string, userId: string): Promise<void> {
-  if (usePg()) return pg.removeVote(company, userId);
+  if (pgEnabled()) return pg.removeVote(company, userId);
   return withDb((db) => {
     db.votes = db.votes.filter((v) => !(v.company === company && v.userId === userId));
   }, true);
 }
 
 export function getVoteState(company: string, userId?: string): Promise<{ count: number; voted: boolean; hasNotificationEmail: boolean }> {
-  if (usePg()) return pg.getVoteState(company, userId);
+  if (pgEnabled()) return pg.getVoteState(company, userId);
   return withDb((db) => {
     const forCompany = db.votes.filter((v) => v.company === company);
     const userVote = userId ? forCompany.find((v) => v.userId === userId) : undefined;
@@ -249,7 +249,7 @@ export function getVoteState(company: string, userId?: string): Promise<{ count:
 }
 
 export function getAllVoteCounts(): Promise<Record<string, number>> {
-  if (usePg()) return pg.getAllVoteCounts();
+  if (pgEnabled()) return pg.getAllVoteCounts();
   return withDb((db) => {
     const counts: Record<string, number> = {};
     for (const v of db.votes) counts[v.company] = (counts[v.company] ?? 0) + 1;
@@ -258,7 +258,7 @@ export function getAllVoteCounts(): Promise<Record<string, number>> {
 }
 
 export function recordActiveTime(userId: string, eventId: string, activeSeconds: number): Promise<void> {
-  if (usePg()) return pg.recordActiveTime(userId, eventId, activeSeconds, new Date().toISOString());
+  if (pgEnabled()) return pg.recordActiveTime(userId, eventId, activeSeconds, new Date().toISOString());
   return withDb((db) => {
     if (db.activity.some((entry) => entry.id === eventId)) return;
     db.activity.push({ id: eventId, userId, activeSeconds, at: new Date().toISOString() });
@@ -266,7 +266,7 @@ export function recordActiveTime(userId: string, eventId: string, activeSeconds:
 }
 
 export function getFounderWaitlistContacts(): Promise<FounderWaitlistContact[]> {
-  if (usePg()) return pg.getFounderWaitlistContacts();
+  if (pgEnabled()) return pg.getFounderWaitlistContacts();
   return withDb((db) => {
     const usersById = new Map(db.users.map((user) => [user.id, user]));
     return db.votes
@@ -292,7 +292,7 @@ export function getOverview(): Promise<{
   activeSeconds: number;
   userDetails: FounderUserSummary[];
 }> {
-  if (usePg()) return pg.getOverview();
+  if (pgEnabled()) return pg.getOverview();
   return withDb((db) => {
     const activityByUser = new Map<string, { activeSeconds: number; lastActiveAt: string | null }>();
     for (const entry of db.activity) {
@@ -330,7 +330,7 @@ export function getOverview(): Promise<{
 // ---------- Account export and deletion (privacy) ----------
 
 export function exportAccount(userId: string): Promise<Record<string, unknown> | null> {
-  if (usePg()) return pg.exportAccount(userId);
+  if (pgEnabled()) return pg.exportAccount(userId);
   return withDb((db) => {
     const u = db.users.find((x) => x.id === userId);
     if (!u) return null;
@@ -344,7 +344,7 @@ export function exportAccount(userId: string): Promise<Record<string, unknown> |
 }
 
 export function deleteAccount(userId: string): Promise<void> {
-  if (usePg()) return pg.deleteAccount(userId);
+  if (pgEnabled()) return pg.deleteAccount(userId);
   return withDb((db) => {
     db.users = db.users.filter((u) => u.id !== userId);
     db.history = db.history.filter((h) => h.userId !== userId);
