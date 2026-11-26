@@ -5,9 +5,10 @@ interface ProctorRecoveryNoticeProps {
   message: string;
   warningsLeft: number;
   onReenterFullscreen?: () => void;
+  showFullscreenButton?: boolean;
 }
 
-export default function ProctorRecoveryNotice({ code, message, warningsLeft, onReenterFullscreen }: ProctorRecoveryNoticeProps) {
+export default function ProctorRecoveryNotice({ code, message, warningsLeft, onReenterFullscreen, showFullscreenButton }: ProctorRecoveryNoticeProps) {
   const fullscreenIssue = code === "fullscreen-exit";
   const cameraIssue = code.startsWith("camera-") || code === "face-missing";
   const issueLabel = fullscreenIssue ? "Fullscreen required" : code === "face-missing" ? "Face check needed" : cameraIssue ? "Camera check needed" : "Return to assessment";
@@ -21,7 +22,7 @@ export default function ProctorRecoveryNotice({ code, message, warningsLeft, onR
           <p className="mt-1 text-xs font-semibold leading-relaxed text-amber-100">{message}</p>
           <p className="mt-1 text-[10px] font-bold text-rose-200">{fullscreenIssue ? "Re-enter fullscreen" : cameraIssue ? "Uncover the camera and return to the camera view" : "Return to the assessment window"}. The round ends at five warnings.</p>
         </div>
-        {fullscreenIssue && onReenterFullscreen && (
+        {(fullscreenIssue || showFullscreenButton) && onReenterFullscreen && (
           <button type="button" onClick={onReenterFullscreen} className="shrink-0 rounded-lg bg-amber-400 px-3 py-2 text-[10px] font-black text-slate-950 hover:bg-amber-300">
             Re-enter fullscreen
           </button>

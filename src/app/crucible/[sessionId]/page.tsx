@@ -202,9 +202,10 @@ export default function CrucibleCockpitPage({
   const warningCountRef = useRef(0);
   const proctorFailedRef = useRef(false);
   const cleanupTimerRef = useRef<number | null>(null);
-  const recoveryWarningRef = useRef<Record<string, { code: string; message: string }>>({});
+  const recoveryWarningRef = useRef<Record<string, { code: string; message: string; at?: number }>>({});
   const refreshRecoveryNotice = useCallback(() => {
-    const next = Object.values(recoveryWarningRef.current)[0];
+    const all = Object.values(recoveryWarningRef.current);
+    const next = all.find((item) => item.code === "fullscreen-exit") || all[0];
     setRecoveryNotice(next ? { code: next.code, message: next.message } : null);
   }, []);
   const clearRecoveryNotice = useCallback((code?: string) => {
@@ -263,12 +264,32 @@ export default function CrucibleCockpitPage({
   }, [isStrict, terminateProctorAssessment, logProctorEvent]);
   const beginRecoveryNotice = useCallback((code: string, message: string) => {
     if (!isStrict || proctorFailedRef.current) return;
-    if (recoveryWarningRef.current[code]) return;
+    const existing = recoveryWarningRef.current[code];
+    if (existing) { existing.at = Date.now(); return; }
     recordProctorWarning(code, message);
     if (proctorFailedRef.current) return;
-    recoveryWarningRef.current[code] = { code, message };
+    recoveryWarningRef.current[code] = { code, message, at: Date.now() };
     refreshRecoveryNotice();
   }, [clearRecoveryNotice, isStrict, recordProctorWarning, refreshRecoveryNotice, terminateProctorAssessment]);
+  // Safety net: a notice never lingers. Non-fullscreen notices expire a few seconds after the last
+  // time the condition was seen, so a later recurrence warns again. Fullscreen clears when it returns.
+  useEffect(() => {
+    if (!isStrict) return;
+    const timer = window.setInterval(() => {
+      const now = Date.now();
+      let changed = false;
+      for (const code of Object.keys(recoveryWarningRef.current)) {
+        const item = recoveryWarningRef.current[code];
+        if (code === "fullscreen-exit") {
+          if (document.fullscreenElement) { delete recoveryWarningRef.current[code]; changed = true; }
+        } else if (now - (item.at || 0) > 6000) {
+          delete recoveryWarningRef.current[code]; changed = true;
+        }
+      }
+      if (changed) refreshRecoveryNotice();
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [isStrict, refreshRecoveryNotice]);
   const handleProctorWarning = useCallback((code: string, message: string) => {
     if (["camera-ended", "camera-muted", "camera-frame-blank", "camera-face-missing", "camera-face-obscured", "microphone-ended", "microphone-muted", "fullscreen-exit", "face-missing", "multiple-faces", "identity-mismatch", "head-away", "phone-detected"].includes(code)) {
       beginRecoveryNotice(code, message);
@@ -1327,7 +1348,10 @@ export default function CrucibleCockpitPage({
     if (document.fullscreenElement) {
       void document.exitFullscreen().catch(() => recordProctorWarning("fullscreen-error", "The browser could not exit fullscreen."));
     } else if (document.documentElement.requestFullscreen) {
-      void document.documentElement.requestFullscreen().catch(() => recordProctorWarning("fullscreen-error", "Fullscreen could not start. Check browser permissions and try again."));
+      // Called straight from a click so the browser allows it. A refusal is not counted as a warning.
+      void document.documentElement.requestFullscreen().then(() => { clearRecoveryNotice("fullscreen-exit"); setIsFullscreen(true); }).catch(() => {
+        window.alert("Your browser blocked fullscreen. Press F11 (or use the browser menu) to go fullscreen, then continue.");
+      });
     } else {
       recordProctorWarning("fullscreen-unavailable", "Fullscreen is not supported by this browser.");
     }
@@ -1520,6 +1544,7 @@ export default function CrucibleCockpitPage({
           code={recoveryNotice.code}
           message={recoveryNotice.message}
           warningsLeft={Math.max(0, MAX_PROCTOR_WARNINGS - proctorWarningCount)}
+          showFullscreenButton={!isFullscreen}
           onReenterFullscreen={toggleFullscreen}
         />
       )}

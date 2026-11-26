@@ -266,7 +266,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
             warn("head-away", pose === "down-or-up"
               ? "You have been looking down or up for a while. Face the screen and keep your face in view."
               : "Your head or eyes have stayed turned away from the screen. Face the screen and keep your face in view.");
-          } else if (headWindow.count() >= 3 && headWindow.hits() <= 0) {
+          } else if (headWindow.count() >= 3 && headWindow.hits() <= 1) {
             delete lastWarningRef.current["head-away"];
             onRecovery?.("head-away");
           }
