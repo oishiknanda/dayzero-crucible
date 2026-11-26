@@ -16,8 +16,8 @@ export interface HeadPose { yaw: number; pitch: number }
 export interface NeutralPose { yaw: number; pitch: number }
 
 // Radians. About 12 degrees up or down and about 24 degrees sideways away from the pose captured at setup.
-export const PITCH_LIMIT = 0.22;
-export const YAW_LIMIT = 0.42;
+export const PITCH_LIMIT = 0.38;
+export const YAW_LIMIT = 0.6;
 
 export type PoseVerdict = "ok" | "down-or-up" | "sideways";
 

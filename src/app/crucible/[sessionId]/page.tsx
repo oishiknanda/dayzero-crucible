@@ -262,7 +262,7 @@ export default function CrucibleCockpitPage() {
   const beginRecoveryNotice = useCallback((code: string, message: string) => {
     if (!isStrict || proctorFailedRef.current) return;
     const existing = recoveryWarningRef.current[code];
-    if (existing) { existing.at = Date.now(); return; }
+    if (existing) return;
     recordProctorWarning(code, message);
     if (proctorFailedRef.current) return;
     recoveryWarningRef.current[code] = { code, message, at: Date.now() };
@@ -279,7 +279,7 @@ export default function CrucibleCockpitPage() {
         const item = recoveryWarningRef.current[code];
         if (code === "fullscreen-exit") {
           if (document.fullscreenElement) { delete recoveryWarningRef.current[code]; changed = true; }
-        } else if (now - (item.at || 0) > 6000) {
+        } else if (now - (item.at || 0) > 5000) {
           delete recoveryWarningRef.current[code]; changed = true;
         }
       }

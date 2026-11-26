@@ -180,7 +180,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
     let lowFaceConfidenceSamples = 0;
     let multipleFaceSamples = 0;
     let mismatchSamples = 0;
-    const headWindow = new SampleWindow(5);
+    const headWindow = new SampleWindow(10);
     const phoneWindow = new SampleWindow(3);
     let scanTick = 0;
     let slowObjectScans = 0;
@@ -203,7 +203,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           faces = scan.faces;
           if (!cancelled) {
             phoneWindow.push(scan.objects.some((o) => isPhoneObject(o)));
-            if (phoneWindow.reached(2, 2)) warn("phone-detected", "A phone appears to be in view. Put it away, out of sight, and continue.");
+            if (phoneWindow.reached(3, 3)) warn("phone-detected", "A phone appears to be in view. Put it away, out of sight, and continue.");
             else if (phoneWindow.count() >= 2 && phoneWindow.hits() === 0) { delete lastWarningRef.current["phone-detected"]; onRecovery?.("phone-detected"); }
           }
         } else {
@@ -214,7 +214,7 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
         setFaceMonitorStatus("Face check active");
         missingFaceSamples = faces.length === 0 ? missingFaceSamples + 1 : 0;
         multipleFaceSamples = faces.length > 1 ? multipleFaceSamples + 1 : 0;
-        if (missingFaceSamples >= 2) {
+        if (missingFaceSamples >= 4) {
           setCameraReady(false);
           setCameraIssue("No face visible. Uncover the camera and return to the frame.");
           warn("camera-face-missing", "The camera view is covered or your face is out of frame. Uncover the lens and return to view.");
@@ -261,12 +261,12 @@ export default function ProctoringCameraTile({ stream, faceIdentity, onWarning, 
           const gazeAway = Boolean(gaze && (Math.min(gazeBearingDelta, Math.PI - gazeBearingDelta) > 0.55 || Math.abs(gaze.strength - faceIdentity.neutralGazeStrength) > 0.18));
           const pose = classifyHeadPose(angle ? { yaw: angle.yaw, pitch: angle.pitch } : undefined, { yaw: faceIdentity.neutralYaw, pitch: faceIdentity.neutralPitch });
           // A sliding window: 5 of the last 8 checks (about 6 seconds), so one good frame cannot hide a long look-down.
-          headWindow.push(pose !== "ok" || gazeAway);
-          if (headWindow.reached(3, 4)) {
+          headWindow.push(pose !== "ok" || (gazeAway && Math.abs(gaze?.strength ?? 0) > 0.5));
+          if (headWindow.reached(7, 10)) {
             warn("head-away", pose === "down-or-up"
               ? "You have been looking down or up for a while. Face the screen and keep your face in view."
               : "Your head or eyes have stayed turned away from the screen. Face the screen and keep your face in view.");
-          } else if (headWindow.count() >= 3 && headWindow.hits() <= 1) {
+          } else if (headWindow.count() >= 3 && headWindow.hits() <= 4) {
             delete lastWarningRef.current["head-away"];
             onRecovery?.("head-away");
           }
