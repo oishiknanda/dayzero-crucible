@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { EXTRA_COMPANIES } from "@/data/indianCompanies";
 import { TRACK_COMPANIES } from "@/data/companyTrackRegistry";
 import { LIVE_COMPANIES } from "@/lib/waitlist";
+import { LIVE_COMPANIES as LIVE_LIST } from "@/data/liveCompanies";
+import { getCompanyTrackData } from "@/data/companyTracks";
+import { MAX_PROCTOR_WARNINGS } from "@/lib/crucible/proctoringPolicy";
 import { guard } from "../../../lib/rateGuard";
 
 export const runtime = "nodejs";
@@ -11,12 +14,16 @@ const SITE_GUIDE = `You are Neo, the friendly and concise customer-support guide
 VERIFIED DAYZERO FACTS
 - DayZero offers company-specific technical interview practice, role selection, four standard rounds, and scorecards after a round is concluded.
 - The landing page has company track cards and a Pricing section. Company cards appear in the company track area; the top navigation also has a Tracks menu.
-- Tracks currently open to everyone: Amazon, Google, and Microsoft. Other listed company tracks show a Coming Soon page with a vote counter; users may optionally provide an email for a launch update. One vote per account.
+- Tracks currently open to everyone are listed under LIVE NOW below. Other listed company tracks show a Coming Soon page with a vote counter; users may optionally provide an email for a launch update. One vote per account.
 - To start: choose a company track, select an engineering role, choose a round, complete the pre-flight setup, then enter the rehearsal. Do not direct users to /hub; there is no /hub route.
 - The standard pipeline has Round 1 Online Assessment, Round 2 Technical Viva, Round 3 System Design / LLD, and Round 4 Behavioral / Bar Raiser or company-specific equivalent. A separate bonus AI-assisted debugging rehearsal is available for Google and Amazon.
-- Before entering a round, the pre-flight page lets the user choose strict proctoring or practice mode. Strict mode requires camera and microphone permissions and begins in fullscreen when supported. During strict mode the site checks camera feed/obstruction, microphone state, tab visibility, window focus, fullscreen exits, and paste attempts. Six warnings are allowed; the seventh ends the attempt. Practice mode disables strict monitoring. Do not claim the site performs room recording or actual dual-monitor surveillance.
+- Do not mention Microsoft as an open track unless it appears under LIVE NOW.
+- Before entering a round, the pre-flight page lets the user choose strict proctoring or practice mode. Strict mode requires camera and microphone permissions and begins in fullscreen when supported. During strict mode the site checks camera feed/obstruction, microphone state, tab visibility, window focus, fullscreen exits, and paste attempts. Warnings are counted and the round ends at the warning limit given under PROCTORING below. Practice mode disables strict monitoring. Do not claim the site performs room recording or actual dual-monitor surveillance.
 - A round scorecard appears when the user concludes the round or the assessment ends. Signed-in users can view saved completed-round performance history at /profile. Sign in is required; use /login?callbackUrl=/profile if asked how.
-- A resume score tool is available at /resume-score.
+- A resume score tool is available at /resume-score. A Hiring Alerts page at /hiring-alerts lists current openings. Sign in works with email and password (at least 10 characters), Google, or GitHub, at /login.
+- Privacy and Terms pages are at /privacy and /terms. Signed-in users can export or delete their account data from /profile. Passwords are never shown to or asked for by Neo.
+- During a round the AI interviewer speaks its replies (the AI Voice button mutes it) and the candidate can answer by typing or by voice. Rounds are timed; the timer is shown in the round header and the round locks when time runs out.
+- Free-tier launch: if the AI is very busy the site may ask the user to wait a moment and try again; suggest waiting about a minute.
 - Pricing displayed on the landing page: Diagnostic Sandbox $0 forever; Pro Candidate Pass $29/month; Full Placement Crucible $69/month. These are the prices shown in the UI; do not promise that payment, subscription activation, or checkout is currently available. Direct users to the Pricing section (#pricing) for the current display.
 - The Founder access page is an internal page at /founder; do not disclose or help bypass founder authentication or secrets.
 - No public scorecard verification page is documented. Do not tell users that their scorecard is publicly accessible; it is private to their session/account.
@@ -35,15 +42,37 @@ const COMPANY_NAMES = Array.from(new Set([
   "Amazon", "Microsoft",
 ])).sort((a, b) => a.localeCompare(b));
 
-const CURRENT_SITE_GUIDE = `${SITE_GUIDE}\n\nCOMPANY CATALOG\nCompanies visible in the current site catalog: ${COMPANY_NAMES.join(", ")}. The publicly open list is: ${LIVE_COMPANIES.join(", ")}. All other listed companies currently show the waitlist unless founder access has opened them for the founder.`;
+function liveNowFacts(): string {
+  return LIVE_LIST.map((company) => {
+    try {
+      const data = getCompanyTrackData(company.slug);
+      const roles = Object.values(data.roles).map((role) => role.roleTitle).slice(0, 8).join("; ");
+      const first = Object.values(data.roles)[0];
+      const rounds = first ? first.rounds.map((round) => `${round.round} ${round.title} (${round.duration})`).join("; ") : "";
+      return `- ${company.name}: open at /tracks/${company.slug}. Roles: ${roles || "see the track page"}. Rounds: ${rounds || "see the track page"}.`;
+    } catch {
+      return `- ${company.name}: open at /tracks/${company.slug}.`;
+    }
+  }).join("\n");
+}
+
+const PROCTOR_FACTS = `PROCTORING\n- Strict mode counts warnings; the round ends at ${MAX_PROCTOR_WARNINGS} warnings. Warnings come from leaving fullscreen, switching tabs or windows, pasting, a covered or lost camera, no face or more than one face in view, a phone in view, or looking or turning away for a sustained time. Short glances and normal movement are not penalised. Warning banners disappear after a few seconds, and the user can re-enter fullscreen with the button on the banner. A person can review recorded events if a user appeals; the privacy page explains this.`;
+
+const CURRENT_SITE_GUIDE = `${SITE_GUIDE}\n\nLIVE NOW (open to everyone)\n${liveNowFacts()}\n\n${PROCTOR_FACTS}\n\nCOMPANY CATALOG\nCompanies visible in the current site catalog: ${COMPANY_NAMES.join(", ")}. The publicly open list is: ${LIVE_COMPANIES.join(", ")}. All other listed companies currently show the waitlist unless founder access has opened them for the founder.`;
+
+const LIVE_NAMES = LIVE_LIST.map((company) => company.name);
+const liveNamesText = () => LIVE_NAMES.length > 1 ? LIVE_NAMES.slice(0, -1).join(", ") + " and " + LIVE_NAMES[LIVE_NAMES.length - 1] : LIVE_NAMES.join("");
 
 function offlineAnswer(question: string): string {
   const q = question.toLowerCase();
+  if (/(compan|comap|track).*(live|open|available)|(live|open|available).*(compan|comap|track)/.test(q)) {
+    return `${liveNamesText()} are open right now. Other listed companies show a Coming Soon page where you can vote for early access. Pick one from the [company tracks](#tracks).`;
+  }
   if (/price|pricing|cost|subscription|pay|billing/.test(q)) {
     return "The Pricing section currently displays Diagnostic Sandbox at $0 forever, Pro Candidate Pass at $29/month, and Full Placement Crucible at $69/month. These are the prices shown on the site; I can’t confirm checkout or subscription activation. See the [Pricing section](#pricing).";
   }
   if (/proctor|camera|microphone|mic|tab switch|fullscreen|monitor/.test(q)) {
-    return "Before each round, pre-flight lets you choose Strict Proctoring or Practice Mode. Strict mode checks camera and microphone access, fullscreen, tab visibility, focus, and camera feed; six warnings are allowed and the seventh ends the attempt. Practice mode turns strict monitoring off.";
+    return `Before each round, pre-flight lets you choose Strict Proctoring or Practice Mode. Strict mode checks camera and microphone access, fullscreen, tab visibility, focus, and camera feed; ${MAX_PROCTOR_WARNINGS} warnings end the attempt. Practice mode turns strict monitoring off.`;
   }
   if (/score|performance|result|history|verdict/.test(q)) {
     return "You’ll see a scorecard after you conclude a round. To review saved completed-round performance, sign in and open [your profile](/profile).";
@@ -56,10 +85,10 @@ function offlineAnswer(question: string): string {
     return `${mentionedCompany} is listed as Coming Soon for most users. Open its company page to see the current vote count and optionally add an email for a launch update: [${mentionedCompany} page](/tracks/${slug}).`;
   }
   if (/waitlist|coming soon|vote|email|launch/.test(q)) {
-    return "Amazon, Google, and Microsoft are open. Other listed companies have a Coming Soon page where you can vote; adding an email for a launch update is optional.";
+    return `${liveNamesText()} are open. Other listed companies have a Coming Soon page where you can vote; adding an email for a launch update is optional.`;
   }
   if (/company|track|start|begin|round|role|interview/.test(q)) {
-    return "Choose a company from the Tracks menu or the company cards on the landing page, select a role and round, then complete the pre-flight setup. Amazon, Google, and Microsoft are open; other tracks may be on the waitlist. The standard pipeline has four rounds, plus a Google/Amazon debugging bonus rehearsal. See [company tracks](#tracks).";
+    return `Choose a company from the Tracks menu or the company cards on the landing page, select a role and round, then complete the pre-flight setup. ${liveNamesText()} are open; other tracks may be on the waitlist. The standard pipeline has four rounds, plus a Google/Amazon debugging bonus rehearsal. See [company tracks](#tracks).`;
   }
   return "I can help with company tracks, roles and rounds, proctoring, scorecards, performance history, resume scoring, waitlists, and the pricing shown on the site. What are you trying to do?";
 }

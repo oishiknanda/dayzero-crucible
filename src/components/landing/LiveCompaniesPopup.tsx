@@ -4,16 +4,14 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LIVE_COMPANIES } from "@/data/liveCompanies";
 
-// A small, dismissible "live now" card shown once per visitor. Changing the list in
-// src/data/liveCompanies.ts shows it again, because the stored key includes the company slugs.
-const STORAGE_KEY = "dz_live_popup:" + LIVE_COMPANIES.map((company) => company.slug).join(",");
+// A small, dismissible "live now" card shown every time the landing page loads (it is only mounted there).
+// The list comes from src/data/liveCompanies.ts.
 
 export function LiveCompaniesPopup() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (LIVE_COMPANIES.length === 0) return;
-    try { if (window.localStorage.getItem(STORAGE_KEY)) return; } catch { /* storage unavailable: just show it */ }
     const timer = window.setTimeout(() => setOpen(true), 1500);
     return () => window.clearTimeout(timer);
   }, []);
@@ -28,7 +26,6 @@ export function LiveCompaniesPopup() {
 
   const close = () => {
     setOpen(false);
-    try { window.localStorage.setItem(STORAGE_KEY, "1"); } catch { /* ignore */ }
   };
 
   if (!open) return null;

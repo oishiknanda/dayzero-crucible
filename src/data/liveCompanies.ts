@@ -1,11 +1,12 @@
-// Companies that are LIVE right now. The landing-page popup is built from this list.
+// Companies that are LIVE right now. This ONE list drives the landing popup, which tracks open to everyone
+// (src/lib/waitlist.ts) and what the Neo assistant tells users.
 //
 // To announce a new company: add ONE object below.
 //   - slug:  the track slug used in /tracks/<slug>
 //   - name:  display name
 //   - color: brand colour (used for the letter badge when there is no logo file)
 //   - logo:  OPTIONAL. Drop an SVG/PNG in /public/logos and set "/logos/<file>". Without it a coloured letter badge is shown.
-// Adding a company also makes the popup appear again for people who closed an older version of it.
+// A company must also have its tracks/questions in place before you add it here.
 export interface LiveCompany {
   slug: string;
   name: string;
