@@ -5,6 +5,7 @@ import { CompanyMarquee } from "@/components/landing/CompanyMarquee";
 import { FeatureCards } from "@/components/landing/FeatureCards";
 import { TrackPreview } from "@/components/landing/TrackPreview";
 import NeoSupportWidget from "@/components/landing/NeoSupportWidget";
+import { LiveCompaniesPopup } from "@/components/landing/LiveCompaniesPopup";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <FeatureCards />
       <TrackPreview />
       <NeoSupportWidget />
+      <LiveCompaniesPopup />
 
       {/* Enterprise SaaS Footer */}
       <footer className="py-14 border-t-2 border-slate-300 bg-white text-xs text-slate-600">
