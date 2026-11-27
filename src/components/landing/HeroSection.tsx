@@ -1,7 +1,7 @@
-﻿import React from "react";
+import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Terminal, ShieldAlert, AlertCircle, CheckCircle2, MessageSquare } from "lucide-react";
+import { ArrowRight, Terminal, ShieldAlert, AlertCircle, CheckCircle2, MessageSquare, CircleCheck } from "lucide-react";
 
 export const HeroSection = () => {
   const hotKeywords = [
@@ -16,8 +16,16 @@ export const HeroSection = () => {
     "Python high-throughput",
   ];
 
+  const rounds = [
+    { title: "Round 1 · Online assessment", text: "Solve problems against hidden test cases under a timer." },
+    { title: "Round 2 · Technical viva", text: "Explain your approach out loud while the AI interviewer questions it." },
+    { title: "Round 3 · System design", text: "Design the system, or write the low-level design, and defend your choices in conversation." },
+    { title: "Round 4 · Behavioral", text: "Answer with specific stories while the interviewer follows up, Bar Raiser style." },
+    { title: "AI-assisted coding round", text: "Work on unfamiliar code with an AI assistant on hand, and practise reading before you edit.", bonus: true },
+  ];
+
   return (
-    <section className="relative overflow-hidden pt-14 pb-20 border-b border-slate-200 bg-white">
+    <section className="relative overflow-hidden pt-8 pb-16 border-b border-slate-200 bg-white">
       <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-14 items-center">
 
         {/* Left: message */}
@@ -32,9 +40,24 @@ export const HeroSection = () => {
             <span className="text-primary">real tech placements.</span>
           </h1>
 
-          <p className="mt-6 text-base sm:text-lg text-slate-700 max-w-xl font-normal leading-relaxed">
+          <p className="mt-5 text-base sm:text-lg text-slate-800 max-w-xl font-medium leading-relaxed">
             The flight simulator built to rehearse every round of top tech hiring loops, from timed algorithmic OAs and hidden test suites to high-pressure architecture and Bar Raiser screens.
           </p>
+
+          <ul className="mt-7 grid gap-3.5 max-w-xl">
+            {rounds.map((item) => (
+              <li key={item.title} className="grid grid-cols-[24px_minmax(0,1fr)] gap-3">
+                <CircleCheck className="h-[22px] w-[22px] text-primary mt-0.5" aria-hidden="true" />
+                <div>
+                  <p className="text-[15.5px] font-bold text-slate-900">
+                    {item.title}
+                    {item.bonus && <span className="ml-2 align-[2px] rounded-full bg-primary-light px-2 py-0.5 text-[11px] font-semibold text-primary">Bonus</span>}
+                  </p>
+                  <p className="text-[15px] font-medium leading-relaxed text-slate-700">{item.text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
 
           <div className="mt-7 flex flex-wrap gap-2">
             {hotKeywords.map((item, idx) => (
