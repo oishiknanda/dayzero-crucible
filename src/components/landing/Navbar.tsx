@@ -157,10 +157,10 @@ export const Navbar = () => {
         {/* Center Nav */}
         <nav className="hidden lg:flex items-center gap-10 text-[14px] font-semibold text-slate-700">
           <a href="#features" className="whitespace-nowrap hover:text-slate-950 transition-colors">
-            Core Architecture
+            Core architecture
           </a>
           <a href="#pipeline" className="whitespace-nowrap hover:text-slate-950 transition-colors">
-            Simulation Pipeline
+            Simulation pipeline
           </a>
 
           {/* 50+ Tech Tracks Dropdown */}
@@ -169,7 +169,7 @@ export const Navbar = () => {
               onClick={() => setIsDropdownOpen((prev) => !prev)}
               className="flex items-center gap-1.5 whitespace-nowrap hover:text-slate-950 transition-colors py-2 group focus:outline-none"
             >
-              <span className={isDropdownOpen ? "text-slate-950 font-bold" : ""}>50+ Tech Tracks</span>
+              <span className={isDropdownOpen ? "text-slate-950 font-bold" : ""}>50+ tech tracks</span>
               <ChevronDown
                 className={`h-4 w-4 transition-transform duration-200 ${
                   isDropdownOpen ? "rotate-180 text-primary" : "text-slate-500 group-hover:text-slate-950"
@@ -242,7 +242,7 @@ export const Navbar = () => {
           </div>
 
           <a href="#pricing" className="whitespace-nowrap hover:text-slate-950 transition-colors">
-            Access & Pricing
+            Access & pricing
           </a>
                   </nav>
 
@@ -251,12 +251,12 @@ export const Navbar = () => {
           <UserMenu />
           <Link href="/hiring-alerts">
             <Button variant="outline" size="md" className="hidden sm:inline-flex font-semibold border-slate-300 text-slate-800 text-sm shadow-sm hover:border-slate-900">
-              Hiring Alerts
+              Hiring alerts
             </Button>
           </Link>
           <Link href="/resume-score">
             <Button variant="primary" size="md" className="font-semibold text-sm px-5 shadow-sm bg-indigo-600 hover:bg-indigo-500 text-white border-none">
-              Resume Score
+              Resume score
             </Button>
           </Link>
         </div>

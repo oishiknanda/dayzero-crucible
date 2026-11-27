@@ -31,7 +31,7 @@ export function LiveCompaniesPopup() {
   if (!open) return null;
 
   return (
-    <section role="dialog" aria-label="Companies live now" className="fixed right-3 top-20 z-[60] w-[min(20rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:right-6">
+    <section role="dialog" aria-label="Companies live now" className="fixed bottom-24 right-3 z-[60] w-[min(20rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:bottom-24 sm:right-6">
       <button type="button" onClick={close} aria-label="Close" className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary">
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
       </button>

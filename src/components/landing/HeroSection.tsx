@@ -5,68 +5,66 @@ import { ArrowRight, Terminal, ShieldAlert, AlertCircle, CheckCircle2, MessageSq
 
 export const HeroSection = () => {
   const hotKeywords = [
-    "LEETCODE-STYLE DSA (COMPANY-WISE)",
-    "CODEFORCES DIV 2/1",
-    "TIMED OA ROUND CRUCIBLE",
-    "SYSTEM DESIGN (LLD & HLD)",
-    "WEB DEVELOPMENT & MERN",
-    "CLOUD ARCHITECTURE",
-    "GPU ACCELERATION & CUDA",
-    "JAVA & C++ CONCURRENCY",
-    "PYTHON HIGH-THROUGHPUT",
+    "LeetCode-style DSA (company-wise)",
+    "Codeforces Div 2/1",
+    "Timed OA round crucible",
+    "System design (LLD & HLD)",
+    "Web development & MERN",
+    "Cloud architecture",
+    "GPU acceleration & CUDA",
+    "Java & C++ concurrency",
+    "Python high-throughput",
   ];
 
   return (
-    <section className="relative overflow-hidden pt-16 pb-24 border-b border-slate-300 bg-[#F1F4F9]">
-      <div className="max-w-6xl mx-auto px-6 text-center relative z-10">
-        
-        {/* Monospace System Pill */}
-        <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-white border border-slate-300 text-slate-900 text-xs font-mono font-bold tracking-wide shadow-sm">
-          <ShieldAlert className="h-4 w-4 text-primary shrink-0" />
-          <span>FULL-CYCLE INTERVIEW REHEARSAL INFRASTRUCTURE</span>
+    <section className="relative overflow-hidden pt-14 pb-20 border-b border-slate-200 bg-white">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-14 items-center">
+
+        {/* Left: message */}
+        <div className="text-left">
+          <div className="inline-flex items-center gap-2 mb-6 px-3.5 py-1.5 rounded-full bg-white border border-slate-300 text-slate-800 text-[13px] font-medium shadow-sm">
+            <ShieldAlert className="h-4 w-4 text-primary shrink-0" />
+            <span>Full-cycle interview rehearsal infrastructure</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-slate-950 font-sans leading-[1.1] text-balance">
+            The all-in-one, <span className="whitespace-nowrap">end-to-end</span> platform for{" "}
+            <span className="text-primary">real tech placements.</span>
+          </h1>
+
+          <p className="mt-6 text-base sm:text-lg text-slate-700 max-w-xl font-normal leading-relaxed">
+            The flight simulator built to rehearse every round of top tech hiring loops, from timed algorithmic OAs and hidden test suites to high-pressure architecture and Bar Raiser screens.
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-2">
+            {hotKeywords.map((item, idx) => (
+              <span
+                key={idx}
+                className="px-3 py-1.5 rounded-md border border-slate-300 bg-white text-slate-800 text-[13px] font-medium cursor-default"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+            <Link href="/login?next=/hub">
+              <Button size="lg" className="w-full sm:w-auto px-8 py-6 gap-2 shadow-sm text-base font-semibold bg-primary hover:bg-primary-hover text-white">
+                Start placement simulation <ArrowRight className="h-5 w-5" />
+              </Button>
+            </Link>
+            <a href="/login?next=/tracks">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base font-semibold border border-slate-300 bg-white hover:bg-slate-50 text-slate-950">
+                Explore 50+ company tracks
+              </Button>
+            </a>
+          </div>
         </div>
 
-        {/* Option C Main Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-950 font-sans leading-[1.1] max-w-5xl mx-auto">
-          The All-in-One, End-to-End Platform for{" "}
-          <span className="text-primary">
-            Real Tech Placements.
-          </span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="mt-7 text-lg sm:text-xl text-slate-700 max-w-3xl mx-auto font-normal leading-relaxed">
-          The flight simulator built to rehearse every round of top tech hiring loops, from timed algorithmic OAs and hidden test suites to high-pressure architecture and Bar Raiser screens.
-        </p>
-
-        {/* High-Impact Eye-Catching Keyword Badges */}
-        <div className="mt-10 flex flex-wrap justify-center gap-3.5 max-w-5xl mx-auto">
-          {hotKeywords.map((item, idx) => (
-            <span
-              key={idx}
-              className="px-5 py-3 rounded-xl border-2 border-slate-900 bg-white text-slate-950 text-sm sm:text-base font-mono font-black tracking-wide shadow-sm cursor-default"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-
-        {/* CTAs */}
-        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link href="/login?next=/hub">
-            <Button size="lg" className="w-full sm:w-auto px-9 py-6 gap-2 shadow-md text-base sm:text-lg font-bold bg-primary hover:bg-primary-hover text-white">
-              Start Placement Simulation <ArrowRight className="h-5 w-5" />
-            </Button>
-          </Link>
-          <a href="/login?next=/tracks">
-            <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base sm:text-lg font-bold border-2 border-slate-900 bg-white hover:bg-slate-50 text-slate-950 shadow-sm">
-              Explore 50+ Company Tracks
-            </Button>
-          </a>
-        </div>
-
+        {/* Right: live interview snapshot (unchanged content and colours) */}
+        <div className="min-w-0">
         {/* Technical Proctor & Viva Simulator Card */}
-        <div className="mt-16 max-w-4xl mx-auto rounded-xl border-2 border-slate-400 bg-white shadow-md overflow-hidden text-left">
+        <div className="w-full rounded-xl border border-slate-300 bg-white shadow-lg overflow-hidden text-left">
           {/* Header Bar */}
           <div className="bg-[#0F172A] px-6 py-4 flex items-center justify-between border-b-2 border-slate-800">
             <span className="hidden sm:block w-10" aria-hidden="true" />
@@ -134,6 +132,8 @@ export const HeroSection = () => {
               </div>
             </div>
           </div>
+        </div>
+
         </div>
 
       </div>

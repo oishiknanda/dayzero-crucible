@@ -7,17 +7,17 @@ export const TrackPreview = () => {
   const steps = [
     {
       num: "01",
-      title: "Select Difficulty & Target Loop",
+      title: "Select difficulty & target loop",
       desc: "Pick your desired technical difficulty level (SDE-1, SDE-2, or Specialist). The platform dynamically seeds past-year company problem sets and evaluation criteria."
     },
     {
       num: "02",
-      title: "Undergo Proctor Lockdown",
+      title: "Undergo proctor lockdown",
       desc: "Enter full-screen mode with camera checks, tab monitoring, and live voice evaluation active in the background."
     },
     {
       num: "03",
-      title: "Receive Exhaustive Diagnostic",
+      title: "Receive exhaustive diagnostic",
       desc: "Get an AST code-quality analysis, STAR behavioral breakdown, and a clear Pass/Bar-Raiser decision before you face the real hiring panel."
     }
   ];
@@ -81,20 +81,20 @@ export const TrackPreview = () => {
   return (
     <div id="pipeline" className="border-b-2 border-slate-300 bg-white">
       {/* 3-Step Pipeline */}
-      <section className="py-24 border-b-2 border-slate-300 bg-white">
+      <section className="py-24 border-b border-slate-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight font-sans">
-            Simulation Pipeline in Three Direct Steps
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-950 tracking-tight font-sans text-balance">
+            Simulation pipeline in three direct steps
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-700 max-w-2xl mx-auto font-medium">
             Experience the complete placement loop end-to-end under genuine test conditions.
           </p>
 
-          <div className="mt-14 grid grid-cols-1 overflow-hidden rounded-xl border-2 border-slate-300 bg-slate-50 text-left md:grid-cols-3 md:divide-x-2 divide-y-2 md:divide-y-0 divide-slate-300">
+          <div className="mt-14 grid grid-cols-1 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 text-left md:grid-cols-3 md:divide-x divide-y md:divide-y-0 divide-slate-200">
             {steps.map((s, idx) => (
               <div key={idx} className="p-8">
-                <span className="font-mono text-sm font-black text-primary">{s.num}</span>
-                <h3 className="mt-3 text-xl font-black text-slate-950">{s.title}</h3>
+                <span className="text-sm font-semibold text-primary">{s.num}</span>
+                <h3 className="mt-3 text-xl font-bold text-slate-950">{s.title}</h3>
                 <p className="mt-3 text-sm text-slate-700 leading-relaxed font-normal">{s.desc}</p>
               </div>
             ))}

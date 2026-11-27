@@ -5,45 +5,45 @@ import { Zap } from "lucide-react";
 export const FeatureCards = () => {
   const features = [
     {
-      badgeText: "STRICT BROWSER ISOLATION",
+      badgeText: "Strict browser isolation",
       badgeVariant: "purple" as const,
       num: "01.",
-      title: "Anti-Cheat & Full-Screen Lockdown",
+      title: "Anti-cheat & full-screen lockdown",
       desc: "Casual practice creates false confidence. DAY-ZERO enforces genuine online assessment constraints: secondary monitor blackouts, tab-switch penalties, clipboard suppression, and automated session forfeiture on threshold violations.",
       highlight: "Eliminates tab-switching habits and conditions candidates under authentic enterprise proctoring."
     },
     {
-      badgeText: "REAL-TIME SPEECH SYNTHESIS",
-      badgeVariant: "blue" as const,
+      badgeText: "Real-time speech synthesis",
+      badgeVariant: "purple" as const,
       num: "02.",
-      title: "Active AI Voice Viva Interruption",
+      title: "Active AI voice viva interruption",
       desc: "Top companies reject silent coders. As you outline algorithms or type data structures, an aggressive AI evaluator intervenes via audio to challenge your edge cases, force oral Big-O dry runs, and test trade-off decisions.",
       highlight: "Forces engineers to articulate technical tradeoffs verbally under real-time cognitive pressure."
     },
     {
-      badgeText: "L4 / L5 CODE QUALITY STANDARDS",
-      badgeVariant: "amber" as const,
+      badgeText: "L4 / L5 code quality standards",
+      badgeVariant: "purple" as const,
       num: "03.",
-      title: "Clean Code & Static AST Analysis",
+      title: "Clean code & static AST analysis",
       desc: "Passing tests is only table stakes. Our engine inspects your Abstract Syntax Tree to identify memory leaks, unnecessary allocations, poor variable semantics, and missing modular architecture before you submit.",
       highlight: "Ensures code meets enterprise engineering standards, beyond basic competitive programming tricks."
     },
     {
-      badgeText: "STAR REASONING FRAMEWORK",
-      badgeVariant: "green" as const,
+      badgeText: "STAR reasoning framework",
+      badgeVariant: "purple" as const,
       num: "04.",
-      title: "Bar Raiser Behavioral Cross-Examination",
+      title: "Bar Raiser behavioral cross-examination",
       desc: "Vague stories get candidates rejected immediately. The behavioral module enforces strict Amazon Leadership Principles and Microsoft Growth Mindset standards, probing timeline specifics and challenging unverified resume claims.",
       highlight: "Deconstructs vague claims to ensure behavioral answers survive senior interviewer skepticism."
     }
   ];
 
   return (
-    <section id="features" className="py-24 border-b-2 border-slate-300 bg-[#EAEFF6]">
+    <section id="features" className="py-24 border-b border-slate-200 bg-slate-50">
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight font-sans">
-            Why Top Candidates Can&apos;t Resist This
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-950 tracking-tight font-sans text-balance">
+            Why top candidates can&apos;t resist this
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-700 leading-relaxed font-medium">
             Mock quizzes don&apos;t prepare you for live interview tension. DAY-ZERO simulates the genuine cognitive load, proctoring penalties, and spontaneous verbal scrutiny of top tech hiring loops.
@@ -54,15 +54,15 @@ export const FeatureCards = () => {
           {features.map((item, idx) => (
             <div
               key={idx}
-              className="p-8 rounded-xl bg-white border-2 border-slate-300 shadow-sm hover:border-slate-800 transition-colors duration-200 flex flex-col justify-between"
+              className="p-8 rounded-xl bg-white border border-slate-200 shadow-sm hover:border-slate-400 transition-colors duration-200 flex flex-col justify-between"
             >
               <div>
                 <div className="mb-4">
-                  <Badge variant={item.badgeVariant}>{item.badgeText}</Badge>
+                  <Badge variant={item.badgeVariant} className="font-sans text-xs normal-case tracking-normal font-medium">{item.badgeText}</Badge>
                 </div>
 
-                <h3 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight mb-3">
-                  <span className="font-mono text-primary mr-2">{item.num}</span>
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-950 tracking-tight mb-3">
+                  <span className="text-primary mr-2">{item.num}</span>
                   {item.title}
                 </h3>
 
@@ -71,9 +71,9 @@ export const FeatureCards = () => {
                 </p>
               </div>
 
-              <div className="mt-6 p-4 rounded-xl bg-slate-100 border-2 border-slate-300 flex items-start gap-3">
-                <Zap className="h-4 w-4 text-amber-500 fill-amber-500 shrink-0 mt-0.5" />
-                <span className="text-xs sm:text-[13px] font-mono text-slate-900 font-bold leading-snug">
+              <div className="mt-6 p-4 rounded-lg bg-slate-50 border border-slate-200 flex items-start gap-3">
+                <Zap className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                <span className="text-sm text-slate-800 font-medium leading-snug">
                   {item.highlight}
                 </span>
               </div>
