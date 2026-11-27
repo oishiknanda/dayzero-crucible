@@ -688,6 +688,31 @@ export default function CrucibleCockpitPage() {
     speakText(text);
   }, [speakText]);
 
+  // Voice hygiene: never keep talking after the candidate leaves the interview (back arrow, close, navigate away).
+  useEffect(() => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    const stop = () => { try { window.speechSynthesis.cancel(); } catch { /* ignore */ } };
+    window.addEventListener("pagehide", stop);
+    window.addEventListener("beforeunload", stop);
+    window.addEventListener("popstate", stop);
+    return () => {
+      window.removeEventListener("pagehide", stop);
+      window.removeEventListener("beforeunload", stop);
+      window.removeEventListener("popstate", stop);
+      stop();
+    };
+  }, []);
+
+  // Speak the opening message of every round (and the Question 2 intro) once, like all later AI messages.
+  const spokenOpeningRef = useRef<string>("");
+  useEffect(() => {
+    if (!proctorGateReady || proctorFailed || dialogue.length !== 1) return;
+    const first = dialogue[0];
+    if (first.sender !== "ai" || spokenOpeningRef.current === first.id) return;
+    const timer = window.setTimeout(() => { spokenOpeningRef.current = first.id; speakText(first.text); }, 700);
+    return () => window.clearTimeout(timer);
+  }, [proctorGateReady, proctorFailed, dialogue, speakText]);
+
   const paragraphs = problem?.paragraphs || [];
   const bulletPoints = problem?.bulletPoints || [];
   const examples = (problem?.examples || []) as any[];
