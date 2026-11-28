@@ -1,7 +1,5 @@
 import React from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
-import { ArrowRight, Terminal, ShieldAlert, AlertCircle, CheckCircle2, MessageSquare, CircleCheck } from "lucide-react";
+import { Terminal, ShieldAlert, AlertCircle, CheckCircle2, MessageSquare, CircleCheck } from "lucide-react";
 
 export const HeroSection = () => {
   const hotKeywords = [
@@ -70,17 +68,9 @@ export const HeroSection = () => {
             ))}
           </div>
 
-          <div className="mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
-            <Link href="/login?next=/hub">
-              <Button size="lg" className="w-full sm:w-auto px-8 py-6 gap-2 shadow-sm text-base font-semibold bg-primary hover:bg-primary-hover text-white">
-                Start placement simulation <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <a href="/login?next=/tracks">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto px-8 py-6 text-base font-semibold border border-slate-300 bg-white hover:bg-slate-50 text-slate-950">
-                Explore 50+ company tracks
-              </Button>
-            </a>
+          <div className="mt-9 space-y-1.5 max-w-xl">
+            <p className="text-base font-semibold text-slate-900">Every round is timed and ends with a scorecard.</p>
+            <p className="text-base font-medium text-slate-700">Pick a company from the 50+ tech tracks menu above to begin.</p>
           </div>
         </div>
 
