@@ -24,7 +24,7 @@ export const HeroSection = () => {
 
   return (
     <section className="relative overflow-hidden pt-8 pb-16 border-b border-slate-200 bg-white">
-      <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-12 items-start">
+      <div className="max-w-[84rem] mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] xl:grid-cols-[1fr_620px] gap-12 lg:gap-12 items-start">
 
         {/* Left: message */}
         <div className="text-left">
