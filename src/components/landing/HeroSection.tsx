@@ -24,7 +24,7 @@ export const HeroSection = () => {
 
   return (
     <section className="relative overflow-hidden pt-8 pb-16 border-b border-slate-200 bg-white">
-      <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 lg:gap-14 items-center">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-12 items-start">
 
         {/* Left: message */}
         <div className="text-left">
@@ -92,12 +92,12 @@ export const HeroSection = () => {
           </div>
 
           {/* Test Case & Problem Banner */}
-          <div className="p-7 bg-[#F8FAFC] border-b border-slate-300">
+          <div className="p-8 bg-[#F8FAFC] border-b border-slate-300">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b-2 border-slate-200">
               <div>
                 <div className="flex items-center gap-2.5">
                   <span className="px-2.5 py-1 rounded-md bg-rose-100 text-rose-900 text-xs font-mono font-extrabold border-2 border-rose-300">HARD</span>
-                  <h4 className="text-lg font-black text-slate-950 font-sans tracking-tight">Problem #654: Maximum Subarray Segment Tree Query</h4>
+                  <h4 className="text-xl font-black text-slate-950 font-sans tracking-tight">Problem #654: Maximum Subarray Segment Tree Query</h4>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-700 font-mono font-semibold mt-1.5">Constraint: N ≤ 2×10⁵, Queries ≤ 10⁵, Time Limit: 2.0s</p>
               </div>
@@ -121,25 +121,25 @@ export const HeroSection = () => {
               </div>
 
               {/* Prompt 1 */}
-              <div className="p-4 rounded-xl bg-white border-2 border-slate-300 shadow-sm flex items-start gap-3.5 hover:border-slate-500 transition-colors">
+              <div className="p-5 rounded-xl bg-white border-2 border-slate-300 shadow-sm flex items-start gap-3.5 hover:border-slate-500 transition-colors">
                 <span className="text-xs font-mono font-black bg-amber-100 text-amber-950 px-2.5 py-1 rounded-md border border-amber-300 shrink-0 mt-0.5">VIVA 01</span>
-                <p className="text-xs sm:text-sm text-slate-900 font-semibold leading-relaxed">
+                <p className="text-sm sm:text-[15px] text-slate-900 font-semibold leading-relaxed">
                   &ldquo;You are getting TLE on test cases 16–20. Your current push-up logic recomputes prefix sums redundantly. Can you optimize this to <span className="font-mono text-indigo-700 font-extrabold underline decoration-indigo-300">O(log N)</span> per query using tree-node caching?&rdquo;
                 </p>
               </div>
 
               {/* Prompt 2 */}
-              <div className="p-4 rounded-xl bg-white border-2 border-slate-300 shadow-sm flex items-start gap-3.5 hover:border-slate-500 transition-colors">
+              <div className="p-5 rounded-xl bg-white border-2 border-slate-300 shadow-sm flex items-start gap-3.5 hover:border-slate-500 transition-colors">
                 <span className="text-xs font-mono font-black bg-indigo-100 text-indigo-950 px-2.5 py-1 rounded-md border border-indigo-300 shrink-0 mt-0.5">VIVA 02</span>
-                <p className="text-xs sm:text-sm text-slate-900 font-semibold leading-relaxed">
+                <p className="text-sm sm:text-[15px] text-slate-900 font-semibold leading-relaxed">
                   &ldquo;Defend your auxiliary space complexity. If memory is restricted to 64MB on the proctored runtime, will your recursive stack cause a segmentation fault on skewed inputs?&rdquo;
                 </p>
               </div>
 
               {/* Prompt 3 */}
-              <div className="p-4 rounded-xl bg-white border-2 border-slate-300 shadow-sm flex items-start gap-3.5 hover:border-slate-500 transition-colors">
+              <div className="p-5 rounded-xl bg-white border-2 border-slate-300 shadow-sm flex items-start gap-3.5 hover:border-slate-500 transition-colors">
                 <span className="text-xs font-mono font-black bg-emerald-100 text-emerald-950 px-2.5 py-1 rounded-md border border-emerald-300 shrink-0 mt-0.5">VIVA 03</span>
-                <p className="text-xs sm:text-sm text-slate-900 font-semibold leading-relaxed">
+                <p className="text-sm sm:text-[15px] text-slate-900 font-semibold leading-relaxed">
                   &ldquo;Suppose this query engine serves 10,000 concurrent requests in production. How would you redesign this in memory using read-write locks or lock-free atomics?&rdquo;
                 </p>
               </div>
